@@ -9,7 +9,7 @@ import { FullScreenLoader } from "@/components/FullScreenLoader";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import type { Visit } from "@/types/database";
 
-type VisitRow = Visit & { shops: { shop_name: string; shop_number: string } | null };
+type VisitRow = Visit & { shops: { shop_name: string; shop_number: string | null } | null };
 
 function startOfToday() {
   const d = new Date();
@@ -86,7 +86,7 @@ export function MyVisits() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="font-semibold text-gray-900">{visit.shops?.shop_name}</p>
-                <p className="text-sm text-gray-500">#{visit.shops?.shop_number}</p>
+                {visit.shops?.shop_number && <p className="text-sm text-gray-500">#{visit.shops.shop_number}</p>}
               </div>
               <span
                 className={`rounded-full px-2 py-1 text-xs font-semibold ${

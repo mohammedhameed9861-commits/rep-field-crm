@@ -7,13 +7,13 @@ import { useAuth } from "@/lib/auth";
 import { getCurrentPosition, type GpsPosition } from "@/lib/geolocation";
 import { ShopPicker } from "@/components/ShopPicker";
 import { PhotoCapture } from "@/components/PhotoCapture";
-import { ProductPicker, type CartItem } from "@/components/ProductPicker";
+import { ProductPicker, cartTotal, type CartItem } from "@/components/ProductPicker";
 import { Button } from "@/components/Button";
 import type { NoSaleReason, Shop, ShopClassification } from "@/types/database";
 
 type ShopSelection =
   | Shop
-  | { shop_name: string; shop_number: string; isNew: true; classification?: ShopClassification | null }
+  | { shop_name: string; shop_number: string | null; isNew: true; classification?: ShopClassification | null }
   | null;
 
 const NO_SALE_REASON_VALUES: NoSaleReason[] = [
@@ -42,6 +42,8 @@ export function NewVisit() {
   const [photoOutside, setPhotoOutside] = useState<File | null>(null);
   const [outcome, setOutcome] = useState<"sold" | "no_sale" | null>(null);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [finalAmount, setFinalAmount] = useState("");
+  const [finalAmountTouched, setFinalAmountTouched] = useState(false);
   const [noSaleReason, setNoSaleReason] = useState<NoSaleReason | "">("");
   const [noSaleNote, setNoSaleNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -50,6 +52,13 @@ export function NewVisit() {
   useEffect(() => {
     requestGps();
   }, []);
+
+  useEffect(() => {
+    if (!finalAmountTouched) {
+      const total = cartTotal(cartItems);
+      setFinalAmount(total > 0 ? String(total) : "");
+    }
+  }, [cartItems, finalAmountTouched]);
 
   function requestGps() {
     setGpsLoading(true);
@@ -60,12 +69,18 @@ export function NewVisit() {
       .finally(() => setGpsLoading(false));
   }
 
+  const finalAmountNumber = Number(finalAmount);
   const canSubmit =
     !!shop &&
     !!gps &&
     !!photoInside &&
     !!photoOutside &&
-    ((outcome === "sold" && cartItems.length > 0) || (outcome === "no_sale" && noSaleReason !== ""));
+    ((outcome === "sold" &&
+      cartItems.length > 0 &&
+      finalAmount.trim() !== "" &&
+      !Number.isNaN(finalAmountNumber) &&
+      finalAmountNumber > 0) ||
+      (outcome === "no_sale" && noSaleReason !== ""));
 
   async function handleSubmit() {
     if (!canSubmit || !profile || !gps || !photoInside || !photoOutside || !shop) return;
@@ -112,7 +127,12 @@ export function NewVisit() {
           p_photo_outside_url: outsidePath,
           p_gps_lat: gps.lat,
           p_gps_lng: gps.lng,
-          p_items: cartItems.map((i) => ({ product_id: i.product.id, quantity: i.quantity })),
+          p_items: cartItems.map((i) =>
+            i.kind === "catalog"
+              ? { product_id: i.product.id, custom_name: null, quantity: i.quantity, unit_price: null }
+              : { product_id: null, custom_name: i.name, quantity: i.quantity, unit_price: i.unitPrice },
+          ),
+          p_final_amount: finalAmountNumber,
         });
         if (rpcError) throw rpcError;
       } else {
@@ -217,8 +237,40 @@ export function NewVisit() {
           </div>
 
           {outcome === "sold" && (
-            <div className="mt-4">
+            <div className="mt-4 space-y-4">
               <ProductPicker items={cartItems} onItemsChange={setCartItems} />
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="final-amount">
+                  {t("newVisit.finalAmount")}
+                </label>
+                <input
+                  id="final-amount"
+                  type="number"
+                  inputMode="decimal"
+                  min="0.01"
+                  step="0.01"
+                  value={finalAmount}
+                  onChange={(e) => {
+                    setFinalAmount(e.target.value);
+                    setFinalAmountTouched(true);
+                  }}
+                  placeholder="0.00"
+                  className="tap-target w-full rounded-xl border border-gray-300 px-4 text-base"
+                />
+                <div className="mt-1 flex items-center justify-between">
+                  <p className="text-xs text-gray-400">{t("newVisit.finalAmountHint")}</p>
+                  {finalAmountTouched && cartItems.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setFinalAmountTouched(false)}
+                      className="shrink-0 text-xs font-medium text-brand-600 underline"
+                    >
+                      {t("newVisit.resetToCartTotal")}
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 

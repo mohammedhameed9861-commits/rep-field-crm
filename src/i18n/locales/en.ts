@@ -46,6 +46,9 @@ export default {
     genericError: "Something went wrong. Please try again.",
     couldNotCreateShop: "Could not create shop",
     needAtLeastOneItem: "Add at least one product to record a sale",
+    finalAmount: "Final invoice amount",
+    finalAmountHint: "Pre-filled from the items above — edit it if the agreed price is different.",
+    resetToCartTotal: "Reset to items total",
   },
   productPicker: {
     searchPlaceholder: "Type a product name...",
@@ -59,6 +62,9 @@ export default {
     total: "Total",
     addedItems: "Items",
     noItemsYet: "No products added yet",
+    addCustom: "Add \"{{name}}\" as a new item",
+    customPricePlaceholder: "Price for this item",
+    custom: "not in catalog",
   },
   photoCapture: {
     captured: "Captured",
@@ -71,7 +77,7 @@ export default {
     searching: "Searching...",
     newShop: "New shop not listed",
     shopName: "Shop name",
-    shopNumber: "Shop number / code",
+    shopNumber: "Shop number / code (optional)",
     useThisShop: "Use this shop",
   },
   noSaleReasons: {
@@ -190,7 +196,7 @@ export default {
     save: "Save",
     creating: "Creating...",
     bulkImport: "Bulk import",
-    bulkImportHint: "Upload a .csv or .xlsx file with columns: name, price, stock_quantity, and optionally sku. Rows with a matching sku update that product; rows without one are added as new.",
+    bulkImportHint: "Upload a .csv or .xlsx file with columns: name, price, stock_quantity, and optionally sku and image_url (a link to an already-hosted photo — embedded pictures inside the file aren't supported). Rows with a matching sku update that product; rows without one are added as new.",
     chooseFile: "Choose file",
     parsing: "Reading file...",
     previewTitle: "Preview ({{count}} rows)",

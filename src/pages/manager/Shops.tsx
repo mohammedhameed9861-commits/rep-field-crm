@@ -61,7 +61,7 @@ export function Shops() {
           >
             <div>
               <p className="font-medium text-gray-900">{shop.shop_name}</p>
-              <p className="text-sm text-gray-500">#{shop.shop_number}</p>
+              {shop.shop_number && <p className="text-sm text-gray-500">#{shop.shop_number}</p>}
             </div>
             <ClassificationBadge classification={shop.classification} />
           </Link>

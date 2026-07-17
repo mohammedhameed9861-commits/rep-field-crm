@@ -39,7 +39,7 @@ export function ShopDetail() {
           <ClassificationBadge classification={shop.classification} />
         </div>
         <p className="text-sm text-gray-500">
-          #{shop.shop_number}
+          {shop.shop_number && `#${shop.shop_number}`}
           {shop.lat != null && shop.lng != null && ` · ${shop.lat}, ${shop.lng}`}
         </p>
       </div>

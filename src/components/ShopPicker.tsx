@@ -7,7 +7,7 @@ import type { Shop, ShopClassification } from "@/types/database";
 
 type ShopSelection =
   | Shop
-  | { shop_name: string; shop_number: string; isNew: true; classification?: ShopClassification | null };
+  | { shop_name: string; shop_number: string | null; isNew: true; classification?: ShopClassification | null };
 
 interface Props {
   selected: ShopSelection | null;
@@ -67,7 +67,7 @@ export function ShopPicker({ selected, onSelect }: Props) {
             <Check className="h-5 w-5 shrink-0 text-brand-600" />
             <div>
               <p className="font-semibold text-gray-900">{selected.shop_name}</p>
-              <p className="text-sm text-gray-500">#{selected.shop_number}</p>
+              {selected.shop_number && <p className="text-sm text-gray-500">#{selected.shop_number}</p>}
             </div>
           </div>
           <button type="button" onClick={() => onSelect(null)} className="text-sm font-medium text-brand-600">
@@ -123,7 +123,7 @@ export function ShopPicker({ selected, onSelect }: Props) {
                 <Store className="h-5 w-5 shrink-0 text-gray-400" />
                 <span>
                   <span className="block font-medium text-gray-900">{shop.shop_name}</span>
-                  <span className="block text-sm text-gray-500">#{shop.shop_number}</span>
+                  {shop.shop_number && <span className="block text-sm text-gray-500">#{shop.shop_number}</span>}
                 </span>
               </button>
             </li>
@@ -155,9 +155,9 @@ export function ShopPicker({ selected, onSelect }: Props) {
           />
           <Button
             type="button"
-            disabled={!newName.trim() || !newNumber.trim()}
+            disabled={!newName.trim()}
             onClick={() =>
-              onSelect({ shop_name: newName.trim(), shop_number: newNumber.trim(), isNew: true })
+              onSelect({ shop_name: newName.trim(), shop_number: newNumber.trim() || null, isNew: true })
             }
           >
             {t("shopPicker.useThisShop")}

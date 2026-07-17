@@ -34,7 +34,7 @@ export type Profile = {
 export type Shop = {
   id: string;
   shop_name: string;
-  shop_number: string;
+  shop_number: string | null;
   lat: number | null;
   lng: number | null;
   classification: ShopClassification | null;
@@ -83,7 +83,8 @@ export type Product = {
 export type OrderItem = {
   id: string;
   visit_id: string;
-  product_id: string;
+  product_id: string | null;
+  custom_name: string | null;
   quantity: number;
   unit_price: number;
   line_total: number;
@@ -123,7 +124,7 @@ export type Database = {
       };
       shops: {
         Row: Shop;
-        Insert: Partial<Shop> & { shop_name: string; shop_number: string };
+        Insert: Partial<Shop> & { shop_name: string };
         Update: Partial<Shop>;
         Relationships: [
           {
@@ -202,7 +203,6 @@ export type Database = {
         Row: OrderItem;
         Insert: Partial<OrderItem> & {
           visit_id: string;
-          product_id: string;
           quantity: number;
           unit_price: number;
         };
@@ -272,7 +272,13 @@ export type Database = {
           p_photo_outside_url: string;
           p_gps_lat: number;
           p_gps_lng: number;
-          p_items: { product_id: string; quantity: number }[];
+          p_items: {
+            product_id: string | null;
+            custom_name: string | null;
+            quantity: number;
+            unit_price: number | null;
+          }[];
+          p_final_amount: number;
         };
         Returns: string;
       };

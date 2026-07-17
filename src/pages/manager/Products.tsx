@@ -103,9 +103,16 @@ export function Products() {
     setImporting(true);
     setError(null);
     try {
+      // Only touch image_url if the file actually had an image column —
+      // otherwise a stock/price-only re-import would wipe out photos
+      // added manually through the table below.
+      const hasImageColumn = parsedRows.some((r) => r.image_url !== null);
+      const payload = hasImageColumn
+        ? parsedRows
+        : parsedRows.map((r) => ({ name: r.name, price: r.price, stock_quantity: r.stock_quantity, sku: r.sku }));
       const { error: upsertErr } = await supabase
         .from("products")
-        .upsert(parsedRows, { onConflict: "sku" });
+        .upsert(payload, { onConflict: "sku" });
       if (upsertErr) throw new Error(upsertErr.message);
       setImportSuccess(t("products.importSuccess", { count: parsedRows.length }));
       setParsedRows(null);
@@ -249,6 +256,7 @@ export function Products() {
               <table className="w-full text-start text-sm">
                 <thead className="bg-gray-50 text-gray-500">
                   <tr>
+                    <th className="px-3 py-2">{t("products.image")}</th>
                     <th className="px-3 py-2">{t("products.name")}</th>
                     <th className="px-3 py-2">{t("products.sku")}</th>
                     <th className="px-3 py-2">{t("products.price")}</th>
@@ -258,6 +266,13 @@ export function Products() {
                 <tbody className="divide-y divide-gray-100">
                   {parsedRows.slice(0, 50).map((row, i) => (
                     <tr key={i}>
+                      <td className="px-3 py-2">
+                        {row.image_url ? (
+                          <img src={row.image_url} alt="" className="h-8 w-8 rounded object-cover" />
+                        ) : (
+                          "—"
+                        )}
+                      </td>
                       <td className="px-3 py-2">{row.name}</td>
                       <td className="px-3 py-2 text-gray-500">{row.sku ?? "—"}</td>
                       <td className="px-3 py-2">{row.price}</td>

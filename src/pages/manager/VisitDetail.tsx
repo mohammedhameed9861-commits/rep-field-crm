@@ -60,7 +60,7 @@ export function VisitDetail() {
         <div className="mb-4 flex items-start justify-between">
           <div>
             <h2 className="text-xl font-bold text-gray-900">{shop.shop_name}</h2>
-            <p className="text-sm text-gray-500">#{shop.shop_number}</p>
+            {shop.shop_number && <p className="text-sm text-gray-500">#{shop.shop_number}</p>}
           </div>
           <span
             className={`rounded-full px-3 py-1 text-sm font-semibold ${
@@ -121,7 +121,9 @@ export function VisitDetail() {
                 <tbody className="divide-y divide-gray-100">
                   {orderItems.map((item) => (
                     <tr key={item.id}>
-                      <td className="px-3 py-2 font-medium text-gray-900">{item.products?.name}</td>
+                      <td className="px-3 py-2 font-medium text-gray-900">
+                        {item.products?.name ?? item.custom_name}
+                      </td>
                       <td className="px-3 py-2">{item.quantity}</td>
                       <td className="px-3 py-2">{item.unit_price.toLocaleString()}</td>
                       <td className="px-3 py-2">{item.line_total.toLocaleString()}</td>

@@ -48,6 +48,9 @@ const ar: typeof en = {
     genericError: "حدث خطأ ما. يرجى المحاولة مجددًا.",
     couldNotCreateShop: "تعذّر إنشاء المتجر",
     needAtLeastOneItem: "أضف منتجًا واحدًا على الأقل لتسجيل عملية بيع",
+    finalAmount: "المبلغ النهائي للفاتورة",
+    finalAmountHint: "مُعبّأ مسبقًا من الأصناف أعلاه — عدّله إذا كان السعر المتفق عليه مختلفًا.",
+    resetToCartTotal: "إعادة التعيين إلى إجمالي الأصناف",
   },
   productPicker: {
     searchPlaceholder: "اكتب اسم المنتج...",
@@ -61,6 +64,9 @@ const ar: typeof en = {
     total: "الإجمالي",
     addedItems: "الأصناف",
     noItemsYet: "لم تتم إضافة أي منتج بعد",
+    addCustom: "إضافة \"{{name}}\" كصنف جديد",
+    customPricePlaceholder: "سعر هذا الصنف",
+    custom: "غير مدرج في الكتالوج",
   },
   photoCapture: {
     captured: "تم الالتقاط",
@@ -73,7 +79,7 @@ const ar: typeof en = {
     searching: "جارِ البحث...",
     newShop: "متجر جديد غير مدرج",
     shopName: "اسم المتجر",
-    shopNumber: "رقم / كود المتجر",
+    shopNumber: "رقم / كود المتجر (اختياري)",
     useThisShop: "استخدام هذا المتجر",
   },
   noSaleReasons: {
@@ -193,7 +199,7 @@ const ar: typeof en = {
     creating: "جارِ الإنشاء...",
     bulkImport: "استيراد جماعي",
     bulkImportHint:
-      "ارفع ملف .csv أو .xlsx يحتوي على الأعمدة: name, price, stock_quantity، ويمكن إضافة sku اختياريًا. الصفوف التي يتطابق فيها sku تُحدّث المنتج، والصفوف الجديدة تُضاف كمنتجات جديدة.",
+      "ارفع ملف .csv أو .xlsx يحتوي على الأعمدة: name, price, stock_quantity، ويمكن إضافة sku و image_url اختياريًا (رابط لصورة مستضافة مسبقًا — الصور المُضمّنة داخل الملف نفسه غير مدعومة). الصفوف التي يتطابق فيها sku تُحدّث المنتج، والصفوف الجديدة تُضاف كمنتجات جديدة.",
     chooseFile: "اختيار ملف",
     parsing: "جارِ قراءة الملف...",
     previewTitle: "معاينة ({{count}} صف)",

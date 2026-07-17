@@ -7,7 +7,7 @@ import { FullScreenLoader } from "@/components/FullScreenLoader";
 import { PhotoThumb } from "@/components/PhotoThumb";
 import type { Profile, Visit } from "@/types/database";
 
-type VisitRow = Visit & { shops: { shop_name: string; shop_number: string } | null };
+type VisitRow = Visit & { shops: { shop_name: string; shop_number: string | null } | null };
 
 export function RepDetail() {
   const { t } = useTranslation();
