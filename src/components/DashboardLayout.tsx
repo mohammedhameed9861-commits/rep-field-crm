@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { LayoutDashboard, Users, Store, Package, UserCog, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, Store, Package, Receipt, UserCog, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import clsx from "clsx";
@@ -10,6 +10,7 @@ const NAV = [
   { to: "/dashboard/reps", key: "nav.reps", icon: Users },
   { to: "/dashboard/shops", key: "nav.shops", icon: Store },
   { to: "/dashboard/products", key: "nav.products", icon: Package },
+  { to: "/dashboard/invoices", key: "nav.invoices", icon: Receipt },
   { to: "/dashboard/reps/manage", key: "nav.manage", icon: UserCog },
 ] as const;
 
@@ -56,14 +57,14 @@ export function DashboardLayout() {
         <Outlet />
       </main>
 
-      <nav className="fixed inset-x-0 bottom-0 flex border-t border-gray-200 bg-white md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 flex overflow-x-auto border-t border-gray-200 bg-white md:hidden">
         {NAV.map(({ to, key, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
             className={({ isActive }) =>
               clsx(
-                "flex flex-1 flex-col items-center gap-1 py-2 text-xs",
+                "flex min-w-[64px] flex-1 flex-col items-center gap-1 py-2 text-xs",
                 isActive ? "text-brand-700" : "text-gray-500",
               )
             }

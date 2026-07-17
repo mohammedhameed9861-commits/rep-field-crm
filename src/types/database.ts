@@ -90,6 +90,25 @@ export type OrderItem = {
   created_at: string;
 };
 
+export type BatchStatus = "draft" | "prepared" | "sent";
+
+export type InvoiceBatch = {
+  id: string;
+  rep_id: string;
+  status: BatchStatus;
+  created_by: string | null;
+  created_at: string;
+  prepared_at: string | null;
+  sent_at: string | null;
+};
+
+export type InvoiceBatchItem = {
+  id: string;
+  batch_id: string;
+  invoice_id: string;
+  created_at: string;
+};
+
 export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5";
@@ -201,6 +220,41 @@ export type Database = {
             columns: ["product_id"];
             isOneToOne: false;
             referencedRelation: "products";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      invoice_batches: {
+        Row: InvoiceBatch;
+        Insert: Partial<InvoiceBatch> & { rep_id: string };
+        Update: Partial<InvoiceBatch>;
+        Relationships: [
+          {
+            foreignKeyName: "invoice_batches_rep_id_fkey";
+            columns: ["rep_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      invoice_batch_items: {
+        Row: InvoiceBatchItem;
+        Insert: Partial<InvoiceBatchItem> & { batch_id: string; invoice_id: string };
+        Update: Partial<InvoiceBatchItem>;
+        Relationships: [
+          {
+            foreignKeyName: "invoice_batch_items_batch_id_fkey";
+            columns: ["batch_id"];
+            isOneToOne: false;
+            referencedRelation: "invoice_batches";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "invoice_batch_items_invoice_id_fkey";
+            columns: ["invoice_id"];
+            isOneToOne: true;
+            referencedRelation: "invoices";
             referencedColumns: ["id"];
           },
         ];
