@@ -4,10 +4,12 @@ export interface GpsPosition {
   accuracy: number;
 }
 
+// message is a translation key (see i18n/locales/*.ts, "newVisit.*") — the
+// caller translates it, since this module has no access to i18next context.
 export function getCurrentPosition(): Promise<GpsPosition> {
   return new Promise((resolve, reject) => {
     if (!("geolocation" in navigator)) {
-      reject(new Error("GPS is not available on this device/browser."));
+      reject(new Error("newVisit.gpsNotSupported"));
       return;
     }
     navigator.geolocation.getCurrentPosition(
@@ -20,11 +22,7 @@ export function getCurrentPosition(): Promise<GpsPosition> {
       },
       (err) => {
         reject(
-          new Error(
-            err.code === err.PERMISSION_DENIED
-              ? "Location permission was denied. Enable it in your browser settings to log a visit."
-              : "Could not get your location. Move to an open area and try again.",
-          ),
+          new Error(err.code === err.PERMISSION_DENIED ? "newVisit.gpsPermissionDenied" : "newVisit.gpsUnavailable"),
         );
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },

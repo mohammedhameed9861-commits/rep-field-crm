@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { MapPin, AlertTriangle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
@@ -7,20 +8,28 @@ import { getCurrentPosition, type GpsPosition } from "@/lib/geolocation";
 import { ShopPicker } from "@/components/ShopPicker";
 import { PhotoCapture } from "@/components/PhotoCapture";
 import { Button } from "@/components/Button";
-import type { NoSaleReason, Shop } from "@/types/database";
+import type { NoSaleReason, Shop, ShopClassification } from "@/types/database";
 
-type ShopSelection = Shop | { shop_name: string; shop_number: string; isNew: true } | null;
+type ShopSelection =
+  | Shop
+  | { shop_name: string; shop_number: string; isNew: true; classification?: ShopClassification | null }
+  | null;
 
-const NO_SALE_REASONS: { value: NoSaleReason; label: string }[] = [
-  { value: "price", label: "Price too high" },
-  { value: "no_stock_need", label: "Doesn't need stock right now" },
-  { value: "competitor", label: "Using a competitor" },
-  { value: "closed", label: "Shop was closed" },
-  { value: "owner_absent", label: "Owner/buyer not present" },
-  { value: "other", label: "Other" },
+const NO_SALE_REASON_VALUES: NoSaleReason[] = [
+  "price",
+  "no_stock_need",
+  "competitor",
+  "no_cash",
+  "not_requested",
+  "delivery_problem",
+  "owner_absent",
+  "previous_complaint",
+  "credit_issue",
+  "other",
 ];
 
 export function NewVisit() {
+  const { t } = useTranslation();
   const { profile } = useAuth();
   const navigate = useNavigate();
 
@@ -73,11 +82,12 @@ export function NewVisit() {
             shop_number: shop.shop_number,
             lat: gps.lat,
             lng: gps.lng,
+            classification: shop.classification ?? null,
             created_by: profile.id,
           })
           .select()
           .single();
-        if (shopError || !createdShop) throw new Error(shopError?.message ?? "Could not create shop");
+        if (shopError || !createdShop) throw new Error(shopError?.message ?? t("newVisit.couldNotCreateShop"));
         shopId = createdShop.id;
       } else {
         shopId = shop.id;
@@ -111,7 +121,7 @@ export function NewVisit() {
 
       navigate("/my-visits", { replace: true });
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setSubmitError(err instanceof Error ? err.message : t("newVisit.genericError"));
     } finally {
       setSubmitting(false);
     }
@@ -120,47 +130,55 @@ export function NewVisit() {
   return (
     <div className="min-h-screen bg-gray-50 pb-28">
       <header className="sticky top-0 z-10 border-b border-gray-200 bg-white px-4 py-4">
-        <h1 className="text-lg font-bold text-gray-900">New Visit</h1>
+        <h1 className="text-lg font-bold text-gray-900">{t("newVisit.title")}</h1>
       </header>
 
       <div className="space-y-6 p-4">
         <section>
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">1. Shop</h2>
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">
+            {t("newVisit.stepShop")}
+          </h2>
           <ShopPicker selected={shop} onSelect={setShop} />
         </section>
 
         <section>
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">2. Location</h2>
-          {gpsLoading && <p className="text-sm text-gray-500">Getting your location...</p>}
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">
+            {t("newVisit.stepLocation")}
+          </h2>
+          {gpsLoading && <p className="text-sm text-gray-500">{t("newVisit.gettingLocation")}</p>}
           {gps && !gpsLoading && (
             <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-800">
               <MapPin className="h-5 w-5 shrink-0" />
-              Location captured (±{Math.round(gps.accuracy)}m)
+              {t("newVisit.locationCaptured", { accuracy: Math.round(gps.accuracy) })}
             </div>
           )}
           {gpsError && !gpsLoading && (
             <div className="space-y-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 shrink-0" />
-                {gpsError}
+                {t(gpsError)}
               </div>
               <button type="button" onClick={requestGps} className="font-semibold underline">
-                Try again
+                {t("newVisit.tryAgain")}
               </button>
             </div>
           )}
         </section>
 
         <section>
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">3. Photos</h2>
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">
+            {t("newVisit.stepPhotos")}
+          </h2>
           <div className="grid grid-cols-1 gap-3">
-            <PhotoCapture label="Photo inside" onCaptured={setPhotoInside} />
-            <PhotoCapture label="Photo outside" onCaptured={setPhotoOutside} />
+            <PhotoCapture label={t("newVisit.photoInside")} onCaptured={setPhotoInside} />
+            <PhotoCapture label={t("newVisit.photoOutside")} onCaptured={setPhotoOutside} />
           </div>
         </section>
 
         <section>
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">4. Outcome</h2>
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">
+            {t("newVisit.stepOutcome")}
+          </h2>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
@@ -171,7 +189,7 @@ export function NewVisit() {
                   : "border-gray-200 text-gray-600"
               }`}
             >
-              Sold
+              {t("newVisit.sold")}
             </button>
             <button
               type="button"
@@ -182,14 +200,14 @@ export function NewVisit() {
                   : "border-gray-200 text-gray-600"
               }`}
             >
-              No Sale
+              {t("newVisit.noSale")}
             </button>
           </div>
 
           {outcome === "sold" && (
             <div className="mt-4">
               <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="amount">
-                Invoice amount
+                {t("newVisit.invoiceAmount")}
               </label>
               <input
                 id="amount"
@@ -212,17 +230,17 @@ export function NewVisit() {
                 onChange={(e) => setNoSaleReason(e.target.value as NoSaleReason)}
                 className="tap-target w-full rounded-xl border border-gray-300 px-4 text-base"
               >
-                <option value="">Select a reason...</option>
-                {NO_SALE_REASONS.map((r) => (
-                  <option key={r.value} value={r.value}>
-                    {r.label}
+                <option value="">{t("newVisit.selectReason")}</option>
+                {NO_SALE_REASON_VALUES.map((value) => (
+                  <option key={value} value={value}>
+                    {t(`noSaleReasons.${value}`)}
                   </option>
                 ))}
               </select>
               <textarea
                 value={noSaleNote}
                 onChange={(e) => setNoSaleNote(e.target.value)}
-                placeholder="Optional note"
+                placeholder={t("newVisit.optionalNote")}
                 rows={3}
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 text-base"
               />
@@ -235,7 +253,7 @@ export function NewVisit() {
 
       <div className="fixed inset-x-0 bottom-0 border-t border-gray-200 bg-white p-4">
         <Button onClick={handleSubmit} disabled={!canSubmit || submitting}>
-          {submitting ? "Submitting..." : "Submit visit"}
+          {submitting ? t("newVisit.submitting") : t("newVisit.submit")}
         </Button>
       </div>
     </div>

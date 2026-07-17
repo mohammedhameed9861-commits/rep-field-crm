@@ -1,11 +1,14 @@
 import { useState, type FormEvent } from "react";
 import { Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/Button";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export function Login() {
+  const { t } = useTranslation();
   const { session, profile, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,13 +32,16 @@ export function Login() {
   return (
     <div className="flex min-h-screen flex-col justify-center bg-gray-50 px-6">
       <div className="mx-auto w-full max-w-sm">
-        <h1 className="mb-1 text-2xl font-bold text-gray-900">Rep Field CRM</h1>
-        <p className="mb-8 text-gray-500">Sign in to log visits or view your dashboard.</p>
+        <div className="mb-4 flex justify-end">
+          <LanguageSwitcher />
+        </div>
+        <h1 className="mb-1 text-2xl font-bold text-gray-900">{t("login.title")}</h1>
+        <p className="mb-8 text-gray-500">{t("login.subtitle")}</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="email">
-              Email
+              {t("login.email")}
             </label>
             <input
               id="email"
@@ -49,7 +55,7 @@ export function Login() {
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="password">
-              Password
+              {t("login.password")}
             </label>
             <input
               id="password"
@@ -65,13 +71,11 @@ export function Login() {
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <Button type="submit" disabled={submitting}>
-            {submitting ? "Signing in..." : "Sign in"}
+            {submitting ? t("login.signingIn") : t("login.signIn")}
           </Button>
         </form>
 
-        <p className="mt-6 text-xs text-gray-400">
-          Accounts are created by your manager. Contact them if you don't have login details.
-        </p>
+        <p className="mt-6 text-xs text-gray-400">{t("login.footer")}</p>
       </div>
     </div>
   );

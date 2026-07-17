@@ -4,7 +4,18 @@
 
 export type Role = "rep" | "manager";
 export type Outcome = "sold" | "no_sale";
-export type NoSaleReason = "price" | "no_stock_need" | "competitor" | "closed" | "owner_absent" | "other";
+export type NoSaleReason =
+  | "price"
+  | "no_stock_need"
+  | "competitor"
+  | "no_cash"
+  | "not_requested"
+  | "delivery_problem"
+  | "owner_absent"
+  | "previous_complaint"
+  | "credit_issue"
+  | "other";
+export type ShopClassification = "A" | "B" | "C";
 
 // NOTE: these must be `type`, not `interface` — interfaces break Supabase's
 // generic type inference (PostgrestQueryBuilder resolves Insert/Update to
@@ -16,6 +27,7 @@ export type Profile = {
   phone: string | null;
   role: Role;
   active: boolean;
+  daily_target: number | null;
   created_at: string;
 };
 
@@ -25,6 +37,7 @@ export type Shop = {
   shop_number: string;
   lat: number | null;
   lng: number | null;
+  classification: ShopClassification | null;
   created_by: string | null;
   created_at: string;
 };

@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { supabase } from "@/lib/supabase";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
+import { ClassificationBadge } from "@/components/ClassificationBadge";
 import { defaultIcon } from "@/lib/leafletIcon";
 import type { Shop } from "@/types/database";
 
 export function Shops() {
+  const { t } = useTranslation();
   const [shops, setShops] = useState<Shop[] | null>(null);
 
   useEffect(() => {
@@ -27,7 +30,7 @@ export function Shops() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-bold text-gray-900">Shops</h2>
+      <h2 className="text-xl font-bold text-gray-900">{t("shops.title")}</h2>
 
       {withCoords.length > 0 && (
         <div className="h-80 overflow-hidden rounded-xl border border-gray-200">
@@ -60,9 +63,10 @@ export function Shops() {
               <p className="font-medium text-gray-900">{shop.shop_name}</p>
               <p className="text-sm text-gray-500">#{shop.shop_number}</p>
             </div>
+            <ClassificationBadge classification={shop.classification} />
           </Link>
         ))}
-        {shops.length === 0 && <p className="p-4 text-gray-400">No shops yet.</p>}
+        {shops.length === 0 && <p className="p-4 text-gray-400">{t("shops.noShopsYet")}</p>}
       </div>
     </div>
   );

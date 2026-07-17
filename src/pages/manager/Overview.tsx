@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/lib/supabase";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
 import type { Visit } from "@/types/database";
@@ -23,24 +24,25 @@ function summarize(visits: Visit[], since: Date) {
 }
 
 function StatCard({ title, stats }: { title: string; stats: ReturnType<typeof summarize> }) {
+  const { t } = useTranslation();
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-5">
       <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">{title}</h3>
       <dl className="grid grid-cols-2 gap-4">
         <div>
-          <dt className="text-xs text-gray-400">Visits</dt>
+          <dt className="text-xs text-gray-400">{t("overview.visits")}</dt>
           <dd className="text-2xl font-bold text-gray-900">{stats.visits}</dd>
         </div>
         <div>
-          <dt className="text-xs text-gray-400">Sales</dt>
+          <dt className="text-xs text-gray-400">{t("overview.sales")}</dt>
           <dd className="text-2xl font-bold text-gray-900">{stats.sales}</dd>
         </div>
         <div>
-          <dt className="text-xs text-gray-400">Revenue</dt>
+          <dt className="text-xs text-gray-400">{t("overview.revenue")}</dt>
           <dd className="text-2xl font-bold text-gray-900">{stats.revenue.toLocaleString()}</dd>
         </div>
         <div>
-          <dt className="text-xs text-gray-400">Conversion</dt>
+          <dt className="text-xs text-gray-400">{t("overview.conversion")}</dt>
           <dd className="text-2xl font-bold text-gray-900">{stats.conversion.toFixed(0)}%</dd>
         </div>
       </dl>
@@ -49,6 +51,7 @@ function StatCard({ title, stats }: { title: string; stats: ReturnType<typeof su
 }
 
 export function Overview() {
+  const { t } = useTranslation();
   const [visits, setVisits] = useState<Visit[] | null>(null);
 
   useEffect(() => {
@@ -67,11 +70,11 @@ export function Overview() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-bold text-gray-900">Overview</h2>
+      <h2 className="text-xl font-bold text-gray-900">{t("overview.title")}</h2>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <StatCard title="Today" stats={today} />
-        <StatCard title="Last 7 days" stats={week} />
-        <StatCard title="Last 30 days" stats={month} />
+        <StatCard title={t("overview.today")} stats={today} />
+        <StatCard title={t("overview.last7Days")} stats={week} />
+        <StatCard title={t("overview.last30Days")} stats={month} />
       </div>
     </div>
   );

@@ -1,27 +1,30 @@
 import { NavLink, Outlet } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { LayoutDashboard, Users, Store, UserCog, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import clsx from "clsx";
 
 const NAV = [
-  { to: "/dashboard/overview", label: "Overview", icon: LayoutDashboard },
-  { to: "/dashboard/reps", label: "Reps", icon: Users },
-  { to: "/dashboard/shops", label: "Shops", icon: Store },
-  { to: "/dashboard/reps/manage", label: "Manage", icon: UserCog },
-];
+  { to: "/dashboard/overview", key: "nav.overview", icon: LayoutDashboard },
+  { to: "/dashboard/reps", key: "nav.reps", icon: Users },
+  { to: "/dashboard/shops", key: "nav.shops", icon: Store },
+  { to: "/dashboard/reps/manage", key: "nav.manage", icon: UserCog },
+] as const;
 
 export function DashboardLayout() {
+  const { t } = useTranslation();
   const { profile, signOut } = useAuth();
 
   return (
     <div className="min-h-screen bg-gray-50 pb-16 md:pb-0">
       <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 md:px-8">
         <div>
-          <h1 className="text-lg font-bold text-gray-900">Rep Field CRM</h1>
+          <h1 className="text-lg font-bold text-gray-900">{t("common.appName")}</h1>
           <p className="text-sm text-gray-500">{profile?.full_name}</p>
         </div>
-        <div className="hidden gap-1 md:flex">
-          {NAV.map(({ to, label, icon: Icon }) => (
+        <div className="hidden items-center gap-1 md:flex">
+          {NAV.map(({ to, key, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
@@ -32,11 +35,18 @@ export function DashboardLayout() {
                 )
               }
             >
-              <Icon className="h-4 w-4" /> {label}
+              <Icon className="h-4 w-4" /> {t(key)}
             </NavLink>
           ))}
+          <LanguageSwitcher className="ms-2 flex items-center gap-1 rounded-lg border border-gray-300 px-2 py-1 text-sm" />
         </div>
-        <button onClick={signOut} className="p-2 text-gray-400" aria-label="Sign out">
+        <div className="flex items-center gap-1 md:hidden">
+          <LanguageSwitcher className="p-2 text-gray-400" />
+          <button onClick={signOut} className="p-2 text-gray-400" aria-label={t("common.signOut")}>
+            <LogOut className="h-5 w-5" />
+          </button>
+        </div>
+        <button onClick={signOut} className="hidden p-2 text-gray-400 md:block" aria-label={t("common.signOut")}>
           <LogOut className="h-5 w-5" />
         </button>
       </header>
@@ -46,7 +56,7 @@ export function DashboardLayout() {
       </main>
 
       <nav className="fixed inset-x-0 bottom-0 flex border-t border-gray-200 bg-white md:hidden">
-        {NAV.map(({ to, label, icon: Icon }) => (
+        {NAV.map(({ to, key, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
@@ -58,7 +68,7 @@ export function DashboardLayout() {
             }
           >
             <Icon className="h-5 w-5" />
-            {label}
+            {t(key)}
           </NavLink>
         ))}
       </nav>
