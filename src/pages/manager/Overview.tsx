@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { AlertTriangle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
-import type { Visit } from "@/types/database";
+import type { Profile, Visit } from "@/types/database";
 
 function startOfDay(offsetDays: number) {
   const d = new Date();
@@ -50,9 +52,12 @@ function StatCard({ title, stats }: { title: string; stats: ReturnType<typeof su
   );
 }
 
+type Alert = { rep: Profile; kind: "notStarted" | "behindTarget"; achieved?: number };
+
 export function Overview() {
   const { t } = useTranslation();
   const [visits, setVisits] = useState<Visit[] | null>(null);
+  const [reps, setReps] = useState<Profile[] | null>(null);
 
   useEffect(() => {
     supabase
@@ -60,13 +65,41 @@ export function Overview() {
       .select("*")
       .gte("visit_time", startOfDay(30).toISOString())
       .then(({ data }) => setVisits(data ?? []));
+    supabase
+      .from("profiles")
+      .select("*")
+      .eq("role", "rep")
+      .eq("active", true)
+      .then(({ data }) => setReps(data ?? []));
   }, []);
 
   const today = useMemo(() => (visits ? summarize(visits, startOfDay(0)) : null), [visits]);
   const week = useMemo(() => (visits ? summarize(visits, startOfDay(7)) : null), [visits]);
   const month = useMemo(() => (visits ? summarize(visits, startOfDay(30)) : null), [visits]);
 
-  if (!today || !week || !month) return <FullScreenLoader />;
+  const alerts = useMemo<Alert[]>(() => {
+    if (!visits || !reps) return [];
+    const todayStart = startOfDay(0);
+    const result: Alert[] = [];
+    for (const rep of reps) {
+      const repToday = visits.filter((v) => v.rep_id === rep.id && new Date(v.visit_time) >= todayStart);
+      if (repToday.length === 0) {
+        result.push({ rep, kind: "notStarted" });
+        continue;
+      }
+      if (rep.daily_target != null) {
+        const achieved = repToday
+          .filter((v) => v.outcome === "sold")
+          .reduce((sum, v) => sum + Number(v.sale_amount ?? 0), 0);
+        if (achieved < rep.daily_target) {
+          result.push({ rep, kind: "behindTarget", achieved });
+        }
+      }
+    }
+    return result;
+  }, [visits, reps]);
+
+  if (!today || !week || !month || !reps) return <FullScreenLoader />;
 
   return (
     <div className="space-y-4">
@@ -75,6 +108,30 @@ export function Overview() {
         <StatCard title={t("overview.today")} stats={today} />
         <StatCard title={t("overview.last7Days")} stats={week} />
         <StatCard title={t("overview.last30Days")} stats={month} />
+      </div>
+
+      <div className="rounded-xl border border-gray-200 bg-white p-5">
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">{t("overview.alerts")}</h3>
+        {alerts.length === 0 ? (
+          <p className="text-sm text-gray-400">{t("overview.noAlerts")}</p>
+        ) : (
+          <ul className="divide-y divide-gray-100">
+            {alerts.map((alert) => (
+              <li key={`${alert.kind}-${alert.rep.id}`} className="flex items-center gap-2 py-2 text-sm">
+                <AlertTriangle className="h-4 w-4 shrink-0 text-amber-500" />
+                <Link to={`/dashboard/reps/${alert.rep.id}`} className="text-gray-800 hover:text-brand-700">
+                  {alert.kind === "notStarted"
+                    ? t("overview.alertNotStarted", { name: alert.rep.full_name })
+                    : t("overview.alertBehindTarget", {
+                        name: alert.rep.full_name,
+                        achieved: alert.achieved?.toLocaleString(),
+                        target: alert.rep.daily_target?.toLocaleString(),
+                      })}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );

@@ -21,6 +21,7 @@ const VisitDetail = lazy(() => import("@/pages/manager/VisitDetail").then((m) =>
 const ManageReps = lazy(() => import("@/pages/manager/ManageReps").then((m) => ({ default: m.ManageReps })));
 const Products = lazy(() => import("@/pages/manager/Products").then((m) => ({ default: m.Products })));
 const InvoicePrep = lazy(() => import("@/pages/manager/InvoicePrep").then((m) => ({ default: m.InvoicePrep })));
+const Analytics = lazy(() => import("@/pages/manager/Analytics").then((m) => ({ default: m.Analytics })));
 
 function Root() {
   const { session, profile, loading } = useAuth();
@@ -71,6 +72,7 @@ export default function App() {
         <Route path="shops/:shopId" element={<ShopDetail />} />
         <Route path="products" element={<Products />} />
         <Route path="invoices" element={<InvoicePrep />} />
+        <Route path="analytics" element={<Analytics />} />
         <Route path="visit/:id" element={<VisitDetail />} />
       </Route>
 

@@ -6,6 +6,7 @@ export interface ParsedProductRow {
   stock_quantity: number;
   sku: string | null;
   image_url: string | null;
+  category: string | null;
 }
 
 function normalizeKey(key: string) {
@@ -36,9 +37,11 @@ export async function parseProductFile(file: File): Promise<ParsedProductRow[]> 
     // something this lightweight in-browser parser can extract.
     const imageRaw = normalized.image_url ?? normalized.image ?? normalized.photo_url ?? normalized.photo;
     const image_url = imageRaw != null && String(imageRaw).trim() !== "" ? String(imageRaw).trim() : null;
+    const categoryRaw = normalized.category ?? normalized.category_name;
+    const category = categoryRaw != null && String(categoryRaw).trim() !== "" ? String(categoryRaw).trim() : null;
 
     if (!name || Number.isNaN(price) || Number.isNaN(stock_quantity)) continue;
-    rows.push({ name, price, stock_quantity, sku, image_url });
+    rows.push({ name, price, stock_quantity, sku, image_url, category });
   }
   return rows;
 }

@@ -76,6 +76,7 @@ export type Product = {
   price: number;
   stock_quantity: number;
   image_url: string | null;
+  category: string | null;
   active: boolean;
   created_at: string;
   updated_at: string;

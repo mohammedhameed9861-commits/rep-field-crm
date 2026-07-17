@@ -23,7 +23,7 @@ export function Products() {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const [form, setForm] = useState({ name: "", sku: "", price: "", stock_quantity: "" });
+  const [form, setForm] = useState({ name: "", sku: "", price: "", stock_quantity: "", category: "" });
   const [formImage, setFormImage] = useState<File | null>(null);
   const [formImagePreview, setFormImagePreview] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
@@ -66,10 +66,11 @@ export function Products() {
         sku: form.sku.trim() || null,
         price: Number(form.price),
         stock_quantity: Number(form.stock_quantity) || 0,
+        category: form.category.trim() || null,
         image_url,
       });
       if (insertErr) throw new Error(insertErr.message);
-      setForm({ name: "", sku: "", price: "", stock_quantity: "" });
+      setForm({ name: "", sku: "", price: "", stock_quantity: "", category: "" });
       setFormImage(null);
       setFormImagePreview(null);
       refresh();
@@ -103,13 +104,19 @@ export function Products() {
     setImporting(true);
     setError(null);
     try {
-      // Only touch image_url if the file actually had an image column —
-      // otherwise a stock/price-only re-import would wipe out photos
-      // added manually through the table below.
+      // Only touch image_url/category if the file actually had that column —
+      // otherwise a stock/price-only re-import would wipe out photos or
+      // categories added manually through the table below.
       const hasImageColumn = parsedRows.some((r) => r.image_url !== null);
-      const payload = hasImageColumn
-        ? parsedRows
-        : parsedRows.map((r) => ({ name: r.name, price: r.price, stock_quantity: r.stock_quantity, sku: r.sku }));
+      const hasCategoryColumn = parsedRows.some((r) => r.category !== null);
+      const payload = parsedRows.map((r) => ({
+        name: r.name,
+        price: r.price,
+        stock_quantity: r.stock_quantity,
+        sku: r.sku,
+        ...(hasImageColumn ? { image_url: r.image_url } : {}),
+        ...(hasCategoryColumn ? { category: r.category } : {}),
+      }));
       const { error: upsertErr } = await supabase
         .from("products")
         .upsert(payload, { onConflict: "sku" });
@@ -205,6 +212,12 @@ export function Products() {
           className="tap-target rounded-xl border border-gray-300 px-4"
         />
         <input
+          placeholder={t("products.category")}
+          value={form.category}
+          onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
+          className="tap-target rounded-xl border border-gray-300 px-4"
+        />
+        <input
           required
           type="number"
           min="0"
@@ -259,6 +272,7 @@ export function Products() {
                     <th className="px-3 py-2">{t("products.image")}</th>
                     <th className="px-3 py-2">{t("products.name")}</th>
                     <th className="px-3 py-2">{t("products.sku")}</th>
+                    <th className="px-3 py-2">{t("products.category")}</th>
                     <th className="px-3 py-2">{t("products.price")}</th>
                     <th className="px-3 py-2">{t("products.stock")}</th>
                   </tr>
@@ -275,6 +289,7 @@ export function Products() {
                       </td>
                       <td className="px-3 py-2">{row.name}</td>
                       <td className="px-3 py-2 text-gray-500">{row.sku ?? "—"}</td>
+                      <td className="px-3 py-2 text-gray-500">{row.category ?? "—"}</td>
                       <td className="px-3 py-2">{row.price}</td>
                       <td className="px-3 py-2">{row.stock_quantity}</td>
                     </tr>
@@ -307,6 +322,7 @@ export function Products() {
               <th className="px-4 py-3">{t("products.image")}</th>
               <th className="px-4 py-3">{t("products.name")}</th>
               <th className="px-4 py-3">{t("products.sku")}</th>
+              <th className="px-4 py-3">{t("products.category")}</th>
               <th className="px-4 py-3">{t("products.price")}</th>
               <th className="px-4 py-3">{t("products.stock")}</th>
               <th className="px-4 py-3">{t("products.active")}</th>
@@ -334,6 +350,7 @@ export function Products() {
                 </td>
                 <td className="px-4 py-3 font-medium text-gray-900">{p.name}</td>
                 <td className="px-4 py-3 text-gray-500">{p.sku ?? "—"}</td>
+                <td className="px-4 py-3 text-gray-500">{p.category ?? "—"}</td>
                 <td className="px-4 py-3">
                   <input
                     type="number"
@@ -366,7 +383,7 @@ export function Products() {
             ))}
             {products.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-gray-400">
+                <td colSpan={7} className="px-4 py-6 text-center text-gray-400">
                   {t("products.noProductsYet")}
                 </td>
               </tr>
