@@ -202,5 +202,10 @@ export default {
     errorUpdate: "Failed to update product",
     errorImport: "Failed to import products",
     errorParse: "Could not read that file. Make sure it's a valid .csv or .xlsx with name/price/stock_quantity columns.",
+    image: "Photo",
+    addImage: "Add photo",
+    changeImage: "Change photo",
+    uploadingImage: "Uploading...",
+    errorImage: "Failed to upload photo",
   },
 };

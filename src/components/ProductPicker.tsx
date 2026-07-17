@@ -91,7 +91,17 @@ export function ProductPicker({ items, onItemsChange }: Props) {
                 disabled={product.stock_quantity <= 0}
                 className="tap-target flex w-full items-center gap-3 px-4 text-start active:bg-gray-50 disabled:opacity-50"
               >
-                <Package className="h-5 w-5 shrink-0 text-gray-400" />
+                {product.image_url ? (
+                  <img
+                    src={product.image_url}
+                    alt=""
+                    className="h-10 w-10 shrink-0 rounded-lg object-cover"
+                  />
+                ) : (
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+                    <Package className="h-5 w-5 text-gray-400" />
+                  </span>
+                )}
                 <span className="flex-1">
                   <span className="block font-medium text-gray-900">{product.name}</span>
                   <span className="block text-xs text-gray-500">

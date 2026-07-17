@@ -205,6 +205,11 @@ const ar: typeof en = {
     errorUpdate: "فشل تحديث المنتج",
     errorImport: "فشل استيراد المنتجات",
     errorParse: "تعذّرت قراءة الملف. تأكد أنه ملف .csv أو .xlsx صالح يحتوي أعمدة name وprice وstock_quantity.",
+    image: "الصورة",
+    addImage: "إضافة صورة",
+    changeImage: "تغيير الصورة",
+    uploadingImage: "جارِ الرفع...",
+    errorImage: "فشل رفع الصورة",
   },
 };
 
