@@ -105,6 +105,15 @@ export function VisitDetail() {
           )}
         </dl>
 
+        {visit.outcome === "sold" && visit.order_notes && (
+          <div className="mt-5">
+            <p className="mb-1 text-xs font-semibold uppercase text-gray-400">{t("newVisit.orderNotesTitle")}</p>
+            <p className="whitespace-pre-wrap rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-800">
+              {visit.order_notes}
+            </p>
+          </div>
+        )}
+
         {visit.outcome === "sold" && orderItems.length > 0 && (
           <div className="mt-5">
             <p className="mb-1 text-xs font-semibold uppercase text-gray-400">{t("visitDetail.items")}</p>

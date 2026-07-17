@@ -55,6 +55,7 @@ export type Visit = {
   sale_amount: number | null;
   no_sale_reason: NoSaleReason | null;
   no_sale_note: string | null;
+  order_notes: string | null;
   created_at: string;
 };
 
@@ -272,13 +273,9 @@ export type Database = {
           p_photo_outside_url: string;
           p_gps_lat: number;
           p_gps_lng: number;
-          p_items: {
-            product_id: string | null;
-            custom_name: string | null;
-            quantity: number;
-            unit_price: number | null;
-          }[];
+          p_items: { product_id: string; quantity: number }[];
           p_final_amount: number;
+          p_order_notes?: string | null;
         };
         Returns: string;
       };

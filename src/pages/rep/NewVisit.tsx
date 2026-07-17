@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/auth";
 import { getCurrentPosition, type GpsPosition } from "@/lib/geolocation";
 import { ShopPicker } from "@/components/ShopPicker";
 import { PhotoCapture } from "@/components/PhotoCapture";
-import { ProductPicker, cartTotal, type CartItem } from "@/components/ProductPicker";
+import { ProductPicker, type CartItem } from "@/components/ProductPicker";
 import { Button } from "@/components/Button";
 import type { NoSaleReason, Shop, ShopClassification } from "@/types/database";
 
@@ -29,6 +29,10 @@ const NO_SALE_REASON_VALUES: NoSaleReason[] = [
   "other",
 ];
 
+function cartTotal(items: CartItem[]) {
+  return items.reduce((sum, i) => sum + i.quantity * i.product.price, 0);
+}
+
 export function NewVisit() {
   const { t } = useTranslation();
   const { profile } = useAuth();
@@ -41,6 +45,7 @@ export function NewVisit() {
   const [photoInside, setPhotoInside] = useState<File | null>(null);
   const [photoOutside, setPhotoOutside] = useState<File | null>(null);
   const [outcome, setOutcome] = useState<"sold" | "no_sale" | null>(null);
+  const [orderNotes, setOrderNotes] = useState("");
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [finalAmount, setFinalAmount] = useState("");
   const [finalAmountTouched, setFinalAmountTouched] = useState(false);
@@ -76,7 +81,7 @@ export function NewVisit() {
     !!photoInside &&
     !!photoOutside &&
     ((outcome === "sold" &&
-      cartItems.length > 0 &&
+      (cartItems.length > 0 || orderNotes.trim() !== "") &&
       finalAmount.trim() !== "" &&
       !Number.isNaN(finalAmountNumber) &&
       finalAmountNumber > 0) ||
@@ -127,12 +132,9 @@ export function NewVisit() {
           p_photo_outside_url: outsidePath,
           p_gps_lat: gps.lat,
           p_gps_lng: gps.lng,
-          p_items: cartItems.map((i) =>
-            i.kind === "catalog"
-              ? { product_id: i.product.id, custom_name: null, quantity: i.quantity, unit_price: null }
-              : { product_id: null, custom_name: i.name, quantity: i.quantity, unit_price: i.unitPrice },
-          ),
+          p_items: cartItems.map((i) => ({ product_id: i.product.id, quantity: i.quantity })),
           p_final_amount: finalAmountNumber,
+          p_order_notes: orderNotes.trim() || null,
         });
         if (rpcError) throw rpcError;
       } else {
@@ -237,8 +239,22 @@ export function NewVisit() {
           </div>
 
           {outcome === "sold" && (
-            <div className="mt-4 space-y-4">
-              <ProductPicker items={cartItems} onItemsChange={setCartItems} />
+            <div className="mt-4 space-y-5">
+              <div>
+                <h3 className="mb-2 text-sm font-semibold text-gray-700">{t("newVisit.orderNotesTitle")}</h3>
+                <textarea
+                  value={orderNotes}
+                  onChange={(e) => setOrderNotes(e.target.value)}
+                  placeholder={t("newVisit.orderNotesPlaceholder")}
+                  rows={4}
+                  className="w-full rounded-xl border border-gray-300 px-4 py-3 text-base"
+                />
+              </div>
+
+              <div>
+                <h3 className="mb-2 text-sm font-semibold text-gray-700">{t("newVisit.catalogTitle")}</h3>
+                <ProductPicker items={cartItems} onItemsChange={setCartItems} />
+              </div>
 
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="final-amount">
