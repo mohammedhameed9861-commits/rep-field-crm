@@ -20,6 +20,11 @@ alter table public.order_items add constraint order_items_product_or_custom chec
 -- unit_price for custom lines is rep-supplied (no catalog price exists);
 -- relax the >=0 intent is unchanged, just no longer tied to a lookup.
 
+-- create_sale_visit gains a new parameter (p_final_amount), so this is a
+-- different overload as far as Postgres is concerned — drop the old
+-- signature first so we don't end up with two ambiguous versions.
+drop function if exists public.create_sale_visit(uuid, uuid, text, text, numeric, numeric, jsonb);
+
 create or replace function public.create_sale_visit(
   p_visit_id uuid,
   p_shop_id uuid,
