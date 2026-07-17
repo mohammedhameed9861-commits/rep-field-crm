@@ -116,6 +116,7 @@ const ar: typeof en = {
     products: "المنتجات",
     invoices: "الفواتير",
     analytics: "التحليلات",
+    monitoring: "المراقبة",
     manage: "الإدارة",
   },
   overview: {
@@ -277,6 +278,18 @@ const ar: typeof en = {
     errorSent: "فشل تحديد الدفعة كمُرسلة",
     printedFor: "دفعة فواتير للمندوب {{name}}",
     printedOn: "جُهّزت بتاريخ {{date}}",
+  },
+  fieldMonitoring: {
+    title: "مراقبة الميدان",
+    disclaimer:
+      "هذه أدوات تدقيق ورادع، وليست دليلًا قاطعًا على مخالفة — يمكن التلاعب بالموقع الجغرافي والتوقيت. استخدمها كنقطة بداية للتحقق اليدوي، لا كحكم نهائي.",
+    suspiciousVisits: "زيارات مشبوهة (آخر ٦٠ يومًا)",
+    noSuspicious: "لا توجد زيارات موسومة.",
+    flag_rapid: "تتابع سريع",
+    flag_mismatch: "بعيدة عن موقع المتجر",
+    flag_repeatedGps: "تكرار الموقع الجغرافي بين متاجر مختلفة",
+    missedShops: "متاجر متأخرة الزيارة (١٤ يومًا فأكثر)",
+    noMissedShops: "لا توجد متاجر متأخرة عن الزيارة.",
   },
 };
 

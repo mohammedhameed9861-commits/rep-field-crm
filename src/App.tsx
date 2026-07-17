@@ -22,6 +22,9 @@ const ManageReps = lazy(() => import("@/pages/manager/ManageReps").then((m) => (
 const Products = lazy(() => import("@/pages/manager/Products").then((m) => ({ default: m.Products })));
 const InvoicePrep = lazy(() => import("@/pages/manager/InvoicePrep").then((m) => ({ default: m.InvoicePrep })));
 const Analytics = lazy(() => import("@/pages/manager/Analytics").then((m) => ({ default: m.Analytics })));
+const FieldMonitoring = lazy(() =>
+  import("@/pages/manager/FieldMonitoring").then((m) => ({ default: m.FieldMonitoring })),
+);
 
 function Root() {
   const { session, profile, loading } = useAuth();
@@ -73,6 +76,7 @@ export default function App() {
         <Route path="products" element={<Products />} />
         <Route path="invoices" element={<InvoicePrep />} />
         <Route path="analytics" element={<Analytics />} />
+        <Route path="monitoring" element={<FieldMonitoring />} />
         <Route path="visit/:id" element={<VisitDetail />} />
       </Route>
 

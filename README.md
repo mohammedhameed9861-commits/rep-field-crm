@@ -40,7 +40,8 @@ does *not* protect against.
 ```
 src/
   pages/rep/        NewVisit, MyVisits
-  pages/manager/     Overview, Reps, RepDetail, Shops, ShopDetail, VisitDetail, ManageReps
+  pages/manager/     Overview, Reps, RepDetail, Shops, ShopDetail, VisitDetail, ManageReps,
+                     Products, InvoicePrep, Analytics, FieldMonitoring
   components/        ShopPicker, PhotoCapture, PhotoThumb, DashboardLayout, RequireRole, Button
   lib/               supabase client, auth context, geolocation, image compression, storage helpers
 supabase/
@@ -148,3 +149,12 @@ a rooted/jailbroken phone. Treat this as a strong audit trail and deterrent,
 not absolute proof of visit authenticity. Pair it with periodic manual
 spot-checks (call the shop, compare photo backgrounds over time, watch for
 suspiciously identical GPS accuracy/timestamps across visits).
+
+`/dashboard/monitoring` automates part of that spot-check by flagging visits
+in the last 60 days with implausible GPS patterns (two visits by the same
+rep less than 3 minutes apart, a visit's GPS more than 300m from the shop's
+recorded location, or the same rep logging near-identical GPS at two
+different shops), plus shops nobody has visited in 14+ days. These are
+heuristics for a manager to look into, not conclusions — a real edge case
+(a shop that moved, a dense market with shops meters apart) will trip them
+too.

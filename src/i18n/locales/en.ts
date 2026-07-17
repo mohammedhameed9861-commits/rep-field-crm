@@ -114,6 +114,7 @@ export default {
     products: "Products",
     invoices: "Invoices",
     analytics: "Analytics",
+    monitoring: "Monitoring",
     manage: "Manage",
   },
   overview: {
@@ -274,5 +275,17 @@ export default {
     errorSent: "Failed to mark batch as sent",
     printedFor: "Invoice batch for {{name}}",
     printedOn: "Prepared on {{date}}",
+  },
+  fieldMonitoring: {
+    title: "Field Monitoring",
+    disclaimer:
+      "These are audit aids and deterrents, not proof of misconduct — GPS and timing can be spoofed. Use them as a starting point for a manual spot-check, not a verdict.",
+    suspiciousVisits: "Suspicious visits (last 60 days)",
+    noSuspicious: "No flagged visits.",
+    flag_rapid: "Rapid succession",
+    flag_mismatch: "Far from shop location",
+    flag_repeatedGps: "Repeated GPS across shops",
+    missedShops: "Missed shops (14+ days)",
+    noMissedShops: "No shops overdue for a visit.",
   },
 };
