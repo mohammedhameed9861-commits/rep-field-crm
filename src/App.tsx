@@ -19,6 +19,7 @@ const Shops = lazy(() => import("@/pages/manager/Shops").then((m) => ({ default:
 const ShopDetail = lazy(() => import("@/pages/manager/ShopDetail").then((m) => ({ default: m.ShopDetail })));
 const VisitDetail = lazy(() => import("@/pages/manager/VisitDetail").then((m) => ({ default: m.VisitDetail })));
 const ManageReps = lazy(() => import("@/pages/manager/ManageReps").then((m) => ({ default: m.ManageReps })));
+const Products = lazy(() => import("@/pages/manager/Products").then((m) => ({ default: m.Products })));
 
 function Root() {
   const { session, profile, loading } = useAuth();
@@ -67,6 +68,7 @@ export default function App() {
         <Route path="reps/:repId" element={<RepDetail />} />
         <Route path="shops" element={<Shops />} />
         <Route path="shops/:shopId" element={<ShopDetail />} />
+        <Route path="products" element={<Products />} />
         <Route path="visit/:id" element={<VisitDetail />} />
       </Route>
 

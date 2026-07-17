@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { LayoutDashboard, Users, Store, UserCog, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, Store, Package, UserCog, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import clsx from "clsx";
@@ -9,6 +9,7 @@ const NAV = [
   { to: "/dashboard/overview", key: "nav.overview", icon: LayoutDashboard },
   { to: "/dashboard/reps", key: "nav.reps", icon: Users },
   { to: "/dashboard/shops", key: "nav.shops", icon: Store },
+  { to: "/dashboard/products", key: "nav.products", icon: Package },
   { to: "/dashboard/reps/manage", key: "nav.manage", icon: UserCog },
 ] as const;
 

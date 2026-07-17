@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth";
 import { getCurrentPosition, type GpsPosition } from "@/lib/geolocation";
 import { ShopPicker } from "@/components/ShopPicker";
 import { PhotoCapture } from "@/components/PhotoCapture";
+import { ProductPicker, type CartItem } from "@/components/ProductPicker";
 import { Button } from "@/components/Button";
 import type { NoSaleReason, Shop, ShopClassification } from "@/types/database";
 
@@ -40,7 +41,7 @@ export function NewVisit() {
   const [photoInside, setPhotoInside] = useState<File | null>(null);
   const [photoOutside, setPhotoOutside] = useState<File | null>(null);
   const [outcome, setOutcome] = useState<"sold" | "no_sale" | null>(null);
-  const [saleAmount, setSaleAmount] = useState("");
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [noSaleReason, setNoSaleReason] = useState<NoSaleReason | "">("");
   const [noSaleNote, setNoSaleNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -64,8 +65,7 @@ export function NewVisit() {
     !!gps &&
     !!photoInside &&
     !!photoOutside &&
-    ((outcome === "sold" && Number(saleAmount) > 0) ||
-      (outcome === "no_sale" && noSaleReason !== ""));
+    ((outcome === "sold" && cartItems.length > 0) || (outcome === "no_sale" && noSaleReason !== ""));
 
   async function handleSubmit() {
     if (!canSubmit || !profile || !gps || !photoInside || !photoOutside || !shop) return;
@@ -104,20 +104,32 @@ export function NewVisit() {
       if (insideUpload.error) throw insideUpload.error;
       if (outsideUpload.error) throw outsideUpload.error;
 
-      const { error: visitError } = await supabase.from("visits").insert({
-        id: visitId,
-        rep_id: profile.id,
-        shop_id: shopId,
-        photo_inside_url: insidePath,
-        photo_outside_url: outsidePath,
-        gps_lat: gps.lat,
-        gps_lng: gps.lng,
-        outcome: outcome!,
-        sale_amount: outcome === "sold" ? Number(saleAmount) : null,
-        no_sale_reason: outcome === "no_sale" ? (noSaleReason as NoSaleReason) : null,
-        no_sale_note: outcome === "no_sale" ? noSaleNote.trim() || null : null,
-      });
-      if (visitError) throw visitError;
+      if (outcome === "sold") {
+        const { error: rpcError } = await supabase.rpc("create_sale_visit", {
+          p_visit_id: visitId,
+          p_shop_id: shopId,
+          p_photo_inside_url: insidePath,
+          p_photo_outside_url: outsidePath,
+          p_gps_lat: gps.lat,
+          p_gps_lng: gps.lng,
+          p_items: cartItems.map((i) => ({ product_id: i.product.id, quantity: i.quantity })),
+        });
+        if (rpcError) throw rpcError;
+      } else {
+        const { error: visitError } = await supabase.from("visits").insert({
+          id: visitId,
+          rep_id: profile.id,
+          shop_id: shopId,
+          photo_inside_url: insidePath,
+          photo_outside_url: outsidePath,
+          gps_lat: gps.lat,
+          gps_lng: gps.lng,
+          outcome: "no_sale",
+          no_sale_reason: noSaleReason as NoSaleReason,
+          no_sale_note: noSaleNote.trim() || null,
+        });
+        if (visitError) throw visitError;
+      }
 
       navigate("/my-visits", { replace: true });
     } catch (err) {
@@ -206,20 +218,7 @@ export function NewVisit() {
 
           {outcome === "sold" && (
             <div className="mt-4">
-              <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="amount">
-                {t("newVisit.invoiceAmount")}
-              </label>
-              <input
-                id="amount"
-                type="number"
-                inputMode="decimal"
-                min="0.01"
-                step="0.01"
-                value={saleAmount}
-                onChange={(e) => setSaleAmount(e.target.value)}
-                placeholder="0.00"
-                className="tap-target w-full rounded-xl border border-gray-300 px-4 text-base"
-              />
+              <ProductPicker items={cartItems} onItemsChange={setCartItems} />
             </div>
           )}
 

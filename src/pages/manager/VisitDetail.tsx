@@ -8,7 +8,9 @@ import { supabase } from "@/lib/supabase";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
 import { PhotoThumb } from "@/components/PhotoThumb";
 import { defaultIcon } from "@/lib/leafletIcon";
-import type { Invoice, Profile, Shop, Visit } from "@/types/database";
+import type { Invoice, OrderItem, Profile, Shop, Visit } from "@/types/database";
+
+type OrderItemRow = OrderItem & { products: { name: string } | null };
 
 export function VisitDetail() {
   const { t } = useTranslation();
@@ -17,6 +19,7 @@ export function VisitDetail() {
   const [shop, setShop] = useState<Shop | null>(null);
   const [rep, setRep] = useState<Profile | null>(null);
   const [invoice, setInvoice] = useState<Invoice | null>(null);
+  const [orderItems, setOrderItems] = useState<OrderItemRow[]>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -35,12 +38,12 @@ export function VisitDetail() {
         setShop(shopData ?? null);
         setRep(repData ?? null);
         if (data.outcome === "sold") {
-          const { data: invoiceData } = await supabase
-            .from("invoices")
-            .select("*")
-            .eq("visit_id", data.id)
-            .single();
+          const [{ data: invoiceData }, { data: itemsData }] = await Promise.all([
+            supabase.from("invoices").select("*").eq("visit_id", data.id).single(),
+            supabase.from("order_items").select("*, products(name)").eq("visit_id", data.id),
+          ]);
           setInvoice(invoiceData ?? null);
+          setOrderItems((itemsData as OrderItemRow[]) ?? []);
         }
       });
   }, [id]);
@@ -101,6 +104,34 @@ export function VisitDetail() {
             </>
           )}
         </dl>
+
+        {visit.outcome === "sold" && orderItems.length > 0 && (
+          <div className="mt-5">
+            <p className="mb-1 text-xs font-semibold uppercase text-gray-400">{t("visitDetail.items")}</p>
+            <div className="overflow-hidden rounded-lg border border-gray-200">
+              <table className="w-full text-start text-sm">
+                <thead className="bg-gray-50 text-gray-500">
+                  <tr>
+                    <th className="px-3 py-2">{t("products.name")}</th>
+                    <th className="px-3 py-2">{t("visitDetail.quantity")}</th>
+                    <th className="px-3 py-2">{t("visitDetail.unitPrice")}</th>
+                    <th className="px-3 py-2">{t("visitDetail.lineTotal")}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {orderItems.map((item) => (
+                    <tr key={item.id}>
+                      <td className="px-3 py-2 font-medium text-gray-900">{item.products?.name}</td>
+                      <td className="px-3 py-2">{item.quantity}</td>
+                      <td className="px-3 py-2">{item.unit_price.toLocaleString()}</td>
+                      <td className="px-3 py-2">{item.line_total.toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         <div className="mt-5 grid grid-cols-2 gap-3">
           <div>

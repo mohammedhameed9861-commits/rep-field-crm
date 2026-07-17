@@ -68,6 +68,27 @@ export type Invoice = {
   created_at: string;
 };
 
+export type Product = {
+  id: string;
+  sku: string | null;
+  name: string;
+  price: number;
+  stock_quantity: number;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type OrderItem = {
+  id: string;
+  visit_id: string;
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+  line_total: number;
+  created_at: string;
+};
+
 export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5";
@@ -151,12 +172,55 @@ export type Database = {
           },
         ];
       };
+      products: {
+        Row: Product;
+        Insert: Partial<Product> & { name: string; price: number };
+        Update: Partial<Product>;
+        Relationships: [];
+      };
+      order_items: {
+        Row: OrderItem;
+        Insert: Partial<OrderItem> & {
+          visit_id: string;
+          product_id: string;
+          quantity: number;
+          unit_price: number;
+        };
+        Update: Partial<OrderItem>;
+        Relationships: [
+          {
+            foreignKeyName: "order_items_visit_id_fkey";
+            columns: ["visit_id"];
+            isOneToOne: false;
+            referencedRelation: "visits";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey";
+            columns: ["product_id"];
+            isOneToOne: false;
+            referencedRelation: "products";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      create_sale_visit: {
+        Args: {
+          p_visit_id: string;
+          p_shop_id: string;
+          p_photo_inside_url: string;
+          p_photo_outside_url: string;
+          p_gps_lat: number;
+          p_gps_lng: number;
+          p_items: { product_id: string; quantity: number }[];
+        };
+        Returns: string;
+      };
     };
     Enums: {
       [_ in never]: never;
