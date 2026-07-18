@@ -9,6 +9,7 @@ import { ShopPicker } from "@/components/ShopPicker";
 import { PhotoCapture } from "@/components/PhotoCapture";
 import { ProductPicker, type CartItem } from "@/components/ProductPicker";
 import { Button } from "@/components/Button";
+import { buildNoSaleVisitInsert, buildSaleVisitArgs, canSubmitVisit, cartTotal } from "@/lib/visitSubmission";
 import type { NoSaleReason, Shop, ShopClassification } from "@/types/database";
 
 type ShopSelection =
@@ -28,10 +29,6 @@ const NO_SALE_REASON_VALUES: NoSaleReason[] = [
   "credit_issue",
   "other",
 ];
-
-function cartTotal(items: CartItem[]) {
-  return items.reduce((sum, i) => sum + i.quantity * i.product.price, 0);
-}
 
 export function NewVisit() {
   const { t } = useTranslation();
@@ -75,17 +72,17 @@ export function NewVisit() {
   }
 
   const finalAmountNumber = Number(finalAmount);
-  const canSubmit =
-    !!shop &&
-    !!gps &&
-    !!photoInside &&
-    !!photoOutside &&
-    ((outcome === "sold" &&
-      (cartItems.length > 0 || orderNotes.trim() !== "") &&
-      finalAmount.trim() !== "" &&
-      !Number.isNaN(finalAmountNumber) &&
-      finalAmountNumber > 0) ||
-      (outcome === "no_sale" && noSaleReason !== ""));
+  const canSubmit = canSubmitVisit({
+    hasShop: !!shop,
+    hasGps: !!gps,
+    hasPhotoInside: !!photoInside,
+    hasPhotoOutside: !!photoOutside,
+    outcome,
+    cartItemCount: cartItems.length,
+    orderNotes,
+    finalAmount,
+    noSaleReason,
+  });
 
   async function handleSubmit() {
     if (!canSubmit || !profile || !gps || !photoInside || !photoOutside || !shop) return;
@@ -125,31 +122,35 @@ export function NewVisit() {
       if (outsideUpload.error) throw outsideUpload.error;
 
       if (outcome === "sold") {
-        const { error: rpcError } = await supabase.rpc("create_sale_visit", {
-          p_visit_id: visitId,
-          p_shop_id: shopId,
-          p_photo_inside_url: insidePath,
-          p_photo_outside_url: outsidePath,
-          p_gps_lat: gps.lat,
-          p_gps_lng: gps.lng,
-          p_items: cartItems.map((i) => ({ product_id: i.product.id, quantity: i.quantity })),
-          p_final_amount: finalAmountNumber,
-          p_order_notes: orderNotes.trim() || null,
-        });
+        const { error: rpcError } = await supabase.rpc(
+          "create_sale_visit",
+          buildSaleVisitArgs({
+            visitId,
+            shopId,
+            photoInsidePath: insidePath,
+            photoOutsidePath: outsidePath,
+            gpsLat: gps.lat,
+            gpsLng: gps.lng,
+            cartItems,
+            finalAmount: finalAmountNumber,
+            orderNotes,
+          }),
+        );
         if (rpcError) throw rpcError;
       } else {
-        const { error: visitError } = await supabase.from("visits").insert({
-          id: visitId,
-          rep_id: profile.id,
-          shop_id: shopId,
-          photo_inside_url: insidePath,
-          photo_outside_url: outsidePath,
-          gps_lat: gps.lat,
-          gps_lng: gps.lng,
-          outcome: "no_sale",
-          no_sale_reason: noSaleReason as NoSaleReason,
-          no_sale_note: noSaleNote.trim() || null,
-        });
+        const { error: visitError } = await supabase.from("visits").insert(
+          buildNoSaleVisitInsert({
+            visitId,
+            repId: profile.id,
+            shopId,
+            photoInsidePath: insidePath,
+            photoOutsidePath: outsidePath,
+            gpsLat: gps.lat,
+            gpsLng: gps.lng,
+            noSaleReason: noSaleReason as NoSaleReason,
+            noSaleNote,
+          }),
+        );
         if (visitError) throw visitError;
       }
 

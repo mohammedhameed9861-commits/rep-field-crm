@@ -110,6 +110,21 @@ Camera capture and GPS both require a secure context — `localhost` is fine
 for dev, but once deployed the site must be served over HTTPS (Cloudflare
 Pages does this by default).
 
+### Running tests
+
+```bash
+npm run test        # unit tests, once
+npm run test:watch  # unit tests, watch mode
+```
+
+Unit tests cover the pure business-rule logic that's easy to silently break
+— the sold/no-sale visit validation and RPC payload building
+(`src/lib/visitSubmission.ts`), the Overview stats/alerts math
+(`src/lib/repStats.ts`), and the Field Monitoring GPS-distance check
+(`src/lib/geo.ts`) — not full end-to-end flows (that would need a live
+Supabase project with camera/GPS mocked in a real browser). `.github/workflows/ci.yml`
+runs lint, tests, and the build on every push and pull request.
+
 ## 3. Deploy to Cloudflare Pages
 
 1. Push this repo to GitHub (already done if you're reading this from the

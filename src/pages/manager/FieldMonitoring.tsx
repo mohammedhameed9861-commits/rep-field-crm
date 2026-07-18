@@ -5,6 +5,7 @@ import { AlertTriangle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
 import { ClassificationBadge } from "@/components/ClassificationBadge";
+import { haversineMeters } from "@/lib/geo";
 import type { Shop, Visit } from "@/types/database";
 
 type VisitRow = Visit & {
@@ -24,16 +25,6 @@ const DUPLICATE_GPS_METERS = 50;
 const RAPID_MINUTES = 3;
 const SUSPICIOUS_WINDOW_DAYS = 60;
 const MISSED_SHOP_DAYS = 14;
-
-function haversineMeters(lat1: number, lng1: number, lat2: number, lng2: number) {
-  const R = 6_371_000;
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a =
-    Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
 
 function startOfDay(offsetDays: number) {
   const d = new Date();

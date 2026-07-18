@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { AlertTriangle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
+import { computeRepAlerts, summarizeVisits, type PeriodSummary } from "@/lib/repStats";
 import type { Profile, Visit } from "@/types/database";
 
 function startOfDay(offsetDays: number) {
@@ -13,19 +14,7 @@ function startOfDay(offsetDays: number) {
   return d;
 }
 
-function summarize(visits: Visit[], since: Date) {
-  const inRange = visits.filter((v) => new Date(v.visit_time) >= since);
-  const sales = inRange.filter((v) => v.outcome === "sold");
-  const revenue = sales.reduce((sum, v) => sum + Number(v.sale_amount ?? 0), 0);
-  return {
-    visits: inRange.length,
-    sales: sales.length,
-    revenue,
-    conversion: inRange.length ? (sales.length / inRange.length) * 100 : 0,
-  };
-}
-
-function StatCard({ title, stats }: { title: string; stats: ReturnType<typeof summarize> }) {
+function StatCard({ title, stats }: { title: string; stats: PeriodSummary }) {
   const { t } = useTranslation();
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-5">
@@ -52,8 +41,6 @@ function StatCard({ title, stats }: { title: string; stats: ReturnType<typeof su
   );
 }
 
-type Alert = { rep: Profile; kind: "notStarted" | "behindTarget"; achieved?: number };
-
 export function Overview() {
   const { t } = useTranslation();
   const [visits, setVisits] = useState<Visit[] | null>(null);
@@ -73,31 +60,14 @@ export function Overview() {
       .then(({ data }) => setReps(data ?? []));
   }, []);
 
-  const today = useMemo(() => (visits ? summarize(visits, startOfDay(0)) : null), [visits]);
-  const week = useMemo(() => (visits ? summarize(visits, startOfDay(7)) : null), [visits]);
-  const month = useMemo(() => (visits ? summarize(visits, startOfDay(30)) : null), [visits]);
+  const today = useMemo(() => (visits ? summarizeVisits(visits, startOfDay(0)) : null), [visits]);
+  const week = useMemo(() => (visits ? summarizeVisits(visits, startOfDay(7)) : null), [visits]);
+  const month = useMemo(() => (visits ? summarizeVisits(visits, startOfDay(30)) : null), [visits]);
 
-  const alerts = useMemo<Alert[]>(() => {
-    if (!visits || !reps) return [];
-    const todayStart = startOfDay(0);
-    const result: Alert[] = [];
-    for (const rep of reps) {
-      const repToday = visits.filter((v) => v.rep_id === rep.id && new Date(v.visit_time) >= todayStart);
-      if (repToday.length === 0) {
-        result.push({ rep, kind: "notStarted" });
-        continue;
-      }
-      if (rep.daily_target != null) {
-        const achieved = repToday
-          .filter((v) => v.outcome === "sold")
-          .reduce((sum, v) => sum + Number(v.sale_amount ?? 0), 0);
-        if (achieved < rep.daily_target) {
-          result.push({ rep, kind: "behindTarget", achieved });
-        }
-      }
-    }
-    return result;
-  }, [visits, reps]);
+  const alerts = useMemo(
+    () => (visits && reps ? computeRepAlerts(reps, visits, startOfDay(0)) : []),
+    [visits, reps],
+  );
 
   if (!today || !week || !month || !reps) return <FullScreenLoader />;
 
