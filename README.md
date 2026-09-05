@@ -4,10 +4,12 @@ Mobile-first field sales tool: reps log shop visits with photo + GPS proof and
 either close a sale (auto-generates an invoice) or log a no-sale reason.
 Managers get a live dashboard, filterable by rep.
 
-> This repo also contains [`/site`](./site), a separate, static marketing
-> site for the business (meant for the root domain, e.g. `yourdomain.com`,
-> with this CRM on `crm.yourdomain.com`). The two share no backend, database,
-> or auth — see [`site/README.md`](./site/README.md) for details.
+> The business's public marketing site lives in a separate repo,
+> [`flowercomsite`](https://github.com/mohammedhameed9861-commits/flowercomsite)
+> (meant for the root domain, e.g. `yourdomain.com`, with this CRM on
+> `crm.yourdomain.com`). Kept separate on purpose — no shared backend,
+> database, or auth, and hosting integrations for the site never need
+> access to this repo's code.
 
 - **Frontend**: React + Vite + TypeScript + Tailwind, plain client-side SPA (no
   server framework) — works on any phone browser, no install.
