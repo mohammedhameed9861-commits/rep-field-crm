@@ -1,67 +1,44 @@
-// Everything on the page that's specific to your business lives here.
-// Edit this file to update content — you shouldn't need to touch App.tsx.
+// Brand/business config that doesn't need translation.
+// Page text (headings, descriptions) lives in src/i18n/locales/en.json and ar.json.
 
-export const siteConfig = {
-  businessName: "Petal & Stem Distribution",
-  tagline: "Fresh-cut flowers, delivered daily to your shop.",
-  subheading:
-    "Wholesale flower distribution for florists, event planners, and retailers — reliable sourcing, competitive pricing, and a delivery route you can set your watch to.",
+interface SiteConfig {
+  businessName: string;
+  whatsapp: { number: string; messageEn: string; messageAr: string };
+  contact: {
+    email: string;
+    phoneDisplay: string;
+    address: string;
+    hours: string;
+    instagram: string;
+  };
+  /** Optional: path to a real hero background video (e.g. "/hero.mp4"). Leave empty to use the animated botanical fallback. */
+  heroVideoSrc: string;
+}
+
+export const siteConfig: SiteConfig = {
+  businessName: "Flowercom",
 
   // WhatsApp click-to-chat button.
   // Number must be digits only: country code + number, no "+", no spaces, no leading 0.
-  // Example: a US number (555) 123-4567 -> "15551234567"
   whatsapp: {
-    number: "15550000000", // TODO: replace with your real WhatsApp Business number
-    message: "Hi! I'd like to know more about wholesale flower orders.",
+    number: "", // TODO: waiting on real WhatsApp number — button is hidden until this is set
+    messageEn: "Hi! I'd like to know more about wholesale flower orders.",
+    messageAr: "مرحبًا! أريد الاستفسار عن طلبات الزهور بالجملة.",
   },
 
   contact: {
-    email: "orders@example.com", // TODO: replace
-    phoneDisplay: "+1 (555) 000-0000", // TODO: replace
-    address: "123 Market Street, Your City", // TODO: replace
-    hours: "Mon–Sat, 6:00 AM – 4:00 PM",
+    email: "sales@flowercomiq.com",
+    phoneDisplay: "", // TODO: confirm public phone number
+    address: "", // TODO
+    hours: "", // TODO
+    instagram: "flowecomiq",
   },
 
-  valueProps: [
-    {
-      title: "Fresh-cut daily",
-      description:
-        "Stock arrives fresh every morning, sourced directly from growers — no sitting in a warehouse.",
-    },
-    {
-      title: "Reliable delivery routes",
-      description:
-        "Set delivery days for your shop and count on it — our reps run the same routes every week.",
-    },
-    {
-      title: "Wholesale pricing",
-      description:
-        "Volume pricing for florists, event planners, and retailers, with simple invoicing per order.",
-    },
-    {
-      title: "Wide variety",
-      description:
-        "Roses, seasonal blooms, greenery, and everything in between — one supplier for your full order.",
-    },
-  ],
+  heroVideoSrc: "",
+};
 
-  categories: [
-    { name: "Roses", description: "Classic and garden varieties, in every color." },
-    { name: "Seasonal Blooms", description: "Tulips, peonies, sunflowers — whatever's in season." },
-    { name: "Greenery & Foliage", description: "Eucalyptus, ferns, and filler greens for arrangements." },
-    { name: "Lilies & Orchids", description: "Statement flowers for high-end arrangements." },
-    { name: "Wedding & Event", description: "Bulk arrangement-ready flowers for large orders." },
-    { name: "Mixed Bouquets", description: "Pre-arranged mixes ready for retail display." },
-  ],
-
-  stats: [
-    { value: "10+", label: "years distributing" },
-    { value: "200+", label: "shops served" },
-    { value: "6", label: "delivery days a week" },
-  ],
-} as const;
-
-export function whatsappHref() {
-  const encoded = encodeURIComponent(siteConfig.whatsapp.message);
+export function whatsappHref(lang: "en" | "ar") {
+  const message = lang === "ar" ? siteConfig.whatsapp.messageAr : siteConfig.whatsapp.messageEn;
+  const encoded = encodeURIComponent(message);
   return `https://wa.me/${siteConfig.whatsapp.number}?text=${encoded}`;
 }

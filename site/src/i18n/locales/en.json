@@ -1,0 +1,58 @@
+{
+  "nav": {
+    "whatsapp": "Chat on WhatsApp"
+  },
+  "hero": {
+    "tagline": "Fresh-cut flowers, delivered daily.",
+    "subheading": "Wholesale flower distribution for florists, event planners, and retailers — reliable sourcing, competitive pricing, and a delivery route you can set your watch to.",
+    "cta": "Order on WhatsApp"
+  },
+  "valueProps": {
+    "title": "Why shops order from us",
+    "items": [
+      {
+        "title": "Fresh-cut daily",
+        "description": "Stock arrives fresh every morning, sourced directly from growers — no sitting in a warehouse."
+      },
+      {
+        "title": "Reliable delivery routes",
+        "description": "Set delivery days for your shop and count on it — our reps run the same routes every week."
+      },
+      {
+        "title": "Wholesale pricing",
+        "description": "Volume pricing for florists, event planners, and retailers, with simple invoicing per order."
+      },
+      {
+        "title": "Wide variety",
+        "description": "Roses, seasonal blooms, greenery, and everything in between — one supplier for your full order."
+      }
+    ]
+  },
+  "categories": {
+    "title": "What we supply",
+    "subheading": "A full catalog for florists and retailers — ask on WhatsApp for current stock and pricing.",
+    "items": [
+      { "name": "Roses", "description": "Classic and garden varieties, in every color." },
+      { "name": "Seasonal Blooms", "description": "Tulips, peonies, sunflowers — whatever's in season." },
+      { "name": "Greenery & Foliage", "description": "Eucalyptus, ferns, and filler greens for arrangements." },
+      { "name": "Lilies & Orchids", "description": "Statement flowers for high-end arrangements." },
+      { "name": "Wedding & Event", "description": "Bulk arrangement-ready flowers for large orders." },
+      { "name": "Mixed Bouquets", "description": "Pre-arranged mixes ready for retail display." }
+    ]
+  },
+  "stats": [
+    { "value": "10+", "label": "years distributing" },
+    { "value": "200+", "label": "shops served" },
+    { "value": "6", "label": "delivery days a week" }
+  ],
+  "closingCta": {
+    "title": "Ready to place an order?",
+    "subheading": "Message us on WhatsApp for today's availability and wholesale pricing.",
+    "button": "Chat on WhatsApp"
+  },
+  "footer": {
+    "description": "Wholesale flower distribution — fresh stock, reliable routes.",
+    "hoursLabel": "Hours",
+    "rights": "All rights reserved."
+  }
+}
