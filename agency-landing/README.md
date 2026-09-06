@@ -55,6 +55,11 @@ python3 -m http.server 8000
   that content and these sections can be added.
 - **EN toggle**: the "EN" button in the nav is currently decorative (no
   English version exists yet).
-- **Client list**: the client pills (Alshaheera, FiberX, Almarai, etc.)
-  were copied from the real site's client section — confirm they're still
-  accurate before publishing.
+- **Client list**: the 11 client pills (Almarai, Avoca, BYD Auto Iraq,
+  Iraq Mall, AUIB, ICS Iraq, Bayt Halab, Four Views Restaurant, Honor
+  Iraq, Royal Hospital Baghdad, Medworx) each link to that client's real
+  Instagram profile. Double-check "Bayt Halab" — its display name was
+  guessed from the handle `baythalab.iq`, confirm the correct spelling.
+  To add/remove a client, edit the pill list in **both** `.pill-track`
+  blocks in `index.html` (the second is the hidden duplicate that makes
+  the marquee loop seamlessly) — they must stay identical.

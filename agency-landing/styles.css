@@ -573,7 +573,10 @@ a { text-decoration: none; color: inherit; }
   font-size: 0.85rem;
   font-weight: 700;
   white-space: nowrap;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
+
+a.client-pill:hover { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.28); }
 
 /* ===== CTA ===== */
 .cta { padding: 0 0 110px; }
