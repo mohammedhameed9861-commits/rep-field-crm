@@ -12,6 +12,7 @@ agency-landing/
   index.html    Page markup (nav, hero, stats, about, services, clients, CTA, footer)
   styles.css    All styling (dark theme, RTL-aware with logical properties)
   script.js     Mobile nav toggle, footer year, scroll-reveal
+  images/       Real photos (AI-generated stock-style placeholders for now)
 ```
 
 ## Contact number
@@ -34,13 +35,18 @@ python3 -m http.server 8000
 
 ## Before you launch — things to swap
 
-- **Real photos**: every gradient block with a vector icon inside it is a
-  placeholder (`.placeholder-media` in CSS) standing in for real office/
-  team photography from the actual site. Hotlinked stock photos weren't
-  used because this environment couldn't reach any external image host
-  to verify a working URL — swap the `.placeholder-media` divs for real
-  `<img>` tags when you have the photos (or your own vetted stock photo
-  URLs).
+- **Real photos**: 3 of the 5 image slots now use real photo files
+  (`images/*.webp`) — AI-generated stock-style shots, not actual photos
+  of your team/office, used as a stand-in until you have real ones:
+  - Hero main photo, About section photo, and the "03 مراجعة الأداء"
+    step photo are filled in.
+  - The "01 التنفيذ" and "02 أفكار حملات" step cards still use the
+    vector icons — no photo was provided for those two. Add
+    `images/<file>.webp` and swap the `.media-icon-wrap` block for an
+    `<img class="media-photo" src="images/<file>.webp">` the same way
+    the other three are done, whenever you have shots for those.
+  - To replace any of the 3 filled-in placeholders with your *actual*
+    photography later, just swap the `src` on that `<img class="media-photo">`.
 - **Real logo**: the "Backup BU" text logo in the nav is a text
   reconstruction — swap for the actual logo file if you have it.
 - **Pricing (الأسعار) and FAQ (الأسئلة) sections**: not built out — they
