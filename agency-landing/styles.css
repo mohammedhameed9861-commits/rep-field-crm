@@ -75,6 +75,7 @@ a { text-decoration: none; color: inherit; }
   background: var(--gradient-pink-purple);
   color: #fff;
   box-shadow: 0 20px 45px -18px rgba(236, 30, 121, 0.55);
+  animation: pulse-ring 2.6s ease-out infinite;
 }
 
 .btn-primary:hover { transform: translateY(-2px); }
@@ -104,6 +105,7 @@ a { text-decoration: none; color: inherit; }
 .btn-cta-solid {
   background: #fff;
   color: var(--purple);
+  animation: pulse-ring-light 2.6s ease-out infinite;
 }
 
 .btn-cta-solid:hover { opacity: 0.9; }
@@ -216,8 +218,8 @@ a { text-decoration: none; color: inherit; }
   z-index: 0;
 }
 
-.blob-1 { width: 460px; height: 460px; background: var(--pink); top: -160px; inset-inline-start: -140px; }
-.blob-2 { width: 420px; height: 420px; background: var(--purple); top: -80px; inset-inline-end: -160px; }
+.blob-1 { width: 460px; height: 460px; background: var(--pink); top: -160px; inset-inline-start: -140px; animation: blob-drift 19s ease-in-out infinite; }
+.blob-2 { width: 420px; height: 420px; background: var(--purple); top: -80px; inset-inline-end: -160px; animation: blob-drift 23s ease-in-out infinite reverse; animation-delay: -6s; }
 
 .hero-inner {
   position: relative;
@@ -234,6 +236,8 @@ a { text-decoration: none; color: inherit; }
   font-size: clamp(2.1rem, 4.6vw, 3.4rem);
   line-height: 1.28;
   margin-bottom: 26px;
+  opacity: 0;
+  animation: fade-up 0.7s ease 0.05s forwards;
 }
 
 .grad-blue {
@@ -245,9 +249,21 @@ a { text-decoration: none; color: inherit; }
 
 .grad-pink { color: var(--pink); }
 
-.hero-sub { font-size: 1.05rem; max-width: 480px; margin-bottom: 34px; }
+.hero-sub {
+  font-size: 1.05rem;
+  max-width: 480px;
+  margin-bottom: 34px;
+  opacity: 0;
+  animation: fade-up 0.7s ease 0.22s forwards;
+}
 
-.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+.hero-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fade-up 0.7s ease 0.4s forwards;
+}
 
 /* --- Hero visual / placeholder collage --- */
 .hero-visual { position: relative; min-height: 480px; }
@@ -370,8 +386,9 @@ a { text-decoration: none; color: inherit; }
 .badge-stat strong { font-size: 1.4rem; font-weight: 800; }
 .badge-stat span { font-size: 0.78rem; color: var(--ink-faint); }
 
-.badge-1 { top: 60px; inset-inline-end: -10px; }
-.badge-2 { bottom: 90px; inset-inline-start: -10px; }
+.badge-stat { animation: float-y 4.5s ease-in-out infinite; }
+.badge-1 { top: 60px; inset-inline-end: -10px; animation-delay: 0s; }
+.badge-2 { bottom: 90px; inset-inline-start: -10px; animation-delay: 1.4s; }
 
 .chat-bubble {
   position: absolute;
@@ -386,8 +403,9 @@ a { text-decoration: none; color: inherit; }
   box-shadow: 0 12px 30px -14px rgba(0, 0, 0, 0.6);
 }
 
-.chat-bubble-1 { inset-inline-start: 10%; }
-.chat-bubble-2 { top: 10px; inset-inline-start: 42%; background: rgba(35, 20, 50, 0.95); }
+.chat-bubble { animation: float-y 5s ease-in-out infinite; }
+.chat-bubble-1 { inset-inline-start: 10%; animation-delay: 0.7s; }
+.chat-bubble-2 { top: 10px; inset-inline-start: 42%; background: rgba(35, 20, 50, 0.95); animation-delay: 2.1s; }
 
 /* ===== Stats ===== */
 .stats { padding: 0 0 90px; }
@@ -526,13 +544,24 @@ a { text-decoration: none; color: inherit; }
 
 .pill-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  overflow: hidden;
   background: var(--card-bg);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  padding: 24px;
+  padding: 24px 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }
+
+.pill-track {
+  display: flex;
+  flex-shrink: 0;
+  gap: 12px;
+  padding: 0 24px;
+  animation: marquee 32s linear infinite;
+}
+
+.pill-row:hover .pill-track { animation-play-state: paused; }
 
 .client-pill {
   display: inline-flex;
@@ -543,6 +572,7 @@ a { text-decoration: none; color: inherit; }
   padding: 8px 16px;
   font-size: 0.85rem;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 /* ===== CTA ===== */
@@ -550,6 +580,7 @@ a { text-decoration: none; color: inherit; }
 
 .cta-card {
   background: var(--gradient-pink-purple);
+  background-size: 220% 220%;
   border-radius: var(--radius-lg);
   padding: 56px 48px;
   display: flex;
@@ -557,6 +588,7 @@ a { text-decoration: none; color: inherit; }
   justify-content: space-between;
   gap: 32px;
   flex-wrap: wrap;
+  animation: gradient-drift 8s ease-in-out infinite;
 }
 
 .cta-text h2 {
@@ -596,6 +628,61 @@ a { text-decoration: none; color: inherit; }
 }
 
 .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+/* ===== Motion keyframes ===== */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes blob-drift {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.08); }
+  66% { transform: translate(-20px, 15px) scale(0.95); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes gradient-drift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 20px 45px -18px rgba(236, 30, 121, 0.55), 0 0 0 0 rgba(236, 30, 121, 0.45); }
+  70% { box-shadow: 0 20px 45px -18px rgba(236, 30, 121, 0.55), 0 0 0 14px rgba(236, 30, 121, 0); }
+  100% { box-shadow: 0 20px 45px -18px rgba(236, 30, 121, 0.55), 0 0 0 0 rgba(236, 30, 121, 0); }
+}
+
+@keyframes pulse-ring-light {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5); }
+  70% { box-shadow: 0 0 0 14px rgba(255, 255, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+/* Respect the OS-level reduced-motion preference: kill all decorative
+   motion, but never leave anything stuck invisible — every element that
+   animates in also gets a hard opacity:1 fallback here. */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+  .hero-blob, .chat-bubble, .badge-stat, .cta-card, .btn-primary, .btn-cta-solid, .pill-track {
+    animation: none !important;
+  }
+  .hero-copy h1, .hero-sub, .hero-actions, .reveal {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
 
 /* ===== Responsive ===== */
 @media (max-width: 980px) {

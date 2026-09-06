@@ -119,9 +119,9 @@
     <section class="stats">
       <div class="section-inner stats-grid">
         <div class="stat-card"><span class="stat-num">24/7</span><span class="stat-label">متابعة رقمية</span></div>
-        <div class="stat-card"><span class="stat-num">+11</span><span class="stat-label">خدمة أساسية</span></div>
-        <div class="stat-card"><span class="stat-num">100%</span><span class="stat-label">نسبة رضا العملاء</span></div>
-        <div class="stat-card"><span class="stat-num">28</span><span class="stat-label">عميل تم خدمته</span></div>
+        <div class="stat-card"><span class="stat-num" data-count-to="11" data-prefix="+">+11</span><span class="stat-label">خدمة أساسية</span></div>
+        <div class="stat-card"><span class="stat-num" data-count-to="100" data-suffix="%">100%</span><span class="stat-label">نسبة رضا العملاء</span></div>
+        <div class="stat-card"><span class="stat-num" data-count-to="28">28</span><span class="stat-label">عميل تم خدمته</span></div>
       </div>
     </section>
 
@@ -220,22 +220,43 @@
           <h2>عملاء وعلامات نعمل معها.</h2>
         </div>
 
+        <!-- Auto-scrolling marquee: content is duplicated once so the
+             track can loop seamlessly at -50%. Keep both halves identical. -->
         <div class="pill-row" aria-label="قائمة العملاء">
-          <span class="client-pill">Alshaheera <i class="dot"></i></span>
-          <span class="client-pill">Alsahraa Alkubra <i class="dot"></i></span>
-          <span class="client-pill">FiberX <i class="dot"></i></span>
-          <span class="client-pill">Switch <i class="dot"></i></span>
-          <span class="client-pill">ICS Iraq <i class="dot"></i></span>
-          <span class="client-pill">AUIB <i class="dot"></i></span>
-          <span class="client-pill">ASQ Group <i class="dot"></i></span>
-          <span class="client-pill">Biolite UAE <i class="dot"></i></span>
-          <span class="client-pill">Avoca <i class="dot"></i></span>
-          <span class="client-pill">Four Views <i class="dot"></i></span>
-          <span class="client-pill">Iraq Mall <i class="dot"></i></span>
-          <span class="client-pill">Al Nimaa <i class="dot"></i></span>
-          <span class="client-pill">BYD Auto Iraq <i class="dot"></i></span>
-          <span class="client-pill">Almarai <i class="dot"></i></span>
-          <span class="client-pill">Others <i class="dot"></i></span>
+          <div class="pill-track">
+            <span class="client-pill">Alshaheera <i class="dot"></i></span>
+            <span class="client-pill">Alsahraa Alkubra <i class="dot"></i></span>
+            <span class="client-pill">FiberX <i class="dot"></i></span>
+            <span class="client-pill">Switch <i class="dot"></i></span>
+            <span class="client-pill">ICS Iraq <i class="dot"></i></span>
+            <span class="client-pill">AUIB <i class="dot"></i></span>
+            <span class="client-pill">ASQ Group <i class="dot"></i></span>
+            <span class="client-pill">Biolite UAE <i class="dot"></i></span>
+            <span class="client-pill">Avoca <i class="dot"></i></span>
+            <span class="client-pill">Four Views <i class="dot"></i></span>
+            <span class="client-pill">Iraq Mall <i class="dot"></i></span>
+            <span class="client-pill">Al Nimaa <i class="dot"></i></span>
+            <span class="client-pill">BYD Auto Iraq <i class="dot"></i></span>
+            <span class="client-pill">Almarai <i class="dot"></i></span>
+            <span class="client-pill">Others <i class="dot"></i></span>
+          </div>
+          <div class="pill-track" aria-hidden="true">
+            <span class="client-pill">Alshaheera <i class="dot"></i></span>
+            <span class="client-pill">Alsahraa Alkubra <i class="dot"></i></span>
+            <span class="client-pill">FiberX <i class="dot"></i></span>
+            <span class="client-pill">Switch <i class="dot"></i></span>
+            <span class="client-pill">ICS Iraq <i class="dot"></i></span>
+            <span class="client-pill">AUIB <i class="dot"></i></span>
+            <span class="client-pill">ASQ Group <i class="dot"></i></span>
+            <span class="client-pill">Biolite UAE <i class="dot"></i></span>
+            <span class="client-pill">Avoca <i class="dot"></i></span>
+            <span class="client-pill">Four Views <i class="dot"></i></span>
+            <span class="client-pill">Iraq Mall <i class="dot"></i></span>
+            <span class="client-pill">Al Nimaa <i class="dot"></i></span>
+            <span class="client-pill">BYD Auto Iraq <i class="dot"></i></span>
+            <span class="client-pill">Almarai <i class="dot"></i></span>
+            <span class="client-pill">Others <i class="dot"></i></span>
+          </div>
         </div>
       </div>
     </section>
