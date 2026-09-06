@@ -34,10 +34,13 @@ python3 -m http.server 8000
 
 ## Before you launch — things to swap
 
-- **Real photos**: every gray/purple gradient block with a faint "BU" mark
-  is a placeholder (`.placeholder-media` in CSS) standing in for real
-  office/team photography from the actual site. Replace with real `<img>`
-  tags.
+- **Real photos**: every gradient block with a vector icon inside it is a
+  placeholder (`.placeholder-media` in CSS) standing in for real office/
+  team photography from the actual site. Hotlinked stock photos weren't
+  used because this environment couldn't reach any external image host
+  to verify a working URL — swap the `.placeholder-media` divs for real
+  `<img>` tags when you have the photos (or your own vetted stock photo
+  URLs).
 - **Real logo**: the "Backup BU" text logo in the nav is a text
   reconstruction — swap for the actual logo file if you have it.
 - **Pricing (الأسعار) and FAQ (الأسئلة) sections**: not built out — they
