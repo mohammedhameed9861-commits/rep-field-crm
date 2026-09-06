@@ -22,7 +22,7 @@ const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
 // Reveal-on-scroll for cards/stats
-const revealTargets = document.querySelectorAll('.card, .stat, .testimonial');
+const revealTargets = document.querySelectorAll('.card, .stat-card, .client-pill');
 revealTargets.forEach((el) => el.classList.add('reveal'));
 
 if ('IntersectionObserver' in window) {

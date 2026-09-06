@@ -1,30 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Back-Up — Social Media Growth Agency</title>
-<meta name="description" content="Back-Up: your backup for everything your brand needs to grow. Content, management, ads, and strategy for social media." />
+<title>Backup — وكالة تسويق رقمي</title>
+<meta name="description" content="Backup: وكالة تسويق رقمي تبني أنظمة رقمية احترافية للعلامات التجارية والمؤسسات والمطاعم والمولات." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
+  <!--
+    Contact number used throughout this page: +964 773 050 0554
+    (tel: +9647730500554 / WhatsApp: https://wa.me/9647730500554)
+    Update in one place by search-and-replacing that number if it changes again.
+  -->
+
   <header class="nav" id="nav">
     <div class="nav-inner">
-      <a href="#top" class="logo">Back<span class="dash">-</span>Up</a>
+      <a href="#top" class="logo">Backup <span class="logo-badge">BU</span></a>
 
       <nav class="nav-links" id="nav-links">
-        <a href="#services">Services</a>
-        <a href="#results">Results</a>
-        <a href="#contact">Contact</a>
+        <a href="#about">من نحن</a>
+        <a href="#services">الخدمات</a>
+        <a href="#clients">العملاء</a>
+        <!-- Pricing (الأسعار) and FAQ (الأسئلة) sections weren't in the
+             provided screenshots, so these link to the top for now —
+             send that content and I'll build the real sections. -->
+        <a href="#top">الأسعار</a>
+        <a href="#top">الأسئلة</a>
       </nav>
 
-      <a href="#contact" class="btn btn-nav">Get Started</a>
+      <div class="nav-actions">
+        <a class="icon-btn" href="tel:+9647730500554" aria-label="اتصل بنا">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </a>
+        <button class="icon-btn lang-btn" type="button" aria-label="English version">EN</button>
+        <a class="btn btn-whatsapp" href="https://wa.me/9647730500554" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
 
-      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <button class="nav-toggle" id="nav-toggle" aria-label="فتح القائمة" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -35,15 +52,77 @@
     <section class="hero" id="top">
       <div class="hero-blob blob-1"></div>
       <div class="hero-blob blob-2"></div>
-      <div class="hero-blob blob-3"></div>
 
       <div class="hero-inner">
-        <p class="eyebrow">Social Media Growth Agency</p>
-        <h1>We've got your brand's <span class="highlight">back.</span></h1>
-        <p class="hero-sub">Your backup for everything your brand needs to grow — content, community, ads, and strategy, all under one roof.</p>
-        <div class="hero-actions">
-          <a href="#contact" class="btn btn-primary">Book a Free Strategy Call</a>
-          <a href="#services" class="btn btn-ghost">See What We Do</a>
+        <!-- Placeholder visual collage — swap these blocks for real
+             office/team photos with the Backup logo overlay -->
+        <div class="hero-visual">
+          <div class="chat-bubble chat-bubble-1">نظام Backup الإبداعي / <b>BU</b></div>
+          <div class="chat-bubble chat-bubble-2">حضور رقمي يبيع <span class="dot"></span></div>
+
+          <div class="collage">
+            <div class="collage-main placeholder-media">
+              <span class="ph-logo">BU<br /><small>BACKUP</small></span>
+            </div>
+            <div class="collage-sub collage-sub-1 placeholder-media">
+              <span class="step-tag">01 التنفيذ</span>
+            </div>
+            <div class="collage-sub collage-sub-2 placeholder-media">
+              <span class="step-tag">02 أفكار حملات</span>
+            </div>
+            <div class="collage-sub collage-sub-3 placeholder-media">
+              <span class="step-tag">03 مراجعة الأداء</span>
+            </div>
+
+            <div class="badge badge-stat badge-1">
+              <strong>+28</strong>
+              <span>عميل تم خدمته</span>
+            </div>
+            <div class="badge badge-stat badge-2">
+              <strong>100%</strong>
+              <span>نسبة رضا العملاء</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-copy">
+          <h1>نحوّل العلامات التجارية إلى <span class="grad-blue">منظومات</span> <span class="grad-pink">نمو.</span></h1>
+          <p class="hero-sub">Backup تبني الاستراتيجية، المحتوى، الحملات، التقارير والإدارة اليومية للمنصات للمؤسسات التي لا تريد منشورات فقط — بل تأثير تجاري قابل للقياس.</p>
+          <div class="hero-actions">
+            <a href="https://wa.me/9647730500554" target="_blank" rel="noopener" class="btn btn-primary">تواصل معنا الآن</a>
+            <a href="#services" class="btn btn-ghost">شاهد خدماتنا</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats">
+      <div class="section-inner stats-grid">
+        <div class="stat-card"><span class="stat-num">24/7</span><span class="stat-label">متابعة رقمية</span></div>
+        <div class="stat-card"><span class="stat-num">+11</span><span class="stat-label">خدمة أساسية</span></div>
+        <div class="stat-card"><span class="stat-num">100%</span><span class="stat-label">نسبة رضا العملاء</span></div>
+        <div class="stat-card"><span class="stat-num">28</span><span class="stat-label">عميل تم خدمته</span></div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="about" id="about">
+      <div class="section-inner">
+        <h2>مصمم للمؤسسات التي تريد حضوراً رقمياً احترافياً.</h2>
+
+        <div class="about-grid">
+          <p class="about-lead">الهدف ليس أن تبدو نشطاً فقط. الهدف أن تتحول منصاتك إلى أداة تدعم النمو، الثقة، الطلب والمبيعات.</p>
+
+          <div class="about-media placeholder-media">
+            <span class="ph-logo">BU</span>
+          </div>
+
+          <div class="about-card">
+            <span class="pill pill-dark">Backup عن <span class="dot dot-blue"></span></span>
+            <h3>ندير دورة التسويق الرقمي بالكامل — من الاستراتيجية إلى التنفيذ.</h3>
+            <p>وكالة Backup وكالة تسويق تركز على بناء أنظمة رقمية احترافية للعلامات التجارية، المؤسسات، المدارس، المطاعم، المولات وغيرها.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -51,119 +130,109 @@
     <!-- SERVICES -->
     <section class="services" id="services">
       <div class="section-inner">
-        <p class="eyebrow eyebrow-dark">What We Do</p>
-        <h2>Everything your socials need. Nothing they don't.</h2>
+        <div class="services-head">
+          <p class="services-sub">نطاق خدمة متكامل يحوّل التسويق من نشر عشوائي إلى نظام عمل واضح.</p>
+          <h2>ماذا نقدم؟</h2>
+        </div>
 
         <div class="cards">
           <article class="card">
-            <div class="card-icon icon-1">🎬</div>
-            <h3>Content Creation</h3>
-            <p>Scroll-stopping photo, video, and reels content built to match your brand voice.</p>
+            <div class="card-icon">▶</div>
+            <h3>إنتاج الفيديوهات</h3>
+            <p>إنتاج فيديوهات احترافية مخصصة للمنصات الرقمية ومواقع التواصل.</p>
           </article>
 
           <article class="card">
-            <div class="card-icon icon-2">📅</div>
-            <h3>Social Media Management</h3>
-            <p>Daily posting, captions, hashtags, and engagement — handled end to end.</p>
+            <div class="card-icon">🔍</div>
+            <h3>تحليل الجمهور</h3>
+            <p>دراسة وتحليل الجمهور المستهدف وتحديد الرسائل التسويقية المناسبة لكل شريحة.</p>
           </article>
 
           <article class="card">
-            <div class="card-icon icon-3">🚀</div>
-            <h3>Paid Social Ads</h3>
-            <p>Meta, TikTok, and Instagram campaigns built to convert, not just impress.</p>
+            <div class="card-icon">◎</div>
+            <h3>الاستراتيجية التسويقية</h3>
+            <p>إعداد الاستراتيجية التسويقية وخطة المحتوى الشهرية بما يتوافق مع أهداف المؤسسة.</p>
           </article>
 
           <article class="card">
-            <div class="card-icon icon-4">📊</div>
-            <h3>Strategy &amp; Analytics</h3>
-            <p>Data-backed content strategy with reporting that actually tells you what's working.</p>
+            <div class="card-icon">🕐</div>
+            <h3>الجدولة والنشر</h3>
+            <p>جدولة المحتوى وإدارة عملية النشر على المنصات المختلفة.</p>
           </article>
 
           <article class="card">
-            <div class="card-icon icon-5">🤝</div>
-            <h3>Influencer Partnerships</h3>
-            <p>Creator collabs and UGC that build trust faster than ads alone.</p>
+            <div class="card-icon">✎</div>
+            <h3>كتابة المحتوى</h3>
+            <p>كتابة المحتوى التسويقي للمنشورات، الحملات، العروض والإعلانات.</p>
           </article>
 
           <article class="card">
-            <div class="card-icon icon-6">💬</div>
-            <h3>Community Management</h3>
-            <p>DMs, comments, and reputation — we've got that covered too.</p>
+            <div class="card-icon">✦</div>
+            <h3>تصميم المحتوى البصري</h3>
+            <p>تصميم المحتوى البصري والمنشورات وفق الهوية البصرية للمؤسسة.</p>
+          </article>
+
+          <article class="card">
+            <div class="card-icon">◈</div>
+            <h3>متابعة المنافسين</h3>
+            <p>متابعة المنافسين ورصد الفرص والتوجهات في السوق.</p>
+          </article>
+
+          <article class="card">
+            <div class="card-icon">↗</div>
+            <h3>الحملات الإعلانية</h3>
+            <p>إدارة الحملات الإعلانية، مراقبة الأداء، وتحسين النتائج بشكل مستمر.</p>
+          </article>
+
+          <article class="card">
+            <div class="card-icon">💬</div>
+            <h3>إدارة الحسابات</h3>
+            <p>إدارة الحسابات والردود والتفاعل والمتابعة اليومية.</p>
           </article>
         </div>
       </div>
     </section>
 
-    <!-- SOCIAL PROOF -->
-    <section class="proof" id="results">
+    <!-- CLIENTS -->
+    <section class="clients" id="clients">
       <div class="section-inner">
-        <p class="eyebrow eyebrow-dark">Results</p>
-        <h2>Brands trust us to grow, not just post.</h2>
-
-        <div class="stats">
-          <div class="stat">
-            <span class="stat-num">150+</span>
-            <span class="stat-label">Brands Grown</span>
-          </div>
-          <div class="stat">
-            <span class="stat-num">10M+</span>
-            <span class="stat-label">Followers Reached</span>
-          </div>
-          <div class="stat">
-            <span class="stat-num">3.5x</span>
-            <span class="stat-label">Avg. Engagement Lift</span>
-          </div>
-          <div class="stat">
-            <span class="stat-num">24/7</span>
-            <span class="stat-label">Support</span>
-          </div>
+        <div class="clients-head">
+          <p class="clients-sub">نماذج مختارة من أعمالنا عبر قطاعات المؤسسات، المطاعم، المولات، الاتصالات، التعليم، السيارات وغيرها.</p>
+          <h2>عملاء وعلامات نعمل معها.</h2>
         </div>
 
-        <!-- Placeholder testimonial — swap in a real client quote -->
-        <blockquote class="testimonial">
-          <p>“Back-Up took our socials from an afterthought to our #1 sales channel in three months.”</p>
-          <footer>— Placeholder Client, Founder of Placeholder Brand</footer>
-        </blockquote>
-
-        <!-- Placeholder "trusted by" strip — swap in real client names/logos -->
-        <div class="logo-strip" aria-label="Trusted by brands (placeholder names)">
-          <span>NORTHPEAK</span>
-          <span>LUMEN&nbsp;CO.</span>
-          <span>ORBITAL</span>
-          <span>DRIFTWOOD</span>
-          <span>HALO&nbsp;STUDIO</span>
+        <div class="pill-row" aria-label="قائمة العملاء">
+          <span class="client-pill">Alshaheera <i class="dot"></i></span>
+          <span class="client-pill">Alsahraa Alkubra <i class="dot"></i></span>
+          <span class="client-pill">FiberX <i class="dot"></i></span>
+          <span class="client-pill">Switch <i class="dot"></i></span>
+          <span class="client-pill">ICS Iraq <i class="dot"></i></span>
+          <span class="client-pill">AUIB <i class="dot"></i></span>
+          <span class="client-pill">ASQ Group <i class="dot"></i></span>
+          <span class="client-pill">Biolite UAE <i class="dot"></i></span>
+          <span class="client-pill">Avoca <i class="dot"></i></span>
+          <span class="client-pill">Four Views <i class="dot"></i></span>
+          <span class="client-pill">Iraq Mall <i class="dot"></i></span>
+          <span class="client-pill">Al Nimaa <i class="dot"></i></span>
+          <span class="client-pill">BYD Auto Iraq <i class="dot"></i></span>
+          <span class="client-pill">Almarai <i class="dot"></i></span>
+          <span class="client-pill">Others <i class="dot"></i></span>
         </div>
       </div>
     </section>
 
-    <!-- CONTACT -->
-    <section class="contact" id="contact">
-      <div class="hero-blob blob-4"></div>
-      <div class="section-inner contact-inner">
-        <p class="eyebrow">Let's Talk</p>
-        <h2>Ready to grow your brand?</h2>
-        <p class="contact-sub">Tell us a bit about you and we'll get back to you within 24 hours.</p>
-
-        <!--
-          Simple mailto form — no backend required.
-          Replace YOUR_EMAIL@example.com with your real inbox,
-          or swap this for a form service (e.g. Formspree, Web3Forms) later.
-        -->
-        <form class="contact-form" action="mailto:YOUR_EMAIL@example.com" method="post" enctype="text/plain">
-          <div class="form-row">
-            <input type="text" name="Name" placeholder="Your name" required />
-            <input type="email" name="Email" placeholder="Your email" required />
+    <!-- FINAL CTA -->
+    <section class="cta">
+      <div class="section-inner">
+        <div class="cta-card">
+          <div class="cta-text">
+            <h2>جاهز تجعل علامتك مستحيل تجاهلها؟</h2>
+            <p>راسل Backup الآن واحصل على توصية واضحة للباقة المناسبة حسب نشاطك، احتياجك للمحتوى، وهدف النمو.</p>
           </div>
-          <textarea name="Message" rows="4" placeholder="Tell us about your brand..." required></textarea>
-          <button type="submit" class="btn btn-primary">Send Message</button>
-        </form>
-
-        <!-- Placeholder social links — swap with your real handles -->
-        <div class="social-links">
-          <a href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a>
-          <a href="https://tiktok.com/" target="_blank" rel="noopener">TikTok</a>
-          <a href="https://linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
-          <a href="mailto:YOUR_EMAIL@example.com">Email</a>
+          <div class="cta-actions">
+            <a href="tel:+9647730500554" class="btn btn-cta-outline">اتصل الآن</a>
+            <a href="https://wa.me/9647730500554" target="_blank" rel="noopener" class="btn btn-cta-solid">واتساب +964 773 050 0554</a>
+          </div>
         </div>
       </div>
     </section>
@@ -171,8 +240,12 @@
 
   <footer class="footer">
     <div class="section-inner footer-inner">
-      <span class="logo logo-footer">Back<span class="dash">-</span>Up</span>
-      <p>&copy; <span id="year"></span> Back-Up. All rights reserved.</p>
+      <p class="copyright">© <span id="year"></span> Backup. وكالة تسويق رقمي.</p>
+      <nav class="footer-links">
+        <a href="https://wa.me/9647730500554" target="_blank" rel="noopener">WhatsApp</a>
+        <a href="#top">الأسعار</a>
+        <a href="#services">الخدمات</a>
+      </nav>
     </div>
   </footer>
 

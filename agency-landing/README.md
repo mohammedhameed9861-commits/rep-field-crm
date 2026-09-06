@@ -1,21 +1,30 @@
-# Back-Up — Agency Landing Page
+# Backup — Agency Landing Page
 
-A simple, self-contained landing page for the **Back-Up** social media
-agency. Plain HTML/CSS/JS — no build step, no dependencies, and completely
-separate from the CRM app in the rest of this repo.
+A self-contained landing page recreating the real **Backup** (وكالة تسويق
+رقمي) site design from screenshots, in Arabic/RTL, dark theme with the
+pink→purple brand gradient. Plain HTML/CSS/JS — no build step, no
+dependencies, and separate from the CRM app in the rest of this repo.
 
 ## Structure
 
 ```
 agency-landing/
-  index.html    Page markup (hero, services, results, contact)
-  styles.css    All styling (bold/colorful gradient theme)
+  index.html    Page markup (nav, hero, stats, about, services, clients, CTA, footer)
+  styles.css    All styling (dark theme, RTL-aware with logical properties)
   script.js     Mobile nav toggle, footer year, scroll-reveal
 ```
 
-## Run it locally
+## Contact number
 
-Just open `index.html` in a browser, or serve the folder:
+Every phone/WhatsApp touchpoint on this page uses **+964 773 050 0554**:
+- Nav call icon → `tel:+9647730500554`
+- WhatsApp buttons (nav + hero + CTA + footer) → `https://wa.me/9647730500554`
+- Visible CTA button text → `واتساب +964 773 050 0554`
+
+To change the number again later, search this folder for `9647730500554`
+(and the display form `+964 773 050 0554`) and replace everywhere.
+
+## Run it locally
 
 ```bash
 cd agency-landing
@@ -23,29 +32,20 @@ python3 -m http.server 8000
 # then visit http://localhost:8000
 ```
 
-## Deploy it
+## Before you launch — things to swap
 
-Since it's static, you can drop this folder into any static host:
-
-- **Cloudflare Pages / Netlify / Vercel**: set the project root to
-  `agency-landing/` (or copy its contents to a new repo), no build command
-  needed, output directory is `.`
-- **GitHub Pages**: enable Pages on this repo pointed at this folder (or
-  copy it into its own repo's root).
-
-## Before you launch — placeholders to swap
-
-- **Contact email**: replace `YOUR_EMAIL@example.com` in `index.html`
-  (appears twice — the form's `action` and the footer "Email" link). The
-  contact form currently submits via a plain `mailto:` link (opens the
-  visitor's email client) — swap it for a form service like
-  [Formspree](https://formspree.io) or [Web3Forms](https://web3forms.com)
-  if you want submissions to land somewhere without opening email.
-- **Social links**: update the Instagram/TikTok/LinkedIn URLs in the
-  contact section.
-- **Testimonial**: replace the placeholder quote and name once you have a
-  real client testimonial.
-- **"Trusted by" strip**: replace the placeholder brand names with real
-  client names/logos once you have permission to display them.
-- **Stats**: the numbers (150+ brands, 10M+ followers, etc.) are
-  placeholders — swap in your real figures.
+- **Real photos**: every gray/purple gradient block with a faint "BU" mark
+  is a placeholder (`.placeholder-media` in CSS) standing in for real
+  office/team photography from the actual site. Replace with real `<img>`
+  tags.
+- **Real logo**: the "Backup BU" text logo in the nav is a text
+  reconstruction — swap for the actual logo file if you have it.
+- **Pricing (الأسعار) and FAQ (الأسئلة) sections**: not built out — they
+  weren't visible in the screenshots this page was built from. The nav
+  links currently point back to the top of the page as placeholders. Send
+  that content and these sections can be added.
+- **EN toggle**: the "EN" button in the nav is currently decorative (no
+  English version exists yet).
+- **Client list**: the client pills (Alshaheera, FiberX, Almarai, etc.)
+  were copied from the real site's client section — confirm they're still
+  accurate before publishing.
