@@ -35,17 +35,17 @@ python3 -m http.server 8000
 
 ## Before you launch — things to swap
 
-- **Real photos**: 3 of the 5 image slots now use real photo files
+- **Real photos**: 4 of the 5 image slots now use real photo files
   (`images/*.webp`) — AI-generated stock-style shots, not actual photos
   of your team/office, used as a stand-in until you have real ones:
-  - Hero main photo, About section photo, and the "03 مراجعة الأداء"
-    step photo are filled in.
-  - The "01 التنفيذ" and "02 أفكار حملات" step cards still use the
-    vector icons — no photo was provided for those two. Add
-    `images/<file>.webp` and swap the `.media-icon-wrap` block for an
+  - Hero main photo, About section photo, "02 أفكار حملات", and
+    "03 مراجعة الأداء" are filled in.
+  - The "01 التنفيذ" step card still uses the vector icon — no photo
+    was provided for it. Add `images/<file>.webp` and swap the
+    `.media-icon-wrap` block for an
     `<img class="media-photo" src="images/<file>.webp">` the same way
-    the other three are done, whenever you have shots for those.
-  - To replace any of the 3 filled-in placeholders with your *actual*
+    the other four are done, whenever you have a shot for it.
+  - To replace any of the 4 filled-in placeholders with your *actual*
     photography later, just swap the `src` on that `<img class="media-photo">`.
 - **Real logo**: the "Backup BU" text logo in the nav is a text
   reconstruction — swap for the actual logo file if you have it.
