@@ -76,7 +76,7 @@ export default function AccountsPage() {
   }, [id]);
 
   const totalOrders = orders.length;
-  const lifetimeValue = orders.reduce((sum, o) => sum + Number(o.amount), 0);
+  const lifetimeBouquets = orders.reduce((sum, o) => sum + Number(o.quantity), 0);
   const lastActivity = activity[0]?.at;
 
   return (
@@ -188,9 +188,9 @@ export default function AccountsPage() {
                   <div className="mt-0.5 text-lg font-bold text-sea-800">{totalOrders}</div>
                 </div>
                 <div>
-                  <div className="text-[11px] font-semibold text-gray-500">Lifetime Value</div>
+                  <div className="text-[11px] font-semibold text-gray-500">Total Bouquets</div>
                   <div className="mt-0.5 text-lg font-bold text-sea-800">
-                    {formatIQD(lifetimeValue)}
+                    {lifetimeBouquets} bouquet{lifetimeBouquets === 1 ? "" : "s"}
                   </div>
                 </div>
                 <div>

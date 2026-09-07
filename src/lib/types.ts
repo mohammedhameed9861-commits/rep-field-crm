@@ -55,6 +55,7 @@ export interface OrderRow {
   call_id: string | null;
   items: string;
   amount: number;
+  quantity: number;
   status: OrderStatus;
   created_at: string;
   created_by_profile?: Pick<Profile, "id" | "full_name"> | null;
