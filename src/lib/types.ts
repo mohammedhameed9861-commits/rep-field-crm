@@ -21,6 +21,7 @@ export interface Account {
   shop_class: ShopClass | null;
   assigned_rep_id: string | null;
   active: boolean;
+  notes: string | null;
   created_at: string;
   // joined, when queried with the FK expanded
   assigned_rep?: Pick<Profile, "id" | "full_name"> | null;

@@ -29,6 +29,7 @@ export interface AccountInput {
   phone: string | null;
   shop_class: ShopClass | null;
   assigned_rep_id: string | null;
+  notes: string | null;
 }
 
 export async function createAccount(input: AccountInput): Promise<void> {

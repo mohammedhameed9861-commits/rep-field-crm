@@ -22,6 +22,7 @@ export default function AccountForm({
   const [phone, setPhone] = useState(account?.phone ?? "");
   const [shopClass, setShopClass] = useState<ShopClass | "">(account?.shop_class ?? "");
   const [repId, setRepId] = useState(account?.assigned_rep_id ?? "");
+  const [notes, setNotes] = useState(account?.notes ?? "");
   const [reps, setReps] = useState<Profile[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +47,7 @@ export default function AccountForm({
       phone: phone || null,
       shop_class: shopClass || null,
       assigned_rep_id: repId || null,
+      notes: notes || null,
     };
     try {
       if (editing) await updateAccount(account!.id, input);
@@ -113,6 +115,13 @@ export default function AccountForm({
               </option>
             ))}
           </select>
+          <textarea
+            placeholder="Notes (e.g. closed Fridays, prefers morning delivery)"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={3}
+            className={`${field} resize-none`}
+          />
           {error && <p className="text-sm text-red-600">{error}</p>}
           <button
             type="submit"

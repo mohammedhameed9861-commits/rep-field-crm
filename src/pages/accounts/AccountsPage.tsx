@@ -229,6 +229,12 @@ export default function AccountsPage() {
                 )}
               </div>
 
+              {selected.notes && (
+                <div className="mt-4 rounded-lg bg-cream-50 px-4 py-3 text-sm text-gray-700">
+                  {selected.notes}
+                </div>
+              )}
+
               <div className="grid grid-cols-3 gap-4 border-b border-gray-100 py-4">
                 <div>
                   <div className="text-[11px] font-semibold text-gray-500">Total Orders</div>
