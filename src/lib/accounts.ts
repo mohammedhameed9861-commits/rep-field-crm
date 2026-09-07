@@ -6,6 +6,7 @@ export async function fetchAccounts(): Promise<Account[]> {
   const { data, error } = await supabase
     .from("accounts")
     .select("*, assigned_rep:profiles!accounts_assigned_rep_id_fkey(id, full_name)")
+    .order("active", { ascending: false })
     .order("name", { ascending: true });
   if (error) throw error;
   return (data ?? []) as Account[];
@@ -39,6 +40,13 @@ export async function createAccount(input: AccountInput): Promise<void> {
 export async function updateAccount(id: string, input: AccountInput): Promise<void> {
   if (!supabase) throw new Error("Supabase is not configured");
   const { error } = await supabase.from("accounts").update(input).eq("id", id);
+  if (error) throw error;
+}
+
+/** Archive/reactivate — accounts are never hard-deleted, only hidden. */
+export async function setAccountActive(id: string, active: boolean): Promise<void> {
+  if (!supabase) throw new Error("Supabase is not configured");
+  const { error } = await supabase.from("accounts").update({ active }).eq("id", id);
   if (error) throw error;
 }
 

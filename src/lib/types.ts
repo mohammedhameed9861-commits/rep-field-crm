@@ -20,6 +20,7 @@ export interface Account {
   phone: string | null;
   shop_class: ShopClass | null;
   assigned_rep_id: string | null;
+  active: boolean;
   created_at: string;
   // joined, when queried with the FK expanded
   assigned_rep?: Pick<Profile, "id" | "full_name"> | null;

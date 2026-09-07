@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { MapPin, Pencil, Phone, Plus, Search, TrendingUp, User } from "lucide-react";
-import { fetchAccounts, fetchAccountActivity } from "../../lib/accounts";
+import { Archive, ArchiveRestore, MapPin, Pencil, Phone, Plus, Search, TrendingUp, User } from "lucide-react";
+import { fetchAccounts, fetchAccountActivity, setAccountActive } from "../../lib/accounts";
 import { formatDate, formatDateTime, formatIQD, timeAgo } from "../../lib/format";
 import { useAuth } from "../../lib/auth";
 import type { Account, ActivityItem, OrderRow, ShopClass } from "../../lib/types";
@@ -38,6 +38,17 @@ export default function AccountsPage() {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function toggleActive(account: Account) {
+    const verb = account.active ? "archive" : "reactivate";
+    if (!confirm(`${verb === "archive" ? "Archive" : "Reactivate"} ${account.name}?`)) return;
+    try {
+      await setAccountActive(account.id, !account.active);
+      await reload();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
     }
   }
 
@@ -124,17 +135,23 @@ export default function AccountsPage() {
                   key={a.id}
                   onClick={() => navigate(`/accounts/${a.id}`)}
                   className={`block w-full rounded-lg p-3 text-start ${
-                    a.id === id ? "border border-teal-200 bg-teal-50" : "hover:bg-gray-50"
-                  }`}
+                    !a.active ? "opacity-50" : ""
+                  } ${a.id === id ? "border border-teal-200 bg-teal-50" : "hover:bg-gray-50"}`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <span className="text-sm font-semibold text-gray-900">{a.name}</span>
-                    {a.shop_class && (
-                      <span
-                        className={`shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-bold ${CLASS_BADGE[a.shop_class]}`}
-                      >
-                        {a.shop_class}
+                    {!a.active ? (
+                      <span className="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-[10.5px] font-bold text-gray-500">
+                        Inactive
                       </span>
+                    ) : (
+                      a.shop_class && (
+                        <span
+                          className={`shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-bold ${CLASS_BADGE[a.shop_class]}`}
+                        >
+                          {a.shop_class}
+                        </span>
+                      )
                     )}
                   </div>
                   <div className="mt-1 text-xs text-gray-400">{a.area ?? "—"}</div>
@@ -156,6 +173,11 @@ export default function AccountsPage() {
                 <div>
                   <div className="flex items-center gap-2.5">
                     <h2 className="text-lg font-bold text-sea-800">{selected.name}</h2>
+                    {!selected.active && (
+                      <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-bold text-gray-500">
+                        Inactive
+                      </span>
+                    )}
                     {selected.shop_class && (
                       <span
                         className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${CLASS_BADGE[selected.shop_class]}`}
@@ -182,12 +204,28 @@ export default function AccountsPage() {
                   </div>
                 </div>
                 {profile?.role === "manager" && (
-                  <button
-                    onClick={() => setEditing(true)}
-                    className="flex shrink-0 items-center gap-1.5 rounded-full border border-gray-200 px-3.5 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50"
-                  >
-                    <Pencil size={13} /> Edit
-                  </button>
+                  <div className="flex shrink-0 gap-2">
+                    <button
+                      onClick={() => setEditing(true)}
+                      className="flex items-center gap-1.5 rounded-full border border-gray-200 px-3.5 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50"
+                    >
+                      <Pencil size={13} /> Edit
+                    </button>
+                    <button
+                      onClick={() => void toggleActive(selected)}
+                      className="flex items-center gap-1.5 rounded-full border border-gray-200 px-3.5 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50"
+                    >
+                      {selected.active ? (
+                        <>
+                          <Archive size={13} /> Archive
+                        </>
+                      ) : (
+                        <>
+                          <ArchiveRestore size={13} /> Reactivate
+                        </>
+                      )}
+                    </button>
+                  </div>
                 )}
               </div>
 
