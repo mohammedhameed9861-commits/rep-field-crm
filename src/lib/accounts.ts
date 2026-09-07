@@ -22,15 +22,23 @@ export async function fetchAccount(id: string): Promise<Account | null> {
   return data as Account;
 }
 
-export async function createAccount(input: {
+export interface AccountInput {
   name: string;
   area: string | null;
   phone: string | null;
   shop_class: ShopClass | null;
   assigned_rep_id: string | null;
-}): Promise<void> {
+}
+
+export async function createAccount(input: AccountInput): Promise<void> {
   if (!supabase) throw new Error("Supabase is not configured");
   const { error } = await supabase.from("accounts").insert(input);
+  if (error) throw error;
+}
+
+export async function updateAccount(id: string, input: AccountInput): Promise<void> {
+  if (!supabase) throw new Error("Supabase is not configured");
+  const { error } = await supabase.from("accounts").update(input).eq("id", id);
   if (error) throw error;
 }
 

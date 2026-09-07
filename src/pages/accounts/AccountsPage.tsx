@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { MapPin, Phone, Plus, Search, TrendingUp, User } from "lucide-react";
+import { MapPin, Pencil, Phone, Plus, Search, TrendingUp, User } from "lucide-react";
 import { fetchAccounts, fetchAccountActivity } from "../../lib/accounts";
 import { formatDate, formatDateTime, formatIQD, timeAgo } from "../../lib/format";
 import { useAuth } from "../../lib/auth";
 import type { Account, ActivityItem, OrderRow, ShopClass } from "../../lib/types";
 import { SHOP_CLASS_LABEL } from "../../lib/types";
-import NewAccountForm from "./NewAccountForm";
+import AccountForm from "./AccountForm";
 
 const CLASS_BADGE: Record<ShopClass, string> = {
   A: "bg-teal-100 text-teal-700",
@@ -24,6 +24,7 @@ export default function AccountsPage() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [showNew, setShowNew] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
@@ -180,6 +181,14 @@ export default function AccountsPage() {
                     </span>
                   </div>
                 </div>
+                {profile?.role === "manager" && (
+                  <button
+                    onClick={() => setEditing(true)}
+                    className="flex shrink-0 items-center gap-1.5 rounded-full border border-gray-200 px-3.5 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50"
+                  >
+                    <Pencil size={13} /> Edit
+                  </button>
+                )}
               </div>
 
               <div className="grid grid-cols-3 gap-4 border-b border-gray-100 py-4">
@@ -303,10 +312,21 @@ export default function AccountsPage() {
       </div>
 
       {showNew && (
-        <NewAccountForm
+        <AccountForm
           onClose={() => setShowNew(false)}
-          onCreated={() => {
+          onSaved={() => {
             setShowNew(false);
+            void reload();
+          }}
+        />
+      )}
+
+      {editing && selected && (
+        <AccountForm
+          account={selected}
+          onClose={() => setEditing(false)}
+          onSaved={() => {
+            setEditing(false);
             void reload();
           }}
         />

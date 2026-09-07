@@ -1,22 +1,27 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { X } from "lucide-react";
 import { supabase } from "../../lib/supabase";
-import { createAccount } from "../../lib/accounts";
-import type { Profile, ShopClass } from "../../lib/types";
+import { createAccount, updateAccount } from "../../lib/accounts";
+import type { Account, Profile, ShopClass } from "../../lib/types";
 import { SHOP_CLASS_LABEL } from "../../lib/types";
 
-export default function NewAccountForm({
+export default function AccountForm({
+  account,
   onClose,
-  onCreated,
+  onSaved,
 }: {
+  /** Pass an existing account to edit it; omit to create a new one. */
+  account?: Account;
   onClose: () => void;
-  onCreated: () => void;
+  onSaved: () => void;
 }) {
-  const [name, setName] = useState("");
-  const [area, setArea] = useState("");
-  const [phone, setPhone] = useState("");
-  const [shopClass, setShopClass] = useState<ShopClass | "">("");
-  const [repId, setRepId] = useState("");
+  const editing = Boolean(account);
+
+  const [name, setName] = useState(account?.name ?? "");
+  const [area, setArea] = useState(account?.area ?? "");
+  const [phone, setPhone] = useState(account?.phone ?? "");
+  const [shopClass, setShopClass] = useState<ShopClass | "">(account?.shop_class ?? "");
+  const [repId, setRepId] = useState(account?.assigned_rep_id ?? "");
   const [reps, setReps] = useState<Profile[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,15 +40,17 @@ export default function NewAccountForm({
     e.preventDefault();
     setBusy(true);
     setError(null);
+    const input = {
+      name,
+      area: area || null,
+      phone: phone || null,
+      shop_class: shopClass || null,
+      assigned_rep_id: repId || null,
+    };
     try {
-      await createAccount({
-        name,
-        area: area || null,
-        phone: phone || null,
-        shop_class: shopClass || null,
-        assigned_rep_id: repId || null,
-      });
-      onCreated();
+      if (editing) await updateAccount(account!.id, input);
+      else await createAccount(input);
+      onSaved();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -58,7 +65,9 @@ export default function NewAccountForm({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-sea-800">Add Account</h2>
+          <h2 className="text-lg font-bold text-sea-800">
+            {editing ? "Edit Account" : "Add Account"}
+          </h2>
           <button onClick={onClose} className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100">
             <X size={18} />
           </button>
@@ -110,7 +119,7 @@ export default function NewAccountForm({
             disabled={busy}
             className="w-full rounded-full bg-teal-500 px-6 py-2.5 font-semibold text-white transition hover:bg-teal-600 disabled:opacity-50"
           >
-            {busy ? "Adding…" : "Add Account"}
+            {busy ? "Saving…" : editing ? "Save Changes" : "Add Account"}
           </button>
         </form>
       </div>
