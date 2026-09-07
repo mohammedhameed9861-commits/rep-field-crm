@@ -739,4 +739,21 @@ a.client-pill:hover { background: rgba(255, 255, 255, 0.12); border-color: rgba(
   .cta-actions { justify-content: center; }
 
   .footer-inner { flex-direction: column; text-align: center; }
+
+  /* Clients: the auto-scrolling marquee only shows 2-3 pills at a time on
+     a narrow screen and takes the full 32s loop to reach the rest — reads
+     as "not all clients are shown". Swap it for a manually swipeable row
+     instead: animation off, native horizontal scroll with snap, and the
+     hidden duplicate track removed since it's not needed without the loop. */
+  .pill-row {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+  }
+
+  .pill-track[aria-hidden] { display: none; }
+
+  .pill-track { animation: none !important; }
+
+  .client-pill { scroll-snap-align: start; }
 }
