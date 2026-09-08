@@ -1,3 +1,4 @@
+import { errorMessage } from "../../lib/errors";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -36,7 +37,7 @@ export default function NewCallPage() {
     let alive = true;
     searchAccounts(search)
       .then((data) => alive && setResults(data))
-      .catch((err) => setError(err instanceof Error ? err.message : String(err)));
+      .catch((err) => setError(errorMessage(err)));
     return () => {
       alive = false;
     };
@@ -66,7 +67,7 @@ export default function NewCallPage() {
       });
       navigate("/calls");
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setBusy(false);
     }

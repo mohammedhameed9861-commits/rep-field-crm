@@ -1,3 +1,4 @@
+import { errorMessage } from "../../lib/errors";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -25,7 +26,7 @@ export default function TelesalesDashboard() {
         setStats(s);
         setRecent(calls.slice(0, 6));
       })
-      .catch((err) => setError(err instanceof Error ? err.message : String(err)))
+      .catch((err) => setError(errorMessage(err)))
       .finally(() => alive && setLoading(false));
     return () => {
       alive = false;

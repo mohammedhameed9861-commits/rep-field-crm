@@ -1,3 +1,4 @@
+import { errorMessage } from "../../lib/errors";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Trash2, X } from "lucide-react";
@@ -26,7 +27,7 @@ export default function ManageProductTypesModal({
     try {
       setTypes(await fetchProductTypes());
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -47,7 +48,7 @@ export default function ManageProductTypesModal({
       await reload();
       onChanged();
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setBusy(false);
     }
@@ -61,7 +62,7 @@ export default function ManageProductTypesModal({
       await reload();
       onChanged();
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     }
   }
 

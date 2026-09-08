@@ -1,3 +1,4 @@
+import { errorMessage } from "../../lib/errors";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
@@ -31,7 +32,7 @@ export default function EditCallModal({
       await updateCall(call.id, { outcome, note: note || null, next_followup_at: nextFollowupAt });
       onSaved();
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setBusy(false);
     }

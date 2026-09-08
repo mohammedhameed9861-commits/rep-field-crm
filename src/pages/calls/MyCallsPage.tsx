@@ -1,3 +1,4 @@
+import { errorMessage } from "../../lib/errors";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -27,7 +28,7 @@ export default function MyCallsPage() {
     setLoading(true);
     fetchMyCalls(profile.id)
       .then((data) => alive && setCalls(data))
-      .catch((err) => setError(err instanceof Error ? err.message : String(err)))
+      .catch((err) => setError(errorMessage(err)))
       .finally(() => alive && setLoading(false));
     return () => {
       alive = false;

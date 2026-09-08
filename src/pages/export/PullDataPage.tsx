@@ -1,3 +1,4 @@
+import { errorMessage } from "../../lib/errors";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Download, FileSpreadsheet } from "lucide-react";
@@ -16,7 +17,7 @@ export default function PullDataPage() {
     if (profile?.role !== "manager") return;
     fetchExportCounts()
       .then(setCounts)
-      .catch((err) => setError(err instanceof Error ? err.message : String(err)))
+      .catch((err) => setError(errorMessage(err)))
       .finally(() => setLoading(false));
   }, [profile]);
 
@@ -26,7 +27,7 @@ export default function PullDataPage() {
     try {
       await exportAllDataToExcel();
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setExporting(false);
     }

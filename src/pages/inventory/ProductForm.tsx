@@ -1,3 +1,4 @@
+import { errorMessage } from "../../lib/errors";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
@@ -33,7 +34,7 @@ export default function ProductForm({
     let alive = true;
     fetchProductTypes()
       .then((data) => alive && setTypes(data))
-      .catch((err) => alive && setError(err instanceof Error ? err.message : String(err)))
+      .catch((err) => alive && setError(errorMessage(err)))
       .finally(() => alive && setLoadingTypes(false));
     return () => {
       alive = false;
@@ -56,7 +57,7 @@ export default function ProductForm({
       else await createProduct(input);
       onSaved();
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setBusy(false);
     }

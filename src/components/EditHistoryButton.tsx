@@ -1,3 +1,4 @@
+import { errorMessage } from "../lib/errors";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { History, X } from "lucide-react";
@@ -30,7 +31,7 @@ export default function EditHistoryButton({
     try {
       setEntries(await fetchAuditHistory(tableName, recordId));
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setLoading(false);
     }

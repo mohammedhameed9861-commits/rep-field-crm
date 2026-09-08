@@ -1,3 +1,4 @@
+import { errorMessage } from "../../lib/errors";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyRound, Pencil, Plus, UserCheck, UserX } from "lucide-react";
@@ -30,7 +31,7 @@ export default function RepsPage() {
     try {
       setStaff(await fetchStaff());
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -47,7 +48,7 @@ export default function RepsPage() {
       await setStaffActive(person.id, !person.active);
       await reload();
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     }
   }
 
@@ -59,7 +60,7 @@ export default function RepsPage() {
       setEditingNameFor(null);
       await reload();
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setSavingName(false);
     }
@@ -72,7 +73,7 @@ export default function RepsPage() {
       await resetStaffPassword(person.id, password);
       alert(t("reps.resetSuccess"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     }
   }
 

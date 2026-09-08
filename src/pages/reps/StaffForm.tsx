@@ -1,3 +1,4 @@
+import { errorMessage } from "../../lib/errors";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
@@ -23,7 +24,7 @@ export default function StaffForm({ onClose, onSaved }: { onClose: () => void; o
       await createStaffAccount({ email, password, full_name: fullName, role });
       onSaved();
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setBusy(false);
     }
