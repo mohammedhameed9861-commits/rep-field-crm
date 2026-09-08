@@ -1,6 +1,7 @@
 import { errorMessage } from "../../lib/errors";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { AlertTriangle, ArrowDown, ArrowUp, Pencil, Truck, Users } from "lucide-react";
 import {
   fetchInventoryAlertCounts,
@@ -13,7 +14,7 @@ import {
   type DaySeriesPoint,
   type InventoryAlertCounts,
   type MonthTrend,
-  type NeedsAttentionCounts,
+  type NeedsAttentionAccounts,
   type SalesTeamRow,
   type TodayActivityRow,
   type TopStats,
@@ -23,13 +24,15 @@ import SevenDayChart from "./SevenDayChart";
 
 export default function ManagerDashboard() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const [stats, setStats] = useState<TopStats | null>(null);
   const [trend, setTrend] = useState<MonthTrend | null>(null);
   const [series, setSeries] = useState<DaySeriesPoint[]>([]);
   const [alerts, setAlerts] = useState<InventoryAlertCounts>({ low: 0, critical: 0 });
   const [salesTeam, setSalesTeam] = useState<SalesTeamRow[]>([]);
   const [todayActivity, setTodayActivity] = useState<TodayActivityRow[]>([]);
-  const [needsAttention, setNeedsAttention] = useState<NeedsAttentionCounts | null>(null);
+  const [needsAttention, setNeedsAttention] = useState<NeedsAttentionAccounts | null>(null);
+  const [expandedAttention, setExpandedAttention] = useState<keyof NeedsAttentionAccounts | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -263,25 +266,30 @@ export default function ManagerDashboard() {
             {loading || !needsAttention ? (
               <p className="text-sm text-gray-400">{t("common.loading")}</p>
             ) : (
-              <div className="flex flex-col gap-2 text-xs text-gray-700">
-                <p>
-                  <span className="font-bold text-sea-800" dir="ltr">
-                    {needsAttention.inactiveHighValue}
-                  </span>{" "}
-                  {t("dashboard.manager.inactiveHighValue")}
-                </p>
-                <p>
-                  <span className="font-bold text-sea-800" dir="ltr">
-                    {needsAttention.declining}
-                  </span>{" "}
-                  {t("dashboard.manager.declining")}
-                </p>
-                <p>
-                  <span className="font-bold text-sea-800" dir="ltr">
-                    {needsAttention.reactivation}
-                  </span>{" "}
-                  {t("dashboard.manager.reactivationOpportunities")}
-                </p>
+              <div className="flex flex-col gap-1.5 text-xs text-gray-700">
+                <NeedsAttentionRow
+                  accounts={needsAttention.inactiveHighValue}
+                  label={t("dashboard.manager.inactiveHighValue")}
+                  expanded={expandedAttention === "inactiveHighValue"}
+                  onToggle={() =>
+                    setExpandedAttention(expandedAttention === "inactiveHighValue" ? null : "inactiveHighValue")
+                  }
+                  onGo={(accountId) => navigate(`/accounts/${accountId}`)}
+                />
+                <NeedsAttentionRow
+                  accounts={needsAttention.declining}
+                  label={t("dashboard.manager.declining")}
+                  expanded={expandedAttention === "declining"}
+                  onToggle={() => setExpandedAttention(expandedAttention === "declining" ? null : "declining")}
+                  onGo={(accountId) => navigate(`/accounts/${accountId}`)}
+                />
+                <NeedsAttentionRow
+                  accounts={needsAttention.reactivation}
+                  label={t("dashboard.manager.reactivationOpportunities")}
+                  expanded={expandedAttention === "reactivation"}
+                  onToggle={() => setExpandedAttention(expandedAttention === "reactivation" ? null : "reactivation")}
+                  onGo={(accountId) => navigate(`/accounts/${accountId}`)}
+                />
               </div>
             )}
           </div>
@@ -348,6 +356,62 @@ function MiniStat({
           </span>
         )}
       </div>
+    </div>
+  );
+}
+
+/** One "Needs Attention" line — clicking it jumps straight to the flagged account (when
+ * there's only one) or, with several, expands an inline list to pick from. */
+function NeedsAttentionRow({
+  accounts,
+  label,
+  expanded,
+  onToggle,
+  onGo,
+}: {
+  accounts: { id: string; name: string }[];
+  label: string;
+  expanded: boolean;
+  onToggle: () => void;
+  onGo: (accountId: string) => void;
+}) {
+  if (accounts.length === 0) {
+    return (
+      <p>
+        <span className="font-bold text-sea-800" dir="ltr">
+          0
+        </span>{" "}
+        {label}
+      </p>
+    );
+  }
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => (accounts.length === 1 ? onGo(accounts[0].id) : onToggle())}
+        className="flex items-center gap-1 text-start hover:underline"
+      >
+        <span className="font-bold text-sea-800" dir="ltr">
+          {accounts.length}
+        </span>
+        <span>{label}</span>
+      </button>
+      {expanded && accounts.length > 1 && (
+        <div className="mt-1 flex flex-col items-start gap-0.5 ps-1">
+          {accounts.map((a) => (
+            <button
+              key={a.id}
+              type="button"
+              onClick={() => onGo(a.id)}
+              className="text-teal-700 hover:underline"
+            >
+              {a.name}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

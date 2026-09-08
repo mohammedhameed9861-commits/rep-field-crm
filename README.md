@@ -109,7 +109,9 @@ badge, see below), an editable monthly target with a progress bar
 calendar days), a 7-day sales chart, inventory alerts (Low/Critical
 counts), month-to-date cartons per rep + a combined Telesales row, a
 "Needs Attention" panel (inactive high-value accounts, declining
-accounts, reactivation opportunities — see thresholds below), and
+accounts, reactivation opportunities — see thresholds below; each count
+is clickable — one flagged account jumps straight to its page, more
+than one expands an inline list to pick from), and
 today's visit/call + cartons count per rep and telesales combined. A
 telesales agent gets their own personal version instead (their own
 stats + recent calls). Reps don't get a dashboard — landing on `/`

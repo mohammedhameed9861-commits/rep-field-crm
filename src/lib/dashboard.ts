@@ -253,10 +253,12 @@ export async function fetchTodayActivityByStaff(): Promise<TodayActivityRow[]> {
   return rows;
 }
 
-export interface NeedsAttentionCounts {
-  inactiveHighValue: number;
-  declining: number;
-  reactivation: number;
+/** The account ids/names behind one Needs Attention count — clicking that count in the UI
+ * jumps straight to one of these accounts instead of just showing a number. */
+export interface NeedsAttentionAccounts {
+  inactiveHighValue: { id: string; name: string }[];
+  declining: { id: string; name: string }[];
+  reactivation: { id: string; name: string }[];
 }
 
 const INACTIVE_DAYS = 30;
@@ -272,15 +274,15 @@ const DECLINE_RATIO = 0.8; // this month's cartons below 80% of last month's cou
  *  - reactivation: an account that has ordered before but has had zero
  *    visit/call/order activity in 60+ days.
  */
-export async function fetchNeedsAttention(): Promise<NeedsAttentionCounts> {
-  if (!supabase) return { inactiveHighValue: 0, declining: 0, reactivation: 0 };
+export async function fetchNeedsAttention(): Promise<NeedsAttentionAccounts> {
+  if (!supabase) return { inactiveHighValue: [], declining: [], reactivation: [] };
 
   const now = new Date();
   const thisMonthStart = startOfMonthISO(now);
   const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
 
   const [accountsRes, ordersRes, visitsRes, callsRes] = await Promise.all([
-    supabase.from("accounts").select("id, shop_class").eq("active", true),
+    supabase.from("accounts").select("id, name, shop_class").eq("active", true),
     supabase.from("orders").select("account_id, quantity, created_at"),
     supabase.from("visits").select("account_id, created_at"),
     supabase.from("calls").select("account_id, created_at"),
@@ -290,7 +292,7 @@ export async function fetchNeedsAttention(): Promise<NeedsAttentionCounts> {
   if (visitsRes.error) throw visitsRes.error;
   if (callsRes.error) throw callsRes.error;
 
-  const accounts = (accountsRes.data ?? []) as { id: string; shop_class: string | null }[];
+  const accounts = (accountsRes.data ?? []) as { id: string; name: string; shop_class: string | null }[];
   const orders = (ordersRes.data ?? []) as { account_id: string; quantity: number; created_at: string }[];
   const visits = (visitsRes.data ?? []) as { account_id: string; created_at: string }[];
   const calls = (callsRes.data ?? []) as { account_id: string; created_at: string }[];
@@ -321,25 +323,25 @@ export async function fetchNeedsAttention(): Promise<NeedsAttentionCounts> {
   const reactivationCutoff = new Date(now);
   reactivationCutoff.setDate(reactivationCutoff.getDate() - REACTIVATION_DAYS);
 
-  let inactiveHighValue = 0;
-  let declining = 0;
-  let reactivation = 0;
+  const inactiveHighValue: { id: string; name: string }[] = [];
+  const declining: { id: string; name: string }[] = [];
+  const reactivation: { id: string; name: string }[] = [];
 
   for (const a of accounts) {
     const last = lastActivity.get(a.id);
 
     if ((a.shop_class === "A" || a.shop_class === "B") && (!last || last < inactiveCutoff.toISOString())) {
-      inactiveHighValue++;
+      inactiveHighValue.push({ id: a.id, name: a.name });
     }
 
     const lastMonthQty = lastMonthByAccount.get(a.id) ?? 0;
     const thisMonthQty = thisMonthByAccount.get(a.id) ?? 0;
     if (lastMonthQty > 0 && thisMonthQty < lastMonthQty * DECLINE_RATIO) {
-      declining++;
+      declining.push({ id: a.id, name: a.name });
     }
 
     if (everOrdered.has(a.id) && (!last || last < reactivationCutoff.toISOString())) {
-      reactivation++;
+      reactivation.push({ id: a.id, name: a.name });
     }
   }
 
