@@ -1,6 +1,17 @@
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Camera, History, LayoutGrid, Users, TrendingUp, Phone, PhoneCall, Boxes, Download } from "lucide-react";
+import {
+  Camera,
+  History,
+  LayoutGrid,
+  Users,
+  TrendingUp,
+  Phone,
+  PhoneCall,
+  Boxes,
+  Download,
+  Images,
+} from "lucide-react";
 import { useAuth } from "../lib/auth";
 import { setLanguage } from "../i18n";
 
@@ -8,6 +19,7 @@ const managerNav = [
   { to: "/", labelKey: "nav.dashboard", icon: LayoutGrid, end: true },
   { to: "/accounts", labelKey: "nav.accounts", icon: Users },
   { to: "/reps", labelKey: "nav.reps", icon: TrendingUp },
+  { to: "/visits-activity", labelKey: "nav.visitsActivity", icon: Images },
   { to: "/telesales", labelKey: "nav.telesales", icon: Phone },
   { to: "/inventory", labelKey: "nav.inventory", icon: Boxes },
   { to: "/pull-data", labelKey: "nav.pullData", icon: Download },

@@ -30,14 +30,17 @@ password — no more creating accounts by hand in the Supabase dashboard.
 Reps get their own day-to-day nav: **New Visit** (search any shop by
 name, take a camera photo — no gallery uploads, mark sold/no-sale, and
 log the order in the same step when it's a sale) and **My Visits** (their
-own visit history with the photo, outcome, and reason).
+own visit history with the photo, outcome, and reason). Managers monitor
+all of it from **Visits** — every rep's visits, with the photo, shop,
+outcome, and note, filterable by rep, outcome, and a calendar date range.
 
 **Telesales** — the same New Call / My Calls day-to-day nav as reps get
 for visits: search any shop by name, log an outcome (order placed /
-follow-up / no answer), and when an order is placed, log it in the same
-step. No photo — a call has nothing to photograph. Managers get a
-**Telesales Activity** rollup: every call across every agent, filterable
-by agent, outcome, and date range.
+follow-up / no answer), and an optional note for what she was told on
+the call — and when an order is placed, log it in the same step. No
+photo — a call has nothing to photograph. Managers get a **Telesales
+Activity** rollup: every call across every agent, filterable by agent,
+outcome, and a calendar date range.
 
 **Inventory** — a manager-only screen listing every product with its
 stock on hand and low-stock threshold, plus add/edit. Deliberately
@@ -45,8 +48,11 @@ simple, per the original ask: editing a product's stock is a plain
 manual number, not something orders adjust automatically.
 
 **Dashboard** — a manager's view is built around today vs. month-to-date:
-a top row (sales today, MTD sales, the monthly cartons target, active
-accounts, orders today), an editable monthly target with a progress bar
+today's date at the top (so it's always clear which day you're looking
+at — the browser's own clock, no manual date entry anywhere in the
+app), a top row (sales today, MTD sales, the monthly cartons target,
+active accounts, orders today — MTD Sales carries a small ↑/↓ trend
+badge, see below), an editable monthly target with a progress bar
 (remaining cartons, required/day, current/day, computed from real
 calendar days), a 7-day sales chart, inventory alerts (Low/Critical
 counts), month-to-date cartons per rep + a combined Telesales row, a
@@ -57,6 +63,12 @@ telesales agent gets their own personal version instead (their own
 stats + recent calls). Reps don't get a dashboard — landing on `/`
 sends them straight to My Visits, matching their New Visit/My
 Visits-only nav.
+
+**Month-over-month trend**: the badge next to MTD Sales compares this
+month's cartons-so-far against last month's cartons over the *same*
+first N days (an apples-to-apples partial-month comparison, since the
+current month isn't over yet) — not "vs. next month," which isn't a
+comparison that exists yet.
 
 "Needs Attention" thresholds (all client-side, in `src/lib/dashboard.ts`,
 easy to retune):
@@ -70,7 +82,11 @@ easy to retune):
 **Pull Data** — a manager-only export: one click downloads a single
 `.xlsx` with a tab each for Accounts, Visits, Calls, Orders, Products,
 and Staff — built entirely in the browser (`src/lib/exportData.ts`, via
-SheetJS, loaded on demand so it doesn't bloat everyone else's page load).
+SheetJS, loaded on demand so it doesn't bloat everyone else's page
+load). The Visits and Calls tabs each carry a `Day` column plus the
+linked order's items/bouquets/amount/status inline (blank when that
+visit/call didn't result in a sale) — no need to cross-reference the
+Orders tab by hand.
 
 Every section from the original ask is now built.
 

@@ -14,6 +14,7 @@
     "dashboard": "لوحة التحكم",
     "accounts": "الحسابات",
     "reps": "المندوبون",
+    "visitsActivity": "الزيارات",
     "telesales": "المبيعات الهاتفية",
     "inventory": "المخزون",
     "pullData": "سحب البيانات",
@@ -196,6 +197,11 @@
     "thresholdLabel": "حد المخزون المنخفض",
     "criticalLabel": "حد المخزون الحرج"
   },
+  "dateRange": {
+    "pick": "نطاق التاريخ",
+    "clear": "مسح",
+    "done": "تم"
+  },
   "pullData": {
     "title": "سحب البيانات",
     "subtitle": "كل شيء عن المبيعات ونشاطاتها، في ملف واحد.",
@@ -204,17 +210,22 @@
     "exporting": "جارٍ تجهيز الملف…",
     "exportHint": "يُنزّل ملف .xlsx واحد بتبويب لكل من الحسابات والزيارات والمكالمات والطلبات والمنتجات والموظفين."
   },
+  "visitsActivity": {
+    "title": "نشاط الزيارات",
+    "managerOnly": "المدير فقط يمكنه عرض نشاط الزيارات على مستوى الفريق.",
+    "countOne": "{{count}} زيارة",
+    "countOther": "{{count}} زيارة",
+    "allReps": "كل المندوبين",
+    "allOutcomes": "كل النتائج",
+    "noVisitsFound": "لا توجد زيارات مطابقة لهذه الفلاتر."
+  },
   "telesalesRollup": {
     "title": "نشاط المبيعات الهاتفية",
     "managerOnly": "المدير فقط يمكنه عرض نشاط المبيعات الهاتفية على مستوى الفريق.",
     "countOne": "{{count}} مكالمة",
     "countOther": "{{count}} مكالمة",
-    "filterAgent": "الموظف",
     "allAgents": "كل الموظفين",
-    "filterOutcome": "النتيجة",
     "allOutcomes": "كل النتائج",
-    "filterFrom": "من",
-    "filterTo": "إلى",
     "colDate": "التاريخ",
     "colAgent": "الموظف",
     "colShop": "المحل",
@@ -227,6 +238,7 @@
       "title": "لوحة التحكم",
       "salesToday": "مبيعات اليوم",
       "mtdSales": "مبيعات الشهر",
+      "trendHint": "مقارنة بنفس اليوم من الشهر الماضي",
       "target": "الهدف",
       "statAccounts": "الحسابات النشطة",
       "ordersToday": "طلبات اليوم",

@@ -76,6 +76,16 @@ export async function exportAllDataToExcel(filenamePrefix = "flowercom-crm-expor
   const products = (productsRes.data ?? []) as Row[];
   const staff = (staffRes.data ?? []) as Row[];
 
+  // Orders link back to the one visit/call that produced them — build both
+  // directions so each visit/call row can show its order inline, without a
+  // separate lookup into the Orders tab.
+  const orderByVisitId = new Map<string, Row>();
+  const orderByCallId = new Map<string, Row>();
+  for (const o of orders) {
+    if (o.visit_id) orderByVisitId.set(o.visit_id as string, o);
+    if (o.call_id) orderByCallId.set(o.call_id as string, o);
+  }
+
   const accountRows = accounts.map((a) => ({
     ID: a.id,
     Name: a.name,
@@ -88,24 +98,40 @@ export async function exportAllDataToExcel(filenamePrefix = "flowercom-crm-expor
     "Created At": a.created_at,
   }));
 
-  const visitRows = visits.map((v) => ({
-    ID: v.id,
-    Shop: (v.account as Row | null)?.name ?? "",
-    Rep: (v.rep as Row | null)?.full_name ?? "",
-    Outcome: v.outcome,
-    "No-Sale Reason": v.no_sale_reason,
-    Note: v.note,
-    "Created At": v.created_at,
-  }));
+  const visitRows = visits.map((v) => {
+    const order = orderByVisitId.get(v.id as string);
+    return {
+      ID: v.id,
+      Shop: (v.account as Row | null)?.name ?? "",
+      Rep: (v.rep as Row | null)?.full_name ?? "",
+      Day: (v.created_at as string).slice(0, 10),
+      Outcome: v.outcome,
+      "No-Sale Reason": v.no_sale_reason,
+      Note: v.note,
+      "Order Items": order?.items ?? "",
+      "Order Bouquets": order?.quantity ?? "",
+      "Order Amount (IQD)": order?.amount ?? "",
+      "Order Status": order?.status ?? "",
+      "Created At": v.created_at,
+    };
+  });
 
-  const callRows = calls.map((c) => ({
-    ID: c.id,
-    Shop: (c.account as Row | null)?.name ?? "",
-    "Telesales Agent": (c.telesales as Row | null)?.full_name ?? "",
-    Outcome: c.outcome,
-    Note: c.note,
-    "Created At": c.created_at,
-  }));
+  const callRows = calls.map((c) => {
+    const order = orderByCallId.get(c.id as string);
+    return {
+      ID: c.id,
+      Shop: (c.account as Row | null)?.name ?? "",
+      "Telesales Agent": (c.telesales as Row | null)?.full_name ?? "",
+      Day: (c.created_at as string).slice(0, 10),
+      Outcome: c.outcome,
+      Note: c.note,
+      "Order Items": order?.items ?? "",
+      "Order Bouquets": order?.quantity ?? "",
+      "Order Amount (IQD)": order?.amount ?? "",
+      "Order Status": order?.status ?? "",
+      "Created At": c.created_at,
+    };
+  });
 
   const orderRows = orders.map((o) => ({
     ID: o.id,

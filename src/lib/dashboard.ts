@@ -51,6 +51,51 @@ export async function fetchTopStats(): Promise<TopStats> {
   };
 }
 
+export interface MonthTrend {
+  pctChange: number; // positive = up vs. last month, negative = down
+  thisMonthSoFar: number;
+  lastMonthSameRange: number;
+}
+
+/** This month's cartons so far vs. last month's cartons over the same first N days — an apples-to-apples
+ * partial-month comparison, since the current month isn't over yet. */
+export async function fetchMonthTrend(): Promise<MonthTrend> {
+  if (!supabase) return { pctChange: 0, thisMonthSoFar: 0, lastMonthSameRange: 0 };
+  const now = new Date();
+  const thisMonthStart = startOfMonthISO(now);
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonthSameDayEnd = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate() + 1);
+
+  const [thisRes, lastRes] = await Promise.all([
+    supabase.from("orders").select("quantity").gte("created_at", thisMonthStart),
+    supabase
+      .from("orders")
+      .select("quantity")
+      .gte("created_at", lastMonthStart.toISOString())
+      .lt("created_at", lastMonthSameDayEnd.toISOString()),
+  ]);
+  if (thisRes.error) throw thisRes.error;
+  if (lastRes.error) throw lastRes.error;
+
+  const thisMonthSoFar = ((thisRes.data ?? []) as { quantity: number }[]).reduce(
+    (sum, o) => sum + Number(o.quantity),
+    0,
+  );
+  const lastMonthSameRange = ((lastRes.data ?? []) as { quantity: number }[]).reduce(
+    (sum, o) => sum + Number(o.quantity),
+    0,
+  );
+
+  const pctChange =
+    lastMonthSameRange > 0
+      ? ((thisMonthSoFar - lastMonthSameRange) / lastMonthSameRange) * 100
+      : thisMonthSoFar > 0
+        ? 100
+        : 0;
+
+  return { pctChange, thisMonthSoFar, lastMonthSameRange };
+}
+
 export interface DaySeriesPoint {
   date: string; // "YYYY-MM-DD"
   cartons: number;

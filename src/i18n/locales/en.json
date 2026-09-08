@@ -14,6 +14,7 @@
     "dashboard": "Dashboard",
     "accounts": "Accounts",
     "reps": "Reps",
+    "visitsActivity": "Visits",
     "telesales": "Telesales",
     "inventory": "Inventory",
     "pullData": "Pull Data",
@@ -196,6 +197,11 @@
     "thresholdLabel": "Low-stock at",
     "criticalLabel": "Critical at"
   },
+  "dateRange": {
+    "pick": "Date range",
+    "clear": "Clear",
+    "done": "Done"
+  },
   "pullData": {
     "title": "Pull Data",
     "subtitle": "Everything about sales and sales activity, in one export.",
@@ -204,17 +210,22 @@
     "exporting": "Preparing file…",
     "exportHint": "Downloads one .xlsx file with a tab for Accounts, Visits, Calls, Orders, Products, and Staff."
   },
+  "visitsActivity": {
+    "title": "Visits Activity",
+    "managerOnly": "Only managers can view team-wide visit activity.",
+    "countOne": "{{count}} visit",
+    "countOther": "{{count}} visits",
+    "allReps": "All reps",
+    "allOutcomes": "All outcomes",
+    "noVisitsFound": "No visits match these filters."
+  },
   "telesalesRollup": {
     "title": "Telesales Activity",
     "managerOnly": "Only managers can view team-wide telesales activity.",
     "countOne": "{{count}} call",
     "countOther": "{{count}} calls",
-    "filterAgent": "Agent",
     "allAgents": "All agents",
-    "filterOutcome": "Outcome",
     "allOutcomes": "All outcomes",
-    "filterFrom": "From",
-    "filterTo": "To",
     "colDate": "Date",
     "colAgent": "Agent",
     "colShop": "Shop",
@@ -227,6 +238,7 @@
       "title": "Dashboard",
       "salesToday": "Sales Today",
       "mtdSales": "MTD Sales",
+      "trendHint": "vs. same point last month",
       "target": "Target",
       "statAccounts": "Active Accounts",
       "ordersToday": "Orders Today",

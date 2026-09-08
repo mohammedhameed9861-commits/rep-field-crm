@@ -6,6 +6,7 @@ import { fetchAllCalls } from "../../lib/calls";
 import { fetchStaff } from "../../lib/reps";
 import type { Call, CallOutcome, Profile } from "../../lib/types";
 import { formatDateTime } from "../../lib/format";
+import DateRangePicker from "../../components/DateRangePicker";
 
 const OUTCOME_BADGE: Record<CallOutcome, string> = {
   order_placed: "bg-teal-50 text-teal-700",
@@ -93,19 +94,13 @@ export default function TelesalesRollupPage() {
           <option value="follow_up">{t("callOutcome.follow_up")}</option>
           <option value="no_answer">{t("callOutcome.no_answer")}</option>
         </select>
-        <input
-          type="date"
-          value={dateFrom}
-          onChange={(e) => setDateFrom(e.target.value)}
-          className={field}
-          aria-label={t("telesalesRollup.filterFrom")}
-        />
-        <input
-          type="date"
-          value={dateTo}
-          onChange={(e) => setDateTo(e.target.value)}
-          className={field}
-          aria-label={t("telesalesRollup.filterTo")}
+        <DateRangePicker
+          from={dateFrom}
+          to={dateTo}
+          onChange={(f, tt) => {
+            setDateFrom(f);
+            setDateTo(tt);
+          }}
         />
       </div>
 

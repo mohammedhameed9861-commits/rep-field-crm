@@ -7,6 +7,7 @@ import AccountsPage from "./pages/accounts/AccountsPage";
 import RepsPage from "./pages/reps/RepsPage";
 import NewVisitPage from "./pages/visits/NewVisitPage";
 import MyVisitsPage from "./pages/visits/MyVisitsPage";
+import VisitsActivityPage from "./pages/visits/VisitsActivityPage";
 import NewCallPage from "./pages/calls/NewCallPage";
 import MyCallsPage from "./pages/calls/MyCallsPage";
 import InventoryPage from "./pages/inventory/InventoryPage";
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="reps" element={<RepsPage />} />
             <Route path="visits/new" element={<NewVisitPage />} />
             <Route path="visits" element={<MyVisitsPage />} />
+            <Route path="visits-activity" element={<VisitsActivityPage />} />
             <Route path="calls/new" element={<NewCallPage />} />
             <Route path="calls" element={<MyCallsPage />} />
             <Route path="telesales" element={<TelesalesRollupPage />} />

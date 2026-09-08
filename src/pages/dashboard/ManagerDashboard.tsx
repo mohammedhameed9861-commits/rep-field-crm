@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertTriangle, Pencil, Truck, Users } from "lucide-react";
+import { AlertTriangle, ArrowDown, ArrowUp, Pencil, Truck, Users } from "lucide-react";
 import {
   fetchInventoryAlertCounts,
   fetchLast7DaysSeries,
+  fetchMonthTrend,
   fetchNeedsAttention,
   fetchSalesTeamMTD,
   fetchTodayActivityByStaff,
   fetchTopStats,
   type DaySeriesPoint,
   type InventoryAlertCounts,
+  type MonthTrend,
   type NeedsAttentionCounts,
   type SalesTeamRow,
   type TodayActivityRow,
@@ -21,6 +23,7 @@ import SevenDayChart from "./SevenDayChart";
 export default function ManagerDashboard() {
   const { t, i18n } = useTranslation();
   const [stats, setStats] = useState<TopStats | null>(null);
+  const [trend, setTrend] = useState<MonthTrend | null>(null);
   const [series, setSeries] = useState<DaySeriesPoint[]>([]);
   const [alerts, setAlerts] = useState<InventoryAlertCounts>({ low: 0, critical: 0 });
   const [salesTeam, setSalesTeam] = useState<SalesTeamRow[]>([]);
@@ -35,8 +38,9 @@ export default function ManagerDashboard() {
 
   async function reload() {
     try {
-      const [s, sr, a, st, ta, na] = await Promise.all([
+      const [s, mt, sr, a, st, ta, na] = await Promise.all([
         fetchTopStats(),
+        fetchMonthTrend(),
         fetchLast7DaysSeries(7),
         fetchInventoryAlertCounts(),
         fetchSalesTeamMTD(),
@@ -44,6 +48,7 @@ export default function ManagerDashboard() {
         fetchNeedsAttention(),
       ]);
       setStats(s);
+      setTrend(mt);
       setSeries(sr);
       setAlerts(a);
       setSalesTeam(st);
@@ -107,7 +112,11 @@ export default function ManagerDashboard() {
         {/* Top stat row */}
         <div className="grid grid-cols-5 gap-3">
           <MiniStat label={t("dashboard.manager.salesToday")} value={loading ? "…" : stats?.salesToday ?? 0} />
-          <MiniStat label={t("dashboard.manager.mtdSales")} value={loading ? "…" : mtd} />
+          <MiniStat
+            label={t("dashboard.manager.mtdSales")}
+            value={loading ? "…" : mtd}
+            trendPct={loading ? undefined : trend?.pctChange}
+          />
           <MiniStat label={t("dashboard.manager.target")} value={loading ? "…" : target} />
           <MiniStat
             label={t("dashboard.manager.statAccounts")}
@@ -306,12 +315,37 @@ export default function ManagerDashboard() {
   );
 }
 
-function MiniStat({ label, value }: { label: string; value: number | string }) {
+function MiniStat({
+  label,
+  value,
+  trendPct,
+}: {
+  label: string;
+  value: number | string;
+  /** Percentage change vs. the same point last month — omit to hide the trend badge. */
+  trendPct?: number;
+}) {
+  const { t } = useTranslation();
+  const isUp = (trendPct ?? 0) >= 0;
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-3.5">
       <div className="text-[10.5px] font-semibold text-gray-400">{label}</div>
-      <div className="mt-1 text-lg font-bold text-sea-800" dir="ltr">
-        {value}
+      <div className="mt-1 flex items-center gap-1.5">
+        <span className="text-lg font-bold text-sea-800" dir="ltr">
+          {value}
+        </span>
+        {trendPct !== undefined && (
+          <span
+            className={`flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+              isUp ? "bg-teal-50 text-teal-700" : "bg-red-100 text-red-600"
+            }`}
+            dir="ltr"
+            title={t("dashboard.manager.trendHint")}
+          >
+            {isUp ? <ArrowUp size={10} /> : <ArrowDown size={10} />}
+            {Math.abs(trendPct).toFixed(0)}%
+          </span>
+        )}
       </div>
     </div>
   );

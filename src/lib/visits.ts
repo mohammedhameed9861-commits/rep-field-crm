@@ -80,3 +80,31 @@ export async function fetchMyVisits(repId: string): Promise<Visit[]> {
   if (error) throw error;
   return (data ?? []) as Visit[];
 }
+
+export interface VisitFilters {
+  repId?: string;
+  outcome?: VisitOutcome;
+  /** Inclusive, as a plain "YYYY-MM-DD" date. */
+  dateFrom?: string;
+  /** Inclusive, as a plain "YYYY-MM-DD" date. */
+  dateTo?: string;
+}
+
+/** Every visit across every rep — the manager's team-wide monitoring view, not one rep's own history. */
+export async function fetchAllVisits(filters: VisitFilters = {}): Promise<Visit[]> {
+  if (!supabase) return [];
+  let q = supabase
+    .from("visits")
+    .select(
+      "*, account:accounts!visits_account_id_fkey(id, name, area), rep:profiles!visits_rep_id_fkey(id, full_name)",
+    )
+    .order("created_at", { ascending: false })
+    .limit(500);
+  if (filters.repId) q = q.eq("rep_id", filters.repId);
+  if (filters.outcome) q = q.eq("outcome", filters.outcome);
+  if (filters.dateFrom) q = q.gte("created_at", `${filters.dateFrom}T00:00:00`);
+  if (filters.dateTo) q = q.lte("created_at", `${filters.dateTo}T23:59:59`);
+  const { data, error } = await q;
+  if (error) throw error;
+  return (data ?? []) as Visit[];
+}
