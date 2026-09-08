@@ -44,13 +44,33 @@ stock on hand and low-stock threshold, plus add/edit. Deliberately
 simple, per the original ask: editing a product's stock is a plain
 manual number, not something orders adjust automatically.
 
-**Dashboard** — a manager sees top-level stat tiles (active accounts,
-total orders, total bouquets), a sitewide recent-activity feed (every
-visit/call/order across the whole team), low-stock alerts, and each
-rep/telesales agent's activity count for the last 7 days. A telesales
-agent gets their own personal version instead (their own stats + recent
-calls). Reps don't get a dashboard — landing on `/` sends them straight
-to My Visits, matching their New Visit/My Visits-only nav.
+**Dashboard** — a manager's view is built around today vs. month-to-date:
+a top row (sales today, MTD sales, the monthly cartons target, active
+accounts, orders today), an editable monthly target with a progress bar
+(remaining cartons, required/day, current/day, computed from real
+calendar days), a 7-day sales chart, inventory alerts (Low/Critical
+counts), month-to-date cartons per rep + a combined Telesales row, a
+"Needs Attention" panel (inactive high-value accounts, declining
+accounts, reactivation opportunities — see thresholds below), and
+today's visit/call + cartons count per rep and telesales combined. A
+telesales agent gets their own personal version instead (their own
+stats + recent calls). Reps don't get a dashboard — landing on `/`
+sends them straight to My Visits, matching their New Visit/My
+Visits-only nav.
+
+"Needs Attention" thresholds (all client-side, in `src/lib/dashboard.ts`,
+easy to retune):
+- **Inactive high-value**: an active shop class A/B account with no
+  visit/call/order in 30+ days.
+- **Declining**: an account with real order history whose this-month
+  cartons are under 80% of last month's.
+- **Reactivation opportunity**: an account that has ordered before but
+  has had zero activity in 60+ days.
+
+**Pull Data** — a manager-only export: one click downloads a single
+`.xlsx` with a tab each for Accounts, Visits, Calls, Orders, Products,
+and Staff — built entirely in the browser (`src/lib/exportData.ts`, via
+SheetJS, loaded on demand so it doesn't bloat everyone else's page load).
 
 Every section from the original ask is now built.
 
@@ -97,16 +117,30 @@ component.
 
 ## Known gaps (intentional, for now)
 
-Everything from the original ask is built and bilingual. Nothing left
-outstanding right now beyond ordinary iteration (new fields, reports,
-etc. as they come up).
+- **Orders aren't linked to specific products.** `orders.items` is free
+  text (e.g. "Red Roses x6"), not a reference into `products` — so
+  there's no way to tell which products are actually selling.
+  "Aging Stock" (slow-moving product) was deliberately dropped from the
+  Inventory Alerts for this reason; only Low/Critical stock-level
+  thresholds are tracked. Fixing this for real means reworking the
+  order-entry form to pick real products (with quantities) instead of
+  typing free text — a bigger change than this round's scope.
+- Everything else from the original ask is built and bilingual.
+
+**A dependency note on Pull Data**: it uses the `xlsx` (SheetJS) npm
+package, which `npm audit` flags with two high-severity advisories
+(prototype pollution, ReDoS). Both are about *parsing* an untrusted
+spreadsheet a user uploads — a feature this app never uses; here `xlsx`
+only ever writes a file we generate ourselves from our own data, so
+those advisories don't apply to how it's used. Worth knowing if this
+codebase is inherited later, since `npm audit` will keep flagging it.
 
 ## 1. Set up Supabase
 
 1. Create a new project at [supabase.com](https://supabase.com) — a
    **different** project from the marketing site's.
 2. SQL Editor → New query → paste and run each file in
-   `supabase/migrations/` **in order** (`0001` → `0008`).
+   `supabase/migrations/` **in order** (`0001` → `0010`).
 3. **Turn off public sign-ups**: Authentication → Sign In / Providers →
    turn off "Allow new users to sign up". Staff accounts are created
    through the app's Reps screen (or, before the first manager exists,

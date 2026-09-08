@@ -16,6 +16,7 @@
     "reps": "Reps",
     "telesales": "Telesales",
     "inventory": "Inventory",
+    "pullData": "Pull Data",
     "newVisit": "New Visit",
     "myVisits": "My Visits",
     "newCall": "New Call",
@@ -177,16 +178,31 @@
     "addProduct": "Add Product",
     "colProduct": "Product",
     "colStock": "Stock on hand",
-    "colThreshold": "Low-stock at",
+    "colThreshold": "Low / Critical at",
+    "colStatus": "Status",
     "colActions": "Actions",
-    "noProductsYet": "No products yet."
+    "noProductsYet": "No products yet.",
+    "status": {
+      "ok": "OK",
+      "low": "Low",
+      "critical": "Critical"
+    }
   },
   "productForm": {
     "addTitle": "Add Product",
     "editTitle": "Edit Product",
     "namePlaceholder": "Product name (e.g. Red Roses)",
     "stockLabel": "Stock on hand",
-    "thresholdLabel": "Low-stock at"
+    "thresholdLabel": "Low-stock at",
+    "criticalLabel": "Critical at"
+  },
+  "pullData": {
+    "title": "Pull Data",
+    "subtitle": "Everything about sales and sales activity, in one export.",
+    "managerOnly": "Only managers can export data.",
+    "exportButton": "Export to Excel",
+    "exporting": "Preparing file…",
+    "exportHint": "Downloads one .xlsx file with a tab for Accounts, Visits, Calls, Orders, Products, and Staff."
   },
   "telesalesRollup": {
     "title": "Telesales Activity",
@@ -209,20 +225,30 @@
   "dashboard": {
     "manager": {
       "title": "Dashboard",
-      "subtitle": "Everything across the team, at a glance.",
+      "salesToday": "Sales Today",
+      "mtdSales": "MTD Sales",
+      "target": "Target",
       "statAccounts": "Active Accounts",
-      "statOrders": "Total Orders",
-      "statBouquets": "Total Bouquets",
-      "recentActivity": "Recent Activity",
-      "nothingLogged": "Nothing logged yet.",
-      "lowStock": "Low Stock",
-      "nothingLowStock": "Nothing low on stock.",
-      "leftSuffix": "left",
-      "staffActivity7d": "Staff Activity · 7 days",
-      "noStaffYet": "No staff yet.",
-      "visited": "visited",
-      "called": "called",
-      "loggedOrderAt": "logged an order at"
+      "ordersToday": "Orders Today",
+      "cartons": "cartons",
+      "monthlyTarget": "Monthly Target",
+      "remaining": "Remaining",
+      "requiredPerDay": "Required/day",
+      "currentPerDay": "Current/day",
+      "last7Days": "Sales — Last 7 Days",
+      "inventoryAlerts": "Inventory Alerts",
+      "salesTeam": "Sales Team",
+      "noSalesTeamYet": "No staff yet.",
+      "needsAttention": "Needs Attention",
+      "inactiveHighValue": "inactive high-value accounts",
+      "declining": "declining accounts",
+      "reactivationOpportunities": "reactivation opportunities",
+      "todaysActivity": "Today's Activity",
+      "noActivityToday": "Nothing logged yet today.",
+      "unit": {
+        "visits": "visits",
+        "calls": "calls"
+      }
     },
     "telesales": {
       "welcome": "Welcome back, {{name}}",

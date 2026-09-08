@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Camera, History, LayoutGrid, Users, TrendingUp, Phone, PhoneCall, Boxes } from "lucide-react";
+import { Camera, History, LayoutGrid, Users, TrendingUp, Phone, PhoneCall, Boxes, Download } from "lucide-react";
 import { useAuth } from "../lib/auth";
 import { setLanguage } from "../i18n";
 
@@ -10,6 +10,7 @@ const managerNav = [
   { to: "/reps", labelKey: "nav.reps", icon: TrendingUp },
   { to: "/telesales", labelKey: "nav.telesales", icon: Phone },
   { to: "/inventory", labelKey: "nav.inventory", icon: Boxes },
+  { to: "/pull-data", labelKey: "nav.pullData", icon: Download },
 ];
 
 // Reps live in the field day-to-day — their nav is just logging visits and

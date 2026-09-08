@@ -12,6 +12,7 @@ export interface ProductInput {
   name: string;
   stock_qty: number;
   low_stock_threshold: number;
+  critical_threshold: number;
 }
 
 export async function createProduct(input: ProductInput): Promise<void> {

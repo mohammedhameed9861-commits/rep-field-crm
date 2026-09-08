@@ -73,7 +73,12 @@ export interface Product {
   name: string;
   stock_qty: number;
   low_stock_threshold: number;
+  critical_threshold: number;
   created_at: string;
+}
+
+export interface AppSettings {
+  monthly_target_cartons: number;
 }
 
 /** One combined, chronological feed item for an account's activity timeline. */

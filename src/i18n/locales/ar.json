@@ -16,6 +16,7 @@
     "reps": "المندوبون",
     "telesales": "المبيعات الهاتفية",
     "inventory": "المخزون",
+    "pullData": "سحب البيانات",
     "newVisit": "زيارة جديدة",
     "myVisits": "زياراتي",
     "newCall": "مكالمة جديدة",
@@ -177,16 +178,31 @@
     "addProduct": "إضافة منتج",
     "colProduct": "المنتج",
     "colStock": "الكمية المتوفرة",
-    "colThreshold": "حد المخزون المنخفض",
+    "colThreshold": "منخفض / حرج عند",
+    "colStatus": "الحالة",
     "colActions": "الإجراءات",
-    "noProductsYet": "لا توجد منتجات بعد."
+    "noProductsYet": "لا توجد منتجات بعد.",
+    "status": {
+      "ok": "جيد",
+      "low": "منخفض",
+      "critical": "حرج"
+    }
   },
   "productForm": {
     "addTitle": "إضافة منتج",
     "editTitle": "تعديل المنتج",
     "namePlaceholder": "اسم المنتج (مثال: ورد أحمر)",
     "stockLabel": "الكمية المتوفرة",
-    "thresholdLabel": "حد المخزون المنخفض"
+    "thresholdLabel": "حد المخزون المنخفض",
+    "criticalLabel": "حد المخزون الحرج"
+  },
+  "pullData": {
+    "title": "سحب البيانات",
+    "subtitle": "كل شيء عن المبيعات ونشاطاتها، في ملف واحد.",
+    "managerOnly": "المدير فقط يمكنه تصدير البيانات.",
+    "exportButton": "تصدير إلى إكسل",
+    "exporting": "جارٍ تجهيز الملف…",
+    "exportHint": "يُنزّل ملف .xlsx واحد بتبويب لكل من الحسابات والزيارات والمكالمات والطلبات والمنتجات والموظفين."
   },
   "telesalesRollup": {
     "title": "نشاط المبيعات الهاتفية",
@@ -209,20 +225,30 @@
   "dashboard": {
     "manager": {
       "title": "لوحة التحكم",
-      "subtitle": "كل شيء عن الفريق، بنظرة واحدة.",
+      "salesToday": "مبيعات اليوم",
+      "mtdSales": "مبيعات الشهر",
+      "target": "الهدف",
       "statAccounts": "الحسابات النشطة",
-      "statOrders": "إجمالي الطلبات",
-      "statBouquets": "إجمالي الباقات",
-      "recentActivity": "النشاط الأخير",
-      "nothingLogged": "لا يوجد شيء مسجل بعد.",
-      "lowStock": "مخزون منخفض",
-      "nothingLowStock": "لا يوجد نقص في المخزون.",
-      "leftSuffix": "متبقٍ",
-      "staffActivity7d": "نشاط الموظفين · ٧ أيام",
-      "noStaffYet": "لا يوجد موظفون بعد.",
-      "visited": "زار",
-      "called": "اتصل بـ",
-      "loggedOrderAt": "سجّل طلباً في"
+      "ordersToday": "طلبات اليوم",
+      "cartons": "كرتون",
+      "monthlyTarget": "الهدف الشهري",
+      "remaining": "المتبقي",
+      "requiredPerDay": "المطلوب/يوم",
+      "currentPerDay": "الحالي/يوم",
+      "last7Days": "المبيعات — آخر ٧ أيام",
+      "inventoryAlerts": "تنبيهات المخزون",
+      "salesTeam": "فريق المبيعات",
+      "noSalesTeamYet": "لا يوجد موظفون بعد.",
+      "needsAttention": "يحتاج انتباه",
+      "inactiveHighValue": "حساب عالي القيمة غير نشط",
+      "declining": "حساب في تراجع",
+      "reactivationOpportunities": "فرصة لإعادة التفعيل",
+      "todaysActivity": "نشاط اليوم",
+      "noActivityToday": "لا يوجد شيء مسجل اليوم.",
+      "unit": {
+        "visits": "زيارة",
+        "calls": "مكالمة"
+      }
     },
     "telesales": {
       "welcome": "مرحباً بعودتك، {{name}}",

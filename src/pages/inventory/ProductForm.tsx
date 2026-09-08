@@ -20,6 +20,7 @@ export default function ProductForm({
   const [name, setName] = useState(product?.name ?? "");
   const [stockQty, setStockQty] = useState(String(product?.stock_qty ?? 0));
   const [threshold, setThreshold] = useState(String(product?.low_stock_threshold ?? 0));
+  const [critical, setCritical] = useState(String(product?.critical_threshold ?? 0));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,6 +32,7 @@ export default function ProductForm({
       name,
       stock_qty: Number(stockQty) || 0,
       low_stock_threshold: Number(threshold) || 0,
+      critical_threshold: Number(critical) || 0,
     };
     try {
       if (editing) await updateProduct(product!.id, input);
@@ -97,6 +99,21 @@ export default function ProductForm({
               />
             </label>
           </div>
+          <label className="block">
+            <span className="mb-1 block text-xs font-semibold text-gray-500">
+              {t("productForm.criticalLabel")}
+            </span>
+            <input
+              required
+              type="number"
+              min="0"
+              step="0.5"
+              value={critical}
+              onChange={(e) => setCritical(e.target.value)}
+              className={field}
+              dir="ltr"
+            />
+          </label>
           {error && <p className="text-sm text-red-600">{error}</p>}
           <button
             type="submit"
