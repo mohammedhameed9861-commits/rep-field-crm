@@ -299,12 +299,11 @@ export default function AccountsPage() {
                       <p className="text-sm text-gray-400">{t("accounts.noOrdersYet")}</p>
                     ) : (
                       <div className="flex flex-col">
-                        <div className="grid grid-cols-[90px_1fr_80px_110px_90px_120px] gap-2 px-1 py-1.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
+                        <div className="grid grid-cols-[90px_1fr_80px_110px_120px] gap-2 px-1 py-1.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
                           <span>{t("accounts.colDate")}</span>
                           <span>{t("accounts.colItems")}</span>
                           <span>{t("accounts.colBouquets")}</span>
                           <span>{t("accounts.colAmount")}</span>
-                          <span>{t("accounts.colStatus")}</span>
                           {profile?.role === "manager" && (
                             <span className="text-end">{t("reps.colActions")}</span>
                           )}
@@ -312,7 +311,7 @@ export default function AccountsPage() {
                         {orders.map((o) => (
                           <div
                             key={o.id}
-                            className="grid grid-cols-[90px_1fr_80px_110px_90px_120px] items-center gap-2 border-t border-gray-100 px-1 py-2.5"
+                            className="grid grid-cols-[90px_1fr_80px_110px_120px] items-center gap-2 border-t border-gray-100 px-1 py-2.5"
                           >
                             <span className="text-xs text-gray-600" dir="ltr">
                               {formatDate(o.created_at)}
@@ -324,24 +323,6 @@ export default function AccountsPage() {
                             <span className="text-xs font-semibold text-gray-900" dir="ltr">
                               {formatIQD(o.amount)}
                             </span>
-                            <div className="flex items-center gap-1">
-                              <span
-                                className={`w-fit rounded-full px-2 py-0.5 text-[10.5px] font-bold ${
-                                  o.status === "delivered"
-                                    ? "bg-teal-50 text-teal-700"
-                                    : o.status === "cancelled"
-                                      ? "bg-gray-100 text-gray-500"
-                                      : "bg-warn-100 text-warn-600"
-                                }`}
-                              >
-                                {t(`orderStatus.${o.status}`)}
-                              </span>
-                              {o.updated_at && (
-                                <span className="text-[10.5px] font-semibold text-gray-400">
-                                  ({t("editHistory.edited")})
-                                </span>
-                              )}
-                            </div>
                             {profile?.role === "manager" && (
                               <div className="flex flex-col items-end gap-1">
                                 <button
