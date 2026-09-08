@@ -2,7 +2,7 @@ import { errorMessage } from "../../lib/errors";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { Archive, ArchiveRestore, MapPin, Pencil, Phone, Plus, Search, TrendingUp, User } from "lucide-react";
+import { Archive, ArchiveRestore, ChevronLeft, MapPin, Pencil, Phone, Plus, Search, TrendingUp, User } from "lucide-react";
 import { fetchAccounts, fetchAccountActivity, setAccountActive } from "../../lib/accounts";
 import { formatDate, formatDateTime, timeAgo } from "../../lib/format";
 import { useAuth } from "../../lib/auth";
@@ -99,7 +99,7 @@ export default function AccountsPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex shrink-0 items-center justify-between px-7 pb-4 pt-6">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 px-4 md:px-7 pb-4 pt-6">
         <div>
           <h1 className="text-xl font-bold text-sea-800">{t("accounts.title")}</h1>
           <p className="mt-0.5 text-sm text-gray-500">
@@ -118,11 +118,13 @@ export default function AccountsPage() {
         )}
       </div>
 
-      {error && <p className="px-7 pb-3 text-sm text-red-600">{error}</p>}
+      {error && <p className="px-4 md:px-7 pb-3 text-sm text-red-600">{error}</p>}
 
-      <div className="flex min-h-0 flex-1 gap-4 px-7 pb-6">
+      <div className="flex min-h-0 flex-1 gap-4 px-4 md:px-7 pb-6">
         {/* List */}
-        <div className="flex w-[340px] shrink-0 flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white">
+        <div
+          className={`${id ? "hidden md:flex" : "flex"} w-full shrink-0 flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white md:w-[340px]`}
+        >
           <div className="border-b border-gray-100 p-3">
             <div className="flex items-center gap-2 rounded-lg bg-gray-50 px-3 py-2">
               <Search size={15} className="text-gray-400" />
@@ -172,14 +174,24 @@ export default function AccountsPage() {
         </div>
 
         {/* Detail */}
-        <div className="min-w-0 flex-1 overflow-y-auto rounded-2xl border border-gray-200 bg-white p-6">
+        <div
+          className={`${id ? "block" : "hidden md:block"} min-w-0 flex-1 overflow-y-auto rounded-2xl border border-gray-200 bg-white p-4 md:p-6`}
+        >
+          {id && (
+            <button
+              onClick={() => navigate("/accounts")}
+              className="mb-3 flex items-center gap-1 text-xs font-semibold text-teal-700 md:hidden"
+            >
+              <ChevronLeft size={14} className="rtl:rotate-180" /> {t("accounts.backToList")}
+            </button>
+          )}
           {!selected ? (
             <div className="flex h-full items-center justify-center text-sm text-gray-400">
               {t("accounts.selectPrompt")}
             </div>
           ) : (
             <>
-              <div className="flex items-start justify-between border-b border-gray-100 pb-4">
+              <div className="flex flex-wrap items-start justify-between gap-3 border-b border-gray-100 pb-4">
                 <div>
                   <div className="flex items-center gap-2.5">
                     <h2 className="text-lg font-bold text-sea-800">{selected.name}</h2>
@@ -260,7 +272,7 @@ export default function AccountsPage() {
                 </div>
               )}
 
-              <div className="grid grid-cols-3 gap-4 border-b border-gray-100 py-4">
+              <div className="grid grid-cols-3 gap-2 border-b border-gray-100 py-4 sm:gap-4">
                 <div>
                   <div className="text-[11px] font-semibold text-gray-500">
                     {t("accounts.statTotalOrders")}
@@ -298,8 +310,8 @@ export default function AccountsPage() {
                     {orders.length === 0 ? (
                       <p className="text-sm text-gray-400">{t("accounts.noOrdersYet")}</p>
                     ) : (
-                      <div className="flex flex-col">
-                        <div className="grid grid-cols-[90px_1fr_80px_120px] gap-2 px-1 py-1.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
+                      <div className="flex flex-col overflow-x-auto">
+                        <div className="min-w-[420px] grid grid-cols-[90px_1fr_80px_120px] gap-2 px-1 py-1.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
                           <span>{t("accounts.colDate")}</span>
                           <span>{t("accounts.colItems")}</span>
                           <span>{t("accounts.colBouquets")}</span>
@@ -310,7 +322,7 @@ export default function AccountsPage() {
                         {orders.map((o) => (
                           <div
                             key={o.id}
-                            className="grid grid-cols-[90px_1fr_80px_120px] items-center gap-2 border-t border-gray-100 px-1 py-2.5"
+                            className="min-w-[420px] grid grid-cols-[90px_1fr_80px_120px] items-center gap-2 border-t border-gray-100 px-1 py-2.5"
                           >
                             <span className="text-xs text-gray-600" dir="ltr">
                               {formatDate(o.created_at)}

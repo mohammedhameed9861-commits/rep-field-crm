@@ -44,7 +44,7 @@ export default function InventoryPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex shrink-0 items-center justify-between px-7 pb-4 pt-6">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 px-4 md:px-7 pb-4 pt-6">
         <div>
           <h1 className="text-xl font-bold text-sea-800">{t("inventory.title")}</h1>
           <p className="mt-0.5 text-sm text-gray-500">
@@ -69,11 +69,11 @@ export default function InventoryPage() {
         </div>
       </div>
 
-      {error && <p className="px-7 pb-3 text-sm text-red-600">{error}</p>}
+      {error && <p className="px-4 md:px-7 pb-3 text-sm text-red-600">{error}</p>}
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-7 pb-6">
-        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-          <div className="grid grid-cols-[1fr_110px_140px_100px_140px] gap-2 border-b border-gray-100 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 md:px-7 pb-6">
+        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white">
+          <div className="min-w-[640px] grid grid-cols-[1fr_110px_140px_100px_140px] gap-2 border-b border-gray-100 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
             <span>{t("inventory.colProduct")}</span>
             <span>{t("inventory.colStock")}</span>
             <span>{t("inventory.colThreshold")}</span>
@@ -91,7 +91,7 @@ export default function InventoryPage() {
               return (
                 <div
                   key={p.id}
-                  className="grid grid-cols-[1fr_110px_140px_100px_140px] items-center gap-2 border-t border-gray-100 px-4 py-3"
+                  className="min-w-[640px] grid grid-cols-[1fr_110px_140px_100px_140px] items-center gap-2 border-t border-gray-100 px-4 py-3"
                 >
                   <span className="text-sm font-semibold text-gray-900">{p.name}</span>
                   <span className="text-sm text-gray-700" dir="ltr">

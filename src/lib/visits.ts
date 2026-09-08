@@ -24,9 +24,11 @@ export interface NewVisitInput {
 export async function createVisit(input: NewVisitInput): Promise<void> {
   if (!supabase) throw new Error("Supabase is not configured");
 
+  // A proof-of-visit photo, not a print — ~300KB at 1280px is plenty, and at the
+  // team's volume (dozens of visits a day) storage fills ~3x slower than at 0.8MB.
   const compressed = await imageCompression(input.photo, {
-    maxSizeMB: 0.8,
-    maxWidthOrHeight: 1600,
+    maxSizeMB: 0.3,
+    maxWidthOrHeight: 1280,
     useWebWorker: true,
   });
 
@@ -86,15 +88,26 @@ export async function updateVisit(id: string, input: VisitEditInput): Promise<vo
   if (error) throw error;
 }
 
-/** A signed URL for a visit photo — the bucket is private, so plain public URLs won't work. */
-export async function visitPhotoUrl(path: string): Promise<string | null> {
-  if (!supabase) return null;
-  const { data, error } = await supabase.storage
-    .from(VISIT_PHOTOS_BUCKET)
-    .createSignedUrl(path, 60 * 60);
-  if (error) return null;
-  return data.signedUrl;
+/** Signed URLs for a whole list of visit photos in a handful of requests — the bucket is
+ * private, so plain public URLs won't work, and signing them one request per photo (as
+ * this used to) meant a page of 200 visits fired 200 storage calls at once. */
+export async function visitPhotoUrls(paths: string[]): Promise<Record<string, string>> {
+  if (!supabase || paths.length === 0) return {};
+  const out: Record<string, string> = {};
+  const CHUNK = 100;
+  for (let i = 0; i < paths.length; i += CHUNK) {
+    const { data, error } = await supabase.storage
+      .from(VISIT_PHOTOS_BUCKET)
+      .createSignedUrls(paths.slice(i, i + CHUNK), 60 * 60);
+    if (error) continue; // a missing photo just shows the grey placeholder
+    for (const d of data ?? []) if (d.path && d.signedUrl) out[d.path] = d.signedUrl;
+  }
+  return out;
 }
+
+/** How many of a rep's own visits "My Visits" shows — PostgREST caps any single
+ * request at 1000 rows anyway, and a phone doesn't need every visit ever logged. */
+export const MY_VISITS_LIMIT = 200;
 
 export async function fetchMyVisits(repId: string): Promise<Visit[]> {
   if (!supabase) return [];
@@ -102,7 +115,27 @@ export async function fetchMyVisits(repId: string): Promise<Visit[]> {
     .from("visits")
     .select("*, account:accounts!visits_account_id_fkey(id, name, area)")
     .eq("rep_id", repId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(MY_VISITS_LIMIT);
+  if (error) throw error;
+  return (data ?? []) as Visit[];
+}
+
+/** The rep's follow-up list — queried on its own rather than filtered out of the recent
+ * visits above, so a follow-up set on an older visit doesn't silently drop off. Anything
+ * more than 30 days overdue is left out as stale. */
+export async function fetchMyVisitFollowUps(repId: string): Promise<Visit[]> {
+  if (!supabase) return [];
+  const since = new Date();
+  since.setDate(since.getDate() - 30);
+  const { data, error } = await supabase
+    .from("visits")
+    .select("*, account:accounts!visits_account_id_fkey(id, name, area)")
+    .eq("rep_id", repId)
+    .not("next_followup_at", "is", null)
+    .gte("next_followup_at", since.toISOString().slice(0, 10))
+    .order("next_followup_at", { ascending: true })
+    .limit(100);
   if (error) throw error;
   return (data ?? []) as Visit[];
 }

@@ -35,7 +35,7 @@ export default function TelesalesDashboard() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex shrink-0 items-center justify-between px-7 pb-4 pt-6">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 px-4 md:px-7 pb-4 pt-6">
         <div>
           <h1 className="text-xl font-bold text-sea-800">
             {t("dashboard.telesales.welcome", { name: profile?.full_name })}
@@ -50,10 +50,10 @@ export default function TelesalesDashboard() {
         </Link>
       </div>
 
-      {error && <p className="px-7 pb-3 text-sm text-red-600">{error}</p>}
+      {error && <p className="px-4 md:px-7 pb-3 text-sm text-red-600">{error}</p>}
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-7 pb-6">
-        <div className="grid grid-cols-3 gap-4">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 md:px-7 pb-6">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
           <StatTile
             icon={Phone}
             label={t("dashboard.telesales.statCalls")}

@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { useAuth } from "../../lib/auth";
-import { fetchMyVisits, visitPhotoUrl } from "../../lib/visits";
+import { fetchMyVisits, fetchMyVisitFollowUps, MY_VISITS_LIMIT, visitPhotoUrls } from "../../lib/visits";
 import type { Visit } from "../../lib/types";
 import { formatDateTime } from "../../lib/format";
 import UpcomingFollowUps from "../../components/UpcomingFollowUps";
@@ -13,6 +13,7 @@ export default function MyVisitsPage() {
   const { profile } = useAuth();
   const { t } = useTranslation();
   const [visits, setVisits] = useState<Visit[]>([]);
+  const [followUps, setFollowUps] = useState<Visit[]>([]);
   const [photos, setPhotos] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,16 +22,13 @@ export default function MyVisitsPage() {
     if (!profile) return;
     let alive = true;
     setLoading(true);
-    fetchMyVisits(profile.id)
-      .then(async (data) => {
+    Promise.all([fetchMyVisits(profile.id), fetchMyVisitFollowUps(profile.id)])
+      .then(async ([data, upcoming]) => {
         if (!alive) return;
         setVisits(data);
-        const entries = await Promise.all(
-          data.map(async (v) => [v.id, await visitPhotoUrl(v.photo_path)] as const),
-        );
-        if (alive) {
-          setPhotos(Object.fromEntries(entries.filter(([, url]) => url)) as Record<string, string>);
-        }
+        setFollowUps(upcoming);
+        const urls = await visitPhotoUrls(data.map((v) => v.photo_path));
+        if (alive) setPhotos(Object.fromEntries(data.map((v) => [v.id, urls[v.photo_path]]).filter(([, u]) => u)));
       })
       .catch((err) => setError(errorMessage(err)))
       .finally(() => alive && setLoading(false));
@@ -41,7 +39,7 @@ export default function MyVisitsPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex shrink-0 items-center justify-between px-7 pb-4 pt-6">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 px-4 md:px-7 pb-4 pt-6">
         <div>
           <h1 className="text-xl font-bold text-sea-800">{t("visits.myVisitsTitle")}</h1>
           <p className="mt-0.5 text-sm text-gray-500">
@@ -56,16 +54,16 @@ export default function MyVisitsPage() {
         </Link>
       </div>
 
-      {error && <p className="px-7 pb-3 text-sm text-red-600">{error}</p>}
+      {error && <p className="px-4 md:px-7 pb-3 text-sm text-red-600">{error}</p>}
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-7 pb-6">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 md:px-7 pb-6">
         {loading ? (
           <p className="text-sm text-gray-400">{t("common.loading")}</p>
         ) : visits.length === 0 ? (
           <p className="text-sm text-gray-400">{t("visits.noVisitsYet")}</p>
         ) : (
           <>
-            <UpcomingFollowUps items={visits} />
+            <UpcomingFollowUps items={followUps} />
             <div className="flex flex-col gap-2">
             {visits.map((v) => (
               <div
@@ -112,6 +110,9 @@ export default function MyVisitsPage() {
               </div>
             ))}
             </div>
+            {visits.length >= MY_VISITS_LIMIT && (
+              <p className="mt-3 text-center text-xs text-gray-400">{t("visits.recentOnly", { count: MY_VISITS_LIMIT })}</p>
+            )}
           </>
         )}
       </div>

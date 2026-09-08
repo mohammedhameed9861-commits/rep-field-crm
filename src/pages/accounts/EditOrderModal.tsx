@@ -66,7 +66,7 @@ export default function EditOrderModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+      <div className="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-5 shadow-xl sm:p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-bold text-sea-800">{t("editHistory.editOrder")}</h2>
           <button onClick={onClose} className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100">

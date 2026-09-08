@@ -278,45 +278,24 @@ export async function fetchNeedsAttention(): Promise<NeedsAttentionAccounts> {
   if (!supabase) return { inactiveHighValue: [], declining: [], reactivation: [] };
 
   const now = new Date();
-  const thisMonthStart = startOfMonthISO(now);
-  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
+  // The per-account rollup (last activity, this/last month's cartons) happens in the
+  // database — see migration 0016. Pulling every visit/call/order into the browser to
+  // compute it here broke silently past PostgREST's 1000-row cap.
+  const { data, error } = await supabase.rpc("account_activity_summary", {
+    this_month_start: startOfMonthISO(now),
+    last_month_start: new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString(),
+  });
+  if (error) throw error;
 
-  const [accountsRes, ordersRes, visitsRes, callsRes] = await Promise.all([
-    supabase.from("accounts").select("id, name, shop_class").eq("active", true),
-    supabase.from("orders").select("account_id, quantity, created_at"),
-    supabase.from("visits").select("account_id, created_at"),
-    supabase.from("calls").select("account_id, created_at"),
-  ]);
-  if (accountsRes.error) throw accountsRes.error;
-  if (ordersRes.error) throw ordersRes.error;
-  if (visitsRes.error) throw visitsRes.error;
-  if (callsRes.error) throw callsRes.error;
-
-  const accounts = (accountsRes.data ?? []) as { id: string; name: string; shop_class: string | null }[];
-  const orders = (ordersRes.data ?? []) as { account_id: string; quantity: number; created_at: string }[];
-  const visits = (visitsRes.data ?? []) as { account_id: string; created_at: string }[];
-  const calls = (callsRes.data ?? []) as { account_id: string; created_at: string }[];
-
-  const lastActivity = new Map<string, string>();
-  const bump = (id: string, at: string) => {
-    const cur = lastActivity.get(id);
-    if (!cur || at > cur) lastActivity.set(id, at);
-  };
-  for (const o of orders) bump(o.account_id, o.created_at);
-  for (const v of visits) bump(v.account_id, v.created_at);
-  for (const c of calls) bump(c.account_id, c.created_at);
-
-  const everOrdered = new Set(orders.map((o) => o.account_id));
-
-  const thisMonthByAccount = new Map<string, number>();
-  const lastMonthByAccount = new Map<string, number>();
-  for (const o of orders) {
-    if (o.created_at >= thisMonthStart) {
-      thisMonthByAccount.set(o.account_id, (thisMonthByAccount.get(o.account_id) ?? 0) + Number(o.quantity));
-    } else if (o.created_at >= lastMonthStart && o.created_at < thisMonthStart) {
-      lastMonthByAccount.set(o.account_id, (lastMonthByAccount.get(o.account_id) ?? 0) + Number(o.quantity));
-    }
-  }
+  const rows = (data ?? []) as {
+    id: string;
+    name: string;
+    shop_class: string | null;
+    last_activity_at: string | null;
+    ever_ordered: boolean;
+    this_month_qty: number | string;
+    last_month_qty: number | string;
+  }[];
 
   const inactiveCutoff = new Date(now);
   inactiveCutoff.setDate(inactiveCutoff.getDate() - INACTIVE_DAYS);
@@ -327,20 +306,17 @@ export async function fetchNeedsAttention(): Promise<NeedsAttentionAccounts> {
   const declining: { id: string; name: string }[] = [];
   const reactivation: { id: string; name: string }[] = [];
 
-  for (const a of accounts) {
-    const last = lastActivity.get(a.id);
-
+  for (const a of rows) {
+    const last = a.last_activity_at;
     if ((a.shop_class === "A" || a.shop_class === "B") && (!last || last < inactiveCutoff.toISOString())) {
       inactiveHighValue.push({ id: a.id, name: a.name });
     }
-
-    const lastMonthQty = lastMonthByAccount.get(a.id) ?? 0;
-    const thisMonthQty = thisMonthByAccount.get(a.id) ?? 0;
+    const lastMonthQty = Number(a.last_month_qty);
+    const thisMonthQty = Number(a.this_month_qty);
     if (lastMonthQty > 0 && thisMonthQty < lastMonthQty * DECLINE_RATIO) {
       declining.push({ id: a.id, name: a.name });
     }
-
-    if (everOrdered.has(a.id) && (!last || last < reactivationCutoff.toISOString())) {
+    if (a.ever_ordered && (!last || last < reactivationCutoff.toISOString())) {
       reactivation.push({ id: a.id, name: a.name });
     }
   }

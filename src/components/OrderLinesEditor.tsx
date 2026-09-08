@@ -3,8 +3,11 @@ import { Plus, X } from "lucide-react";
 import type { ProductType } from "../lib/types";
 import { emptyLine, type OrderLineDraft } from "../lib/orderLines";
 
+// Deliberately no w-full here: in a flex row, a w-full sibling that also refuses to shrink
+// (as the quantity box did) takes the whole row and crushes the product dropdown down to
+// its arrow — the "product name doesn't show" bug.
 const field =
-  "w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100";
+  "rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100";
 
 /** The repeatable "Product (from the management-set list) → Quantity" picker an
  * order's line items are built from — replaces free-typing "Red Roses x6,
@@ -56,7 +59,7 @@ export default function OrderLinesEditor({
             placeholder={t("visits.bouquetsPlaceholder")}
             value={line.quantity}
             onChange={(e) => update(i, { quantity: e.target.value })}
-            className={`${field} w-28 shrink-0`}
+            className={`${field} w-24 shrink-0`}
             dir="ltr"
           />
           <button

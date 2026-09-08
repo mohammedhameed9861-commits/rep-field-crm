@@ -28,7 +28,7 @@ export default function Login() {
     "w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100";
 
   return (
-    <div className="flex h-screen items-center justify-center bg-cream-50">
+    <div className="flex min-h-[100dvh] items-center justify-center bg-cream-50 px-4">
       <div className="w-full max-w-sm rounded-2xl border border-gray-100 bg-white p-8 shadow-sm">
         <div className="mb-6 flex items-center gap-2.5">
           <svg width="26" height="26" viewBox="0 0 26 26" fill="none">

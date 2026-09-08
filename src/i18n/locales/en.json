@@ -122,7 +122,8 @@
     "called": "called",
     "outcomeSold": "sold",
     "outcomeNoSale": "no sale",
-    "orderPlaced": "Order placed"
+    "orderPlaced": "Order placed",
+    "backToList": "All accounts"
   },
   "accountForm": {
     "addTitle": "Add Account",
@@ -199,7 +200,8 @@
     "loggedOne": "{{count}} logged",
     "loggedOther": "{{count}} logged",
     "newVisit": "New Visit",
-    "noVisitsYet": "No visits logged yet."
+    "noVisitsYet": "No visits logged yet.",
+    "recentOnly": "Showing your latest {{count}} visits."
   },
   "calls": {
     "logCall": "Log a Call",
@@ -215,7 +217,8 @@
     "loggedOther": "{{count}} logged",
     "newCall": "New Call",
     "noCallsYet": "No calls logged yet.",
-    "allCallTypes": "All call types"
+    "allCallTypes": "All call types",
+    "recentOnly": "Showing your latest {{count}} calls."
   },
   "inventory": {
     "title": "Inventory",
@@ -292,7 +295,8 @@
     "managerOnly": "Only managers can export data.",
     "exportButton": "Export to Excel",
     "exporting": "Preparing file…",
-    "exportHint": "Downloads one .xlsx file with a tab for Accounts, Visits, Calls, Orders, Products, Staff, and Edit History."
+    "exportHint": "Downloads one .xlsx file with a tab for Accounts, Visits, Calls, Orders, Products, Staff, and Edit History.",
+    "orderItems": "Order Items"
   },
   "visitsActivity": {
     "title": "Visits Activity",
@@ -363,5 +367,14 @@
       "recentCalls": "Recent Calls",
       "noCallsYet": "No calls logged yet."
     }
+  },
+  "auth": {
+    "deactivated": "This account has been deactivated. Ask a manager to reactivate it.",
+    "profileMissing": "Your staff profile couldn't be loaded. Sign out and try again, or ask a manager."
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "body": "The screen hit an error it couldn't recover from. Reloading usually fixes it — if it keeps happening, tell a manager what you were doing.",
+    "reload": "Reload"
   }
 }

@@ -5,6 +5,7 @@ export interface ExportCounts {
   visits: number;
   calls: number;
   orders: number;
+  orderItems: number;
   products: number;
   staff: number;
   auditLog: number;
@@ -12,18 +13,19 @@ export interface ExportCounts {
 
 export async function fetchExportCounts(): Promise<ExportCounts> {
   if (!supabase) {
-    return { accounts: 0, visits: 0, calls: 0, orders: 0, products: 0, staff: 0, auditLog: 0 };
+    return { accounts: 0, visits: 0, calls: 0, orders: 0, orderItems: 0, products: 0, staff: 0, auditLog: 0 };
   }
-  const [accounts, visits, calls, orders, products, staff, auditLog] = await Promise.all([
+  const [accounts, visits, calls, orders, orderItems, products, staff, auditLog] = await Promise.all([
     supabase.from("accounts").select("id", { count: "exact", head: true }),
     supabase.from("visits").select("id", { count: "exact", head: true }),
     supabase.from("calls").select("id", { count: "exact", head: true }),
     supabase.from("orders").select("id", { count: "exact", head: true }),
+    supabase.from("order_items").select("id", { count: "exact", head: true }),
     supabase.from("products").select("id", { count: "exact", head: true }),
     supabase.from("profiles").select("id", { count: "exact", head: true }),
     supabase.from("audit_log").select("id", { count: "exact", head: true }),
   ]);
-  for (const r of [accounts, visits, calls, orders, products, staff, auditLog]) {
+  for (const r of [accounts, visits, calls, orders, orderItems, products, staff, auditLog]) {
     if (r.error) throw r.error;
   }
   return {
@@ -31,10 +33,31 @@ export async function fetchExportCounts(): Promise<ExportCounts> {
     visits: visits.count ?? 0,
     calls: calls.count ?? 0,
     orders: orders.count ?? 0,
+    orderItems: orderItems.count ?? 0,
     products: products.count ?? 0,
     staff: staff.count ?? 0,
     auditLog: auditLog.count ?? 0,
   };
+}
+
+type Row = Record<string, unknown>;
+
+/** PostgREST silently returns at most 1000 rows per request, so "select everything" is
+ * never actually everything once a table grows past that — an export that quietly dropped
+ * every visit after the first thousand would be worse than no export. Walk the table in
+ * pages instead, until a page comes back short. */
+async function fetchAllRows(
+  page: (from: number, to: number) => PromiseLike<{ data: unknown[] | null; error: unknown }>,
+): Promise<Row[]> {
+  const PAGE = 1000;
+  const out: Row[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await page(from, from + PAGE - 1);
+    if (error) throw error;
+    const rows = (data ?? []) as Row[];
+    out.push(...rows);
+    if (rows.length < PAGE) return out;
+  }
 }
 
 /** Pulls every row of every table — literally everything — and writes one .xlsx with a tab per table.
@@ -42,49 +65,55 @@ export async function fetchExportCounts(): Promise<ExportCounts> {
  * rather than bundled into every user's initial page load. */
 export async function exportAllDataToExcel(filenamePrefix = "flowercom-crm-export"): Promise<void> {
   if (!supabase) throw new Error("Supabase is not configured");
+  const sb = supabase;
 
-  const [XLSX, accountsRes, visitsRes, callsRes, ordersRes, productsRes, staffRes, auditRes] = await Promise.all([
+  const [XLSX, accounts, visits, calls, orders, orderItems, products, staff, auditLog] = await Promise.all([
     import("xlsx"),
-    supabase
-      .from("accounts")
-      .select("*, assigned_rep:profiles!accounts_assigned_rep_id_fkey(full_name)")
-      .order("created_at", { ascending: true }),
-    supabase
-      .from("visits")
-      .select("*, account:accounts!visits_account_id_fkey(name), rep:profiles!visits_rep_id_fkey(full_name)")
-      .order("created_at", { ascending: true }),
-    supabase
-      .from("calls")
-      .select(
-        "*, account:accounts!calls_account_id_fkey(name), telesales:profiles!calls_telesales_id_fkey(full_name)",
-      )
-      .order("created_at", { ascending: true }),
-    supabase
-      .from("orders")
-      .select(
-        "*, account:accounts!orders_account_id_fkey(name), created_by_profile:profiles!orders_created_by_fkey(full_name)",
-      )
-      .order("created_at", { ascending: true }),
-    supabase.from("products").select("*").order("name", { ascending: true }),
-    supabase.from("profiles").select("*").order("full_name", { ascending: true }),
-    supabase
-      .from("audit_log")
-      .select("*, changed_by_profile:profiles!audit_log_changed_by_fkey(full_name)")
-      .order("changed_at", { ascending: true }),
+    fetchAllRows((f, t) =>
+      sb
+        .from("accounts")
+        .select("*, assigned_rep:profiles!accounts_assigned_rep_id_fkey(full_name)")
+        .order("created_at", { ascending: true })
+        .range(f, t),
+    ),
+    fetchAllRows((f, t) =>
+      sb
+        .from("visits")
+        .select("*, account:accounts!visits_account_id_fkey(name), rep:profiles!visits_rep_id_fkey(full_name)")
+        .order("created_at", { ascending: true })
+        .range(f, t),
+    ),
+    fetchAllRows((f, t) =>
+      sb
+        .from("calls")
+        .select(
+          "*, account:accounts!calls_account_id_fkey(name), telesales:profiles!calls_telesales_id_fkey(full_name)",
+        )
+        .order("created_at", { ascending: true })
+        .range(f, t),
+    ),
+    fetchAllRows((f, t) =>
+      sb
+        .from("orders")
+        .select(
+          "*, account:accounts!orders_account_id_fkey(name), created_by_profile:profiles!orders_created_by_fkey(full_name)",
+        )
+        .order("created_at", { ascending: true })
+        .range(f, t),
+    ),
+    fetchAllRows((f, t) =>
+      sb.from("order_items").select("*").order("created_at", { ascending: true }).range(f, t),
+    ),
+    fetchAllRows((f, t) => sb.from("products").select("*").order("name", { ascending: true }).range(f, t)),
+    fetchAllRows((f, t) => sb.from("profiles").select("*").order("full_name", { ascending: true }).range(f, t)),
+    fetchAllRows((f, t) =>
+      sb
+        .from("audit_log")
+        .select("*, changed_by_profile:profiles!audit_log_changed_by_fkey(full_name)")
+        .order("changed_at", { ascending: true })
+        .range(f, t),
+    ),
   ]);
-  for (const r of [accountsRes, visitsRes, callsRes, ordersRes, productsRes, staffRes, auditRes]) {
-    if (r.error) throw r.error;
-  }
-
-  type Row = Record<string, unknown>;
-
-  const accounts = (accountsRes.data ?? []) as Row[];
-  const visits = (visitsRes.data ?? []) as Row[];
-  const calls = (callsRes.data ?? []) as Row[];
-  const orders = (ordersRes.data ?? []) as Row[];
-  const products = (productsRes.data ?? []) as Row[];
-  const staff = (staffRes.data ?? []) as Row[];
-  const auditLog = (auditRes.data ?? []) as Row[];
 
   // Orders link back to the one visit/call that produced them — build both
   // directions so each visit/call row can show its order inline, without a
@@ -145,6 +174,16 @@ export async function exportAllDataToExcel(filenamePrefix = "flowercom-crm-expor
     };
   });
 
+  const orderShop = new Map(orders.map((o) => [o.id as string, (o.account as Row | null)?.name ?? ""]));
+  const orderItemRows = orderItems.map((i) => ({
+    ID: i.id,
+    "Order ID": i.order_id,
+    Shop: orderShop.get(i.order_id as string) ?? "",
+    Product: i.product_name,
+    Bouquets: i.quantity,
+    "Created At": i.created_at,
+  }));
+
   const orderRows = orders.map((o) => ({
     ID: o.id,
     Shop: (o.account as Row | null)?.name ?? "",
@@ -187,6 +226,7 @@ export async function exportAllDataToExcel(filenamePrefix = "flowercom-crm-expor
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(visitRows), "Visits");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(callRows), "Calls");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(orderRows), "Orders");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(orderItemRows), "Order Items");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(productRows), "Products");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(staffRows), "Staff");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(auditRows), "Edit History");

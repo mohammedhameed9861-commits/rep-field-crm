@@ -74,13 +74,35 @@ export async function updateCall(id: string, input: CallEditInput): Promise<void
   if (error) throw error;
 }
 
+/** How many of an agent's own calls "My Calls" shows — PostgREST caps any single
+ * request at 1000 rows anyway, and nobody scrolls past the last couple hundred. */
+export const MY_CALLS_LIMIT = 200;
+
 export async function fetchMyCalls(telesalesId: string): Promise<Call[]> {
   if (!supabase) return [];
   const { data, error } = await supabase
     .from("calls")
     .select("*, account:accounts!calls_account_id_fkey(id, name, area)")
     .eq("telesales_id", telesalesId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(MY_CALLS_LIMIT);
+  if (error) throw error;
+  return (data ?? []) as Call[];
+}
+
+/** The agent's follow-up list, queried on its own (see fetchMyVisitFollowUps). */
+export async function fetchMyCallFollowUps(telesalesId: string): Promise<Call[]> {
+  if (!supabase) return [];
+  const since = new Date();
+  since.setDate(since.getDate() - 30);
+  const { data, error } = await supabase
+    .from("calls")
+    .select("*, account:accounts!calls_account_id_fkey(id, name, area)")
+    .eq("telesales_id", telesalesId)
+    .not("next_followup_at", "is", null)
+    .gte("next_followup_at", since.toISOString().slice(0, 10))
+    .order("next_followup_at", { ascending: true })
+    .limit(100);
   if (error) throw error;
   return (data ?? []) as Call[];
 }

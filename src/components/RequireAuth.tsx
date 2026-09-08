@@ -4,7 +4,7 @@ import { useAuth } from "../lib/auth";
 import { isSupabaseConfigured } from "../lib/supabase";
 
 export default function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { session, loading } = useAuth();
+  const { session, profile, loading, signOut } = useAuth();
   const { t } = useTranslation();
 
   if (!isSupabaseConfigured) {
@@ -32,5 +32,37 @@ export default function RequireAuth({ children }: { children: React.ReactNode })
     return <Navigate to="/login" replace />;
   }
 
+  // The database already refuses a deactivated account everything (my_role() returns
+  // null once active=false), so without this they'd just see every screen fail with
+  // permission errors and no idea why.
+  if (profile && !profile.active) {
+    return <BlockedScreen message={t("auth.deactivated")} onSignOut={signOut} signOutLabel={t("common.signOut")} />;
+  }
+  if (!profile) {
+    return <BlockedScreen message={t("auth.profileMissing")} onSignOut={signOut} signOutLabel={t("common.signOut")} />;
+  }
+
   return <>{children}</>;
+}
+
+function BlockedScreen({
+  message,
+  onSignOut,
+  signOutLabel,
+}: {
+  message: string;
+  onSignOut: () => Promise<void>;
+  signOutLabel: string;
+}) {
+  return (
+    <div className="mx-auto max-w-md px-6 py-24 text-center">
+      <p className="text-sm text-gray-600">{message}</p>
+      <button
+        onClick={() => void onSignOut()}
+        className="mt-6 rounded-full bg-teal-500 px-6 py-2.5 text-sm font-semibold text-white hover:bg-teal-600"
+      >
+        {signOutLabel}
+      </button>
+    </div>
+  );
 }

@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Pencil } from "lucide-react";
 import { useAuth } from "../../lib/auth";
-import { fetchAllVisits, visitPhotoUrl } from "../../lib/visits";
+import { fetchAllVisits, visitPhotoUrls } from "../../lib/visits";
 import { fetchStaff, setStaffTarget } from "../../lib/reps";
 import { fetchRepPerformance, type RepPerformanceRow } from "../../lib/dashboard";
 import type { Profile, Visit, VisitOutcome } from "../../lib/types";
@@ -46,10 +46,8 @@ export default function VisitsActivityPage() {
         dateTo: dateTo || undefined,
       });
       setVisits(data);
-      const entries = await Promise.all(
-        data.map(async (v) => [v.id, await visitPhotoUrl(v.photo_path)] as const),
-      );
-      setPhotos(Object.fromEntries(entries.filter(([, url]) => url)) as Record<string, string>);
+      const urls = await visitPhotoUrls(data.map((v) => v.photo_path));
+      setPhotos(Object.fromEntries(data.map((v) => [v.id, urls[v.photo_path]]).filter(([, u]) => u)));
     } catch (err) {
       setError(errorMessage(err));
     } finally {
@@ -110,7 +108,7 @@ export default function VisitsActivityPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="shrink-0 px-7 pb-4 pt-6">
+      <div className="shrink-0 px-4 md:px-7 pb-4 pt-6">
         <h1 className="text-xl font-bold text-sea-800">{t("visitsActivity.title")}</h1>
         <p className="mt-0.5 text-sm text-gray-500">
           {t(visits.length === 1 ? "visitsActivity.countOne" : "visitsActivity.countOther", {
@@ -119,11 +117,11 @@ export default function VisitsActivityPage() {
         </p>
       </div>
 
-      {error && <p className="px-7 pb-3 text-sm text-red-600">{error}</p>}
+      {error && <p className="px-4 md:px-7 pb-3 text-sm text-red-600">{error}</p>}
 
-      <div className="shrink-0 px-7 pb-4">
-        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-          <div className="grid grid-cols-[1fr_90px_90px_100px_90px_130px] gap-2 border-b border-gray-100 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
+      <div className="shrink-0 px-4 md:px-7 pb-4">
+        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white">
+          <div className="min-w-[620px] grid grid-cols-[1fr_90px_90px_100px_90px_130px] gap-2 border-b border-gray-100 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
             <span>{t("visitsActivity.colRep")}</span>
             <span>{t("visitsActivity.colBouquetsMTD")}</span>
             <span>{t("visitsActivity.colOrdersMTD")}</span>
@@ -139,7 +137,7 @@ export default function VisitsActivityPage() {
             performance.map((r) => (
               <div
                 key={r.id}
-                className="grid grid-cols-[1fr_90px_90px_100px_90px_130px] items-center gap-2 border-t border-gray-100 px-4 py-2.5"
+                className="min-w-[620px] grid grid-cols-[1fr_90px_90px_100px_90px_130px] items-center gap-2 border-t border-gray-100 px-4 py-2.5"
               >
                 <span className="truncate text-sm font-semibold text-gray-900">{r.name}</span>
                 <span className="text-sm text-gray-700" dir="ltr">
@@ -204,7 +202,7 @@ export default function VisitsActivityPage() {
         </div>
       </div>
 
-      <div className="flex shrink-0 flex-wrap items-center gap-2 px-7 pb-3">
+      <div className="flex shrink-0 flex-wrap items-center gap-2 px-4 md:px-7 pb-3">
         <select value={repId} onChange={(e) => setRepId(e.target.value)} className={field}>
           <option value="">{t("visitsActivity.allReps")}</option>
           {reps.map((r) => (
@@ -232,7 +230,7 @@ export default function VisitsActivityPage() {
         />
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-7 pb-6">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 md:px-7 pb-6">
         {loading ? (
           <p className="text-sm text-gray-400">{t("common.loading")}</p>
         ) : visits.length === 0 ? (

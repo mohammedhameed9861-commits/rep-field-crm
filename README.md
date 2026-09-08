@@ -13,7 +13,8 @@ client account's order history and activity — plus simple stock tracking.
 - **Frontend**: React + Vite + TypeScript + Tailwind, client-side SPA.
 - **Backend**: Supabase (Postgres + Auth + Storage), Row Level Security
   enforcing every permission — not just the UI.
-- **Hosting**: Cloudflare Pages (static build), same as before.
+- **Hosting**: Vercel (static build; `vercel.json` rewrites every path to
+  `index.html` so a refresh on `/visits` or a deep link doesn't 404).
 
 ## What's built so far
 
@@ -27,6 +28,10 @@ free-text note on each one.
 **Reps** — a manager-only "Reps & Staff" screen to create staff logins
 (rep/telesales/manager), deactivate/reactivate them, and reset a
 password — no more creating accounts by hand in the Supabase dashboard.
+Deactivating someone really locks them out (see the trust model below),
+and the function refuses to let a manager deactivate or demote
+themselves, or the last active manager — one mis-click can't leave
+nobody able to run this screen.
 Reps get their own day-to-day nav: **New Visit** (search any shop by
 name, take a live camera photo — no gallery/file uploads on any device,
 see below — mark sold/no-sale with one of nine reasons when it's not a
@@ -168,6 +173,14 @@ Same discipline as the previous implementation, carried over deliberately:
   dashboard. A "History" button next to each editable record shows
   who changed what and when, diffed field by field. Deletion is still
   nowhere in the app for any of these — correction, not removal.
+- **Deactivation is enforced in the database, not just the UI.** Every
+  policy goes through `my_role()`, which since migration `0016` returns
+  null for a profile with `active = false` — so a deactivated rep's phone,
+  session and all, is refused by every table at once. The `manage-rep`
+  function also bans the user in Auth so the session can't refresh. (Before
+  this, `active` was only ever *read* by the UI: a deactivated account with
+  a session still open kept every permission indefinitely.) The audit log
+  is manager-only for the same reason.
 - **A visit needs a photo taken live in the app**, never picked from a
   gallery or file picker on any device. Earlier this used a plain
   `<input type="file" capture="environment">`, but `capture` is only a
@@ -204,16 +217,35 @@ component.
 ## Mobile layout
 
 Reps and telesales log visits/calls from their phones in the field, so
-the nav can't just assume a laptop-width screen. Below Tailwind's `md`
-breakpoint, the sidebar (`src/components/Sidebar.tsx`) is a slide-in
-drawer behind a hamburger button in a thin top bar
-(`src/components/Layout.tsx`), instead of the permanent 224px-wide
-column it used to be everywhere — on a phone that fixed width was over
-half the screen, squeezing every page's content into a sliver narrow
-enough that ordinary sentences wrapped one word per line. Tapping a nav
-link, tapping the backdrop, or the route just changing all close the
-drawer. `md:` and up is unchanged — the sidebar stays permanently
-visible like before.
+every screen has to work at phone width, not just a laptop's. Below
+Tailwind's `md` breakpoint:
+
+- The sidebar (`src/components/Sidebar.tsx`) is a slide-in drawer behind
+  a hamburger button in a thin top bar (`src/components/Layout.tsx`) —
+  it used to be a permanent 224px column, which on a phone was over half
+  the screen and squeezed every page into a sliver where sentences
+  wrapped one word per line. A nav tap, a tap on the backdrop, or the
+  route changing all close it. `md:` and up keeps the always-visible
+  sidebar.
+- Accounts stacks: the list on its own, then the account's detail with
+  an "All accounts" back button once one is picked.
+- The dashboard's stat row, chart/alerts and attention/activity panels
+  stack; the manager tables (Reps, Inventory, Telesales Activity, the
+  per-rep performance table) scroll sideways inside their card rather
+  than crushing their columns.
+- Modals cap at the screen height and scroll inside.
+- It's installable: `public/manifest.webmanifest` plus the icons and
+  `apple-touch-icon` mean "Add to Home Screen" on Android or iOS gives a
+  full-screen app with the Flowercom icon, no browser chrome. (The live
+  camera works in that mode on both.)
+
+`scripts/` doesn't include it, but the way this was verified is worth
+repeating after layout changes: build with a fake `VITE_SUPABASE_URL`,
+serve `dist`, and drive it with Playwright at 390×844 with the Supabase
+REST/Auth/Storage calls mocked — every screen, both languages, checking
+`scrollWidth` never exceeds the viewport. Two bugs that had already
+shipped were caught that way (the product dropdown collapsing to its
+arrow, and the closed drawer sitting over the top bar in Arabic).
 
 ## Known gaps (intentional, for now)
 
@@ -249,7 +281,8 @@ codebase is inherited later, since `npm audit` will keep flagging it.
 1. Create a new project at [supabase.com](https://supabase.com) — a
    **different** project from the marketing site's.
 2. SQL Editor → New query → paste and run each file in
-   `supabase/migrations/` **in order** (`0001` → `0015`).
+   `supabase/migrations/` **in order** (`0001` → `0016`). Run
+   `npm run check:migrations` first if you've edited any of them.
 3. **Turn off public sign-ups**: Authentication → Sign In / Providers →
    turn off "Allow new users to sign up". Staff accounts are created
    through the app's Reps screen (or, before the first manager exists,
@@ -261,7 +294,9 @@ codebase is inherited later, since `npm audit` will keep flagging it.
    ```
    Every account created after this one, through the Reps screen, is
    handled automatically — no more manual SQL.
-5. **Deploy the `manage-rep` Edge Function** (Edge Functions → Deploy new
+5. **Deploy the `manage-rep` Edge Function** (re-deploy it whenever
+   `supabase/functions/manage-rep/index.ts` changes — it did in the
+   hardening round) (Edge Functions → Deploy new
    function → name it `manage-rep` → paste the contents of
    `supabase/functions/manage-rep/index.ts`). It needs no extra secrets —
    `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`
@@ -282,9 +317,55 @@ npm install
 npm run dev
 ```
 
-## 3. Deploy to Cloudflare Pages
+## 3. Deploy to Vercel
 
-1. Workers & Pages → Create → Pages → Connect to Git → this repo.
-2. Build command: `npm run build` · Output directory: `dist`.
-3. Add the same two environment variables as `.env`.
-4. Deploy. `wrangler.jsonc` already handles SPA routing on refresh.
+1. Vercel → Add New Project → import this repo. Framework preset: Vite
+   (build `npm run build`, output `dist` — both auto-detected).
+2. Add the same two environment variables as `.env`
+   (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`).
+3. **Check which branch is the Production Branch** (Project → Settings →
+   Git). Vercel deploys that branch to the main URL; every other branch
+   only gets a preview URL. If the code you expect isn't showing up on the
+   phone, this is the first thing to look at — see "Branches" below.
+4. `vercel.json` already handles SPA routing on refresh.
+
+### Branches — read this before merging anything
+
+`main` and `claude/flower-distributor-website-crm-e2ygrh` are **two
+different apps**. They share migrations `0001`–`0004` in name only (the
+contents differ) and diverge completely after that: `main` has its own
+"Phase 4/5" features, an automated test suite and a migration `0009` that
+creates a `create_sale_visit` function, none of which exist on this
+branch — and this branch's `0005`–`0016` (order line items, call types,
+follow-ups, product types, the audit log, hardening) don't exist on
+`main`. The Supabase project has had *this* branch's migrations run
+against it, and every screen you've been using on the phone is this
+branch. Do not `git merge` one into the other — the migration histories
+would collide. Pick this branch as the source of truth (open a PR from
+it and replace `main`, or point Vercel's Production Branch at it) and
+retire the other lineage.
+
+### Things that will bite later if nobody's watching
+
+- **Supabase free tier pauses a project after 7 days without traffic**,
+  and every sign-in fails until someone un-pauses it in the dashboard.
+  A team using the app daily never hits this; a long holiday will. The
+  Pro plan removes it.
+- **Storage.** Visit photos are compressed to ~300KB at 1280px. The free
+  tier's 1GB is therefore roughly 3,000 visits — at a few dozen visits a
+  day that is months, not years. Pro is 100GB. A manager can delete old
+  photos (migration `0016` added the policy) but the app has no retention
+  UI; if you want one, it's a small follow-up.
+- **Row limits.** PostgREST returns at most 1000 rows per request and
+  says nothing when it truncates. Every query that could grow past that
+  now either filters server-side, pages (`Pull Data`), limits itself
+  ("My Visits"/"My Calls" show the latest 200), or runs in the database
+  (`account_activity_summary` for Needs Attention). Keep it that way
+  when adding queries: never `select *` an unbounded table.
+- **`npm run check:migrations`** applies every file in
+  `supabase/migrations/` in order to a real Postgres (PGlite, in-process,
+  no install) with Supabase's `auth`/`storage` surface stubbed, then
+  smoke-tests the trust model — the enum swaps, the reason constraint,
+  the audit trigger, that `my_role()` goes null on deactivation, the
+  Needs Attention rollup. Run it before pasting a new migration into the
+  SQL editor; a typo fails here instead of half-applying in production.

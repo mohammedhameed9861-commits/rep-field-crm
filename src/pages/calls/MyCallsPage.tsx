@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Phone, Plus } from "lucide-react";
 import { useAuth } from "../../lib/auth";
-import { fetchMyCalls } from "../../lib/calls";
+import { fetchMyCalls, fetchMyCallFollowUps, MY_CALLS_LIMIT } from "../../lib/calls";
 import type { Call } from "../../lib/types";
 import { formatDateTime } from "../../lib/format";
 import UpcomingFollowUps from "../../components/UpcomingFollowUps";
@@ -20,6 +20,7 @@ export default function MyCallsPage() {
   const { profile } = useAuth();
   const { t } = useTranslation();
   const [calls, setCalls] = useState<Call[]>([]);
+  const [followUps, setFollowUps] = useState<Call[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,8 +28,12 @@ export default function MyCallsPage() {
     if (!profile) return;
     let alive = true;
     setLoading(true);
-    fetchMyCalls(profile.id)
-      .then((data) => alive && setCalls(data))
+    Promise.all([fetchMyCalls(profile.id), fetchMyCallFollowUps(profile.id)])
+      .then(([data, upcoming]) => {
+        if (!alive) return;
+        setCalls(data);
+        setFollowUps(upcoming);
+      })
       .catch((err) => setError(errorMessage(err)))
       .finally(() => alive && setLoading(false));
     return () => {
@@ -38,7 +43,7 @@ export default function MyCallsPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex shrink-0 items-center justify-between px-7 pb-4 pt-6">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 px-4 md:px-7 pb-4 pt-6">
         <div>
           <h1 className="text-xl font-bold text-sea-800">{t("calls.myCallsTitle")}</h1>
           <p className="mt-0.5 text-sm text-gray-500">
@@ -53,16 +58,16 @@ export default function MyCallsPage() {
         </Link>
       </div>
 
-      {error && <p className="px-7 pb-3 text-sm text-red-600">{error}</p>}
+      {error && <p className="px-4 md:px-7 pb-3 text-sm text-red-600">{error}</p>}
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-7 pb-6">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 md:px-7 pb-6">
         {loading ? (
           <p className="text-sm text-gray-400">{t("common.loading")}</p>
         ) : calls.length === 0 ? (
           <p className="text-sm text-gray-400">{t("calls.noCallsYet")}</p>
         ) : (
           <>
-            <UpcomingFollowUps items={calls} />
+            <UpcomingFollowUps items={followUps} />
             <div className="flex flex-col gap-2">
             {calls.map((c) => (
               <div
@@ -95,6 +100,9 @@ export default function MyCallsPage() {
               </div>
             ))}
             </div>
+            {calls.length >= MY_CALLS_LIMIT && (
+              <p className="mt-3 text-center text-xs text-gray-400">{t("calls.recentOnly", { count: MY_CALLS_LIMIT })}</p>
+            )}
           </>
         )}
       </div>

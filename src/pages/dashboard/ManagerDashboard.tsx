@@ -103,18 +103,18 @@ export default function ManagerDashboard() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex shrink-0 items-center justify-between px-7 pb-4 pt-6">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 px-4 md:px-7 pb-4 pt-6">
         <h1 className="text-xl font-bold text-sea-800">{t("dashboard.manager.title")}</h1>
         <span className="text-sm text-gray-500" dir="ltr">
           {today}
         </span>
       </div>
 
-      {error && <p className="px-7 pb-3 text-sm text-red-600">{error}</p>}
+      {error && <p className="px-4 md:px-7 pb-3 text-sm text-red-600">{error}</p>}
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-7 pb-6">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 md:px-7 pb-6">
         {/* Top stat row */}
-        <div className="grid grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
           <MiniStat label={t("dashboard.manager.salesToday")} value={loading ? "…" : stats?.salesToday ?? 0} />
           <MiniStat
             label={t("dashboard.manager.mtdSales")}
@@ -184,7 +184,7 @@ export default function ManagerDashboard() {
               <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-gray-100">
                 <div className="h-full rounded-full bg-teal-500" style={{ width: `${pct}%` }} />
               </div>
-              <div className="mt-3 grid grid-cols-3 gap-3 text-xs text-gray-500">
+              <div className="mt-3 grid grid-cols-1 gap-1.5 text-xs text-gray-500 sm:grid-cols-3 sm:gap-3">
                 <span dir="ltr">
                   {t("dashboard.manager.remaining")}: {remaining.toFixed(1)}
                 </span>
@@ -200,7 +200,7 @@ export default function ManagerDashboard() {
         </div>
 
         {/* Chart + inventory alerts */}
-        <div className="mt-4 grid grid-cols-[1fr_260px] gap-4">
+        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_260px]">
           <div className="rounded-2xl border border-gray-200 bg-white p-5">
             <h2 className="mb-3 text-sm font-bold text-sea-800">{t("dashboard.manager.last7Days")}</h2>
             {loading ? (
@@ -260,7 +260,7 @@ export default function ManagerDashboard() {
         </div>
 
         {/* Needs attention + today's activity */}
-        <div className="mt-4 grid grid-cols-2 gap-4">
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="rounded-2xl border border-gray-200 bg-white p-5">
             <h2 className="mb-3 text-sm font-bold text-sea-800">{t("dashboard.manager.needsAttention")}</h2>
             {loading || !needsAttention ? (

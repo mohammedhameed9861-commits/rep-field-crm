@@ -55,6 +55,9 @@ Deno.serve(async (req) => {
       if (!["rep", "telesales", "manager"].includes(role)) {
         return json({ error: "Invalid role" }, 400);
       }
+      if (typeof password !== "string" || password.length < 8) {
+        return json({ error: "Password must be at least 8 characters" }, 400);
+      }
       const { data: created, error: createError } = await admin.auth.admin.createUser({
         email,
         password,
@@ -75,17 +78,46 @@ Deno.serve(async (req) => {
       return json({ ok: true, id: created.user.id });
     }
 
+    // Lockout guards: a manager can't deactivate or demote themselves, and the
+    // last active manager can never be deactivated or demoted — otherwise one
+    // mis-click leaves nobody able to run the Reps screen (or this function).
+    async function wouldRemoveLastManager(id: string): Promise<boolean> {
+      const { data: target } = await admin.from("profiles").select("role, active").eq("id", id).single();
+      if (!target || target.role !== "manager" || !target.active) return false;
+      const { count } = await admin
+        .from("profiles")
+        .select("id", { count: "exact", head: true })
+        .eq("role", "manager")
+        .eq("active", true);
+      return (count ?? 0) <= 1;
+    }
+
     if (action === "set_active") {
       const { id, active } = body;
       if (!id || typeof active !== "boolean") return json({ error: "Missing fields" }, 400);
+      if (!active && id === user.id) return json({ error: "You can't deactivate your own account" }, 400);
+      if (!active && (await wouldRemoveLastManager(id))) {
+        return json({ error: "This is the last active manager — add another manager first" }, 400);
+      }
       const { error } = await admin.from("profiles").update({ active }).eq("id", id);
       if (error) return json({ error: error.message }, 400);
+      // my_role() already returns null for an inactive profile (so every table
+      // refuses them at once); banning in Auth too stops their session from
+      // refreshing, so they're fully out within the hour instead of "until they
+      // happen to sign out".
+      const { error: banError } = await admin.auth.admin.updateUserById(id, {
+        ban_duration: active ? "none" : "876000h",
+      });
+      if (banError) return json({ error: banError.message }, 400);
       return json({ ok: true });
     }
 
     if (action === "reset_password") {
       const { id, password } = body;
       if (!id || !password) return json({ error: "Missing fields" }, 400);
+      if (typeof password !== "string" || password.length < 8) {
+        return json({ error: "Password must be at least 8 characters" }, 400);
+      }
       const { error } = await admin.auth.admin.updateUserById(id, { password });
       if (error) return json({ error: error.message }, 400);
       return json({ ok: true });
@@ -95,6 +127,10 @@ Deno.serve(async (req) => {
       const { id, role } = body;
       if (!id || !["rep", "telesales", "manager"].includes(role)) {
         return json({ error: "Missing or invalid fields" }, 400);
+      }
+      if (id === user.id && role !== "manager") return json({ error: "You can't change your own role" }, 400);
+      if (role !== "manager" && (await wouldRemoveLastManager(id))) {
+        return json({ error: "This is the last active manager — add another manager first" }, 400);
       }
       const { error } = await admin.from("profiles").update({ role }).eq("id", id);
       if (error) return json({ error: error.message }, 400);

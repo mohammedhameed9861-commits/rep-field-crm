@@ -21,8 +21,8 @@ export default function Layout() {
   }, [location.pathname]);
 
   return (
-    <div className="flex h-screen bg-cream-50 text-gray-900">
-      <div className="flex items-center justify-between border-b border-sea-700 bg-sea-800 px-4 py-3 md:hidden">
+    <div className="flex h-[100dvh] flex-col bg-cream-50 text-gray-900 md:flex-row">
+      <div className="flex shrink-0 items-center justify-between border-b border-sea-700 bg-sea-800 px-4 py-3 md:hidden">
         <button
           onClick={() => setMobileOpen(true)}
           className="rounded-md p-1 text-white"
@@ -41,12 +41,12 @@ export default function Layout() {
       <div
         className={`fixed inset-y-0 z-50 flex h-full transition-transform duration-200 md:static md:z-auto md:translate-x-0 ${
           mobileOpen ? "translate-x-0" : isRtl ? "translate-x-full" : "-translate-x-full"
-        } ${isRtl ? "end-0" : "start-0"}`}
+        } start-0`}
       >
         <Sidebar onNavigate={() => setMobileOpen(false)} />
       </div>
 
-      <div className="min-w-0 flex-1 overflow-y-auto">
+      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
         <Outlet />
       </div>
     </div>

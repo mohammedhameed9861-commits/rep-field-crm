@@ -84,7 +84,7 @@ export default function TelesalesRollupPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="shrink-0 px-7 pb-4 pt-6">
+      <div className="shrink-0 px-4 md:px-7 pb-4 pt-6">
         <h1 className="text-xl font-bold text-sea-800">{t("telesalesRollup.title")}</h1>
         <p className="mt-0.5 text-sm text-gray-500">
           {t(calls.length === 1 ? "telesalesRollup.countOne" : "telesalesRollup.countOther", {
@@ -93,7 +93,7 @@ export default function TelesalesRollupPage() {
         </p>
       </div>
 
-      <div className="flex shrink-0 flex-wrap gap-2 px-7 pb-3">
+      <div className="flex shrink-0 flex-wrap gap-2 px-4 md:px-7 pb-3">
         <select value={agentId} onChange={(e) => setAgentId(e.target.value)} className={field}>
           <option value="">{t("telesalesRollup.allAgents")}</option>
           {agents.map((a) => (
@@ -132,11 +132,11 @@ export default function TelesalesRollupPage() {
         />
       </div>
 
-      {error && <p className="px-7 pb-3 text-sm text-red-600">{error}</p>}
+      {error && <p className="px-4 md:px-7 pb-3 text-sm text-red-600">{error}</p>}
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-7 pb-6">
-        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-          <div className="grid grid-cols-[120px_110px_1fr_100px_130px_1fr_140px] gap-2 border-b border-gray-100 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 md:px-7 pb-6">
+        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white">
+          <div className="min-w-[860px] grid grid-cols-[120px_110px_1fr_100px_130px_1fr_140px] gap-2 border-b border-gray-100 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
             <span>{t("telesalesRollup.colDate")}</span>
             <span>{t("telesalesRollup.colAgent")}</span>
             <span>{t("telesalesRollup.colShop")}</span>
@@ -153,7 +153,7 @@ export default function TelesalesRollupPage() {
             calls.map((c) => (
               <div
                 key={c.id}
-                className="grid grid-cols-[120px_110px_1fr_100px_130px_1fr_140px] items-center gap-2 border-t border-gray-100 px-4 py-2.5"
+                className="min-w-[860px] grid grid-cols-[120px_110px_1fr_100px_130px_1fr_140px] items-center gap-2 border-t border-gray-100 px-4 py-2.5"
               >
                 <span className="text-xs text-gray-600" dir="ltr">
                   {formatDateTime(c.created_at)}
