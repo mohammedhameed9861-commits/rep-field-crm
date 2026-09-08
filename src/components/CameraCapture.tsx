@@ -16,7 +16,11 @@ export default function CameraCapture({
 }) {
   const { t } = useTranslation();
   const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  // A real state value, not a ref — the <video> tag only exists in the JSX once this flips
+  // to non-null, so attaching the stream has to happen in an effect *after* that mount, not
+  // inline in startCamera() (which used to write to a ref, never triggering that re-render,
+  // so the srcObject assignment ran against a still-null videoRef and the video stayed black).
+  const [stream, setStream] = useState<MediaStream | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
@@ -25,24 +29,29 @@ export default function CameraCapture({
     return () => stopStream();
   }, []);
 
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+      void videoRef.current.play();
+    }
+  }, [stream]);
+
   function stopStream() {
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
+    setStream((s) => {
+      s?.getTracks().forEach((t) => t.stop());
+      return null;
+    });
   }
 
   async function startCamera() {
     setError(null);
     setStarting(true);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      const s = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: "environment" } },
         audio: false,
       });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
+      setStream(s);
     } catch {
       setError(t("camera.denied"));
     } finally {
@@ -96,7 +105,7 @@ export default function CameraCapture({
 
   return (
     <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-dashed border-gray-200 p-4">
-      {streamRef.current ? (
+      {stream ? (
         <>
           <video ref={videoRef} playsInline muted className="h-48 w-full rounded-lg bg-black object-cover" />
           <button

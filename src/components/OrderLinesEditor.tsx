@@ -39,7 +39,7 @@ export default function OrderLinesEditor({
             required
             value={line.product_name}
             onChange={(e) => update(i, { product_name: e.target.value })}
-            className={field}
+            className={`${field} min-w-0 flex-1`}
           >
             <option value="">{t("orderLines.productPlaceholder")}</option>
             {productTypes.map((pt) => (
