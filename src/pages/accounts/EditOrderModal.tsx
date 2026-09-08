@@ -19,7 +19,6 @@ export default function EditOrderModal({
   const { t } = useTranslation();
   const [items, setItems] = useState(order.items);
   const [quantity, setQuantity] = useState(String(order.quantity));
-  const [amount, setAmount] = useState(String(order.amount));
   const [status, setStatus] = useState<OrderStatus>(order.status);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +31,6 @@ export default function EditOrderModal({
       await updateOrder(order.id, {
         items,
         quantity: Number(quantity) || 0,
-        amount: Number(amount) || 0,
         status,
       });
       onSaved();
@@ -63,29 +61,17 @@ export default function EditOrderModal({
             onChange={(e) => setItems(e.target.value)}
             className={field}
           />
-          <div className="flex gap-3">
-            <input
-              required
-              type="number"
-              min="0"
-              step="0.5"
-              placeholder={t("visits.bouquetsPlaceholder")}
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              className={field}
-              dir="ltr"
-            />
-            <input
-              required
-              type="number"
-              min="0"
-              placeholder={t("visits.amountPlaceholder")}
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className={field}
-              dir="ltr"
-            />
-          </div>
+          <input
+            required
+            type="number"
+            min="0"
+            step="0.5"
+            placeholder={t("visits.bouquetsPlaceholder")}
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            className={field}
+            dir="ltr"
+          />
           <select value={status} onChange={(e) => setStatus(e.target.value as OrderStatus)} className={field}>
             {STATUSES.map((s) => (
               <option key={s} value={s}>

@@ -64,7 +64,6 @@ export async function setAccountActive(id: string, active: boolean): Promise<voi
 export interface OrderEditInput {
   items: string;
   quantity: number;
-  amount: number;
   status: OrderStatus;
 }
 

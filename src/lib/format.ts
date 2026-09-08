@@ -26,7 +26,3 @@ export function timeAgo(iso: string): string {
   const days = Math.round(hours / 24);
   return `${days} day${days === 1 ? "" : "s"} ago`;
 }
-
-export function formatIQD(amount: number): string {
-  return `${new Intl.NumberFormat().format(amount)} IQD`;
-}

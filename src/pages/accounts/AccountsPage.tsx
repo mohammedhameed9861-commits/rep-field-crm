@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { Archive, ArchiveRestore, MapPin, Pencil, Phone, Plus, Search, TrendingUp, User } from "lucide-react";
 import { fetchAccounts, fetchAccountActivity, setAccountActive } from "../../lib/accounts";
-import { formatDate, formatDateTime, formatIQD, timeAgo } from "../../lib/format";
+import { formatDate, formatDateTime, timeAgo } from "../../lib/format";
 import { useAuth } from "../../lib/auth";
 import type { Account, ActivityItem, OrderRow, ShopClass } from "../../lib/types";
 import AccountForm from "./AccountForm";
@@ -299,11 +299,10 @@ export default function AccountsPage() {
                       <p className="text-sm text-gray-400">{t("accounts.noOrdersYet")}</p>
                     ) : (
                       <div className="flex flex-col">
-                        <div className="grid grid-cols-[90px_1fr_80px_110px_120px] gap-2 px-1 py-1.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
+                        <div className="grid grid-cols-[90px_1fr_80px_120px] gap-2 px-1 py-1.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
                           <span>{t("accounts.colDate")}</span>
                           <span>{t("accounts.colItems")}</span>
                           <span>{t("accounts.colBouquets")}</span>
-                          <span>{t("accounts.colAmount")}</span>
                           {profile?.role === "manager" && (
                             <span className="text-end">{t("reps.colActions")}</span>
                           )}
@@ -311,7 +310,7 @@ export default function AccountsPage() {
                         {orders.map((o) => (
                           <div
                             key={o.id}
-                            className="grid grid-cols-[90px_1fr_80px_110px_120px] items-center gap-2 border-t border-gray-100 px-1 py-2.5"
+                            className="grid grid-cols-[90px_1fr_80px_120px] items-center gap-2 border-t border-gray-100 px-1 py-2.5"
                           >
                             <span className="text-xs text-gray-600" dir="ltr">
                               {formatDate(o.created_at)}
@@ -319,9 +318,6 @@ export default function AccountsPage() {
                             <span className="truncate text-xs text-gray-900">{o.items}</span>
                             <span className="text-xs font-semibold text-gray-900" dir="ltr">
                               {o.quantity}
-                            </span>
-                            <span className="text-xs font-semibold text-gray-900" dir="ltr">
-                              {formatIQD(o.amount)}
                             </span>
                             {profile?.role === "manager" && (
                               <div className="flex flex-col items-end gap-1">
@@ -337,7 +333,6 @@ export default function AccountsPage() {
                                   fields={[
                                     { key: "items", label: t("editHistory.fieldItems") },
                                     { key: "quantity", label: t("editHistory.fieldQuantity") },
-                                    { key: "amount", label: t("editHistory.fieldAmount") },
                                     { key: "status", label: t("editHistory.fieldStatus") },
                                   ]}
                                 />
@@ -393,7 +388,10 @@ export default function AccountsPage() {
                                 <p className="flex items-center gap-1.5 text-gray-900">
                                   <TrendingUp size={12} className="text-teal-600" />
                                   {t("accounts.orderPlaced")} &middot;{" "}
-                                  <span dir="ltr">{formatIQD(item.data.amount)}</span>
+                                  {t(
+                                    item.data.quantity === 1 ? "accounts.bouquetOne" : "accounts.bouquetOther",
+                                    { count: item.data.quantity },
+                                  )}
                                 </p>
                               )}
                               <p className="mt-0.5 text-gray-400" dir="ltr">

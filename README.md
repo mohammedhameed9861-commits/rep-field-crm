@@ -53,8 +53,8 @@ own follow-up fields:
 - **Not Interested** — a required Reason (Price, Already bought from
   competitor, No current demand, Quality, Doesn't want to change
   supplier, Other).
-- **Order Placed** — items/bouquets/amount, the exact same fields a rep
-  fills in for a sold visit.
+- **Order Placed** — items/bouquets, the exact same fields a rep fills
+  in for a sold visit.
 - **No Answer** — nothing further; just logged.
 
 An optional note applies to any of them. My Calls is topped by the same
@@ -121,9 +121,9 @@ easy to retune):
 and Staff — built entirely in the browser (`src/lib/exportData.ts`, via
 SheetJS, loaded on demand so it doesn't bloat everyone else's page
 load). The Visits and Calls tabs each carry a `Day` column plus the
-linked order's items/bouquets/amount/status inline (blank when that
-visit/call didn't result in a sale) — no need to cross-reference the
-Orders tab by hand.
+linked order's items/bouquets/status inline (blank when that visit/call
+didn't result in a sale) — no need to cross-reference the Orders tab by
+hand.
 
 Every section from the original ask is now built.
 
@@ -195,6 +195,15 @@ component.
   order-entry form to pick real products (with quantities) instead of
   typing free text — a bigger change than this round's scope.
 - Everything else from the original ask is built and bilingual.
+
+**No money amounts anywhere.** The business tracks bouquets (quantity)
+only, never an IQD figure per order — every "Amount" field, column, and
+export was removed from New Visit, New Call, Edit Order, an account's
+Order History, and Pull Data. `orders.amount` is still a real column in
+the database (`not null default 0`, so nothing broke by no longer
+sending it) purely so any pre-existing historical figures aren't
+destroyed — it's just never collected, shown, or edited anywhere in the
+app now.
 
 **A dependency note on Pull Data**: it uses the `xlsx` (SheetJS) npm
 package, which `npm audit` flags with two high-severity advisories

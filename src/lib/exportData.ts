@@ -121,7 +121,6 @@ export async function exportAllDataToExcel(filenamePrefix = "flowercom-crm-expor
       "Next Follow-up": v.next_followup_at,
       "Order Items": order?.items ?? "",
       "Order Bouquets": order?.quantity ?? "",
-      "Order Amount (IQD)": order?.amount ?? "",
       "Order Status": order?.status ?? "",
       "Created At": v.created_at,
     };
@@ -141,7 +140,6 @@ export async function exportAllDataToExcel(filenamePrefix = "flowercom-crm-expor
       "Next Follow-up": c.next_followup_at,
       "Order Items": order?.items ?? "",
       "Order Bouquets": order?.quantity ?? "",
-      "Order Amount (IQD)": order?.amount ?? "",
       "Order Status": order?.status ?? "",
       "Created At": c.created_at,
     };
@@ -153,7 +151,6 @@ export async function exportAllDataToExcel(filenamePrefix = "flowercom-crm-expor
     Source: o.source,
     Items: o.items,
     Bouquets: o.quantity,
-    "Amount (IQD)": o.amount,
     Status: o.status,
     "Logged By": (o.created_by_profile as Row | null)?.full_name ?? "",
     "Created At": o.created_at,

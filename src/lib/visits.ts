@@ -14,7 +14,7 @@ export interface NewVisitInput {
   /** A plain "YYYY-MM-DD" date, or null for no follow-up planned. */
   next_followup_at: string | null;
   /** Only used when outcome is "sold" — creates the linked order in the same step. */
-  order?: { items: string; quantity: number; amount: number; status: OrderStatus };
+  order?: { items: string; quantity: number; status: OrderStatus };
 }
 
 /** Compress the photo, upload it, then insert the visit (and its order, if sold) — a rep can
@@ -56,7 +56,6 @@ export async function createVisit(input: NewVisitInput): Promise<void> {
       source: "visit",
       visit_id: visit.id,
       items: input.order.items,
-      amount: input.order.amount,
       quantity: input.order.quantity,
       status: input.order.status,
     });

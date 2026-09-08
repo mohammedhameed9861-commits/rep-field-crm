@@ -114,7 +114,6 @@
     "colDate": "Date",
     "colItems": "Items",
     "colBouquets": "Bouquets",
-    "colAmount": "Amount",
     "colStatus": "Status",
     "activityTimeline": "Activity Timeline",
     "noActivityYet": "No visits or calls logged yet.",
@@ -193,7 +192,6 @@
     "noSale": "No Sale",
     "itemsPlaceholder": "Items (e.g. Red Roses x6, Colored Roses x3)",
     "bouquetsPlaceholder": "Bouquets",
-    "amountPlaceholder": "Amount (IQD)",
     "reasonPlaceholder": "Reason (optional)",
     "notePlaceholder": "Note (optional)",
     "saveVisit": "Save Visit",
@@ -274,7 +272,6 @@
     "fieldNote": "Note",
     "fieldItems": "Items",
     "fieldQuantity": "Bouquets",
-    "fieldAmount": "Amount",
     "fieldStatus": "Status",
     "fieldName": "Name",
     "orderHint": "Changing the outcome here doesn't touch any order already linked to this — edit that separately if needed."

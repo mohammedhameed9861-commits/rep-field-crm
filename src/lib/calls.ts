@@ -14,7 +14,7 @@ export interface NewCallInput {
    * outcome is "interested_callback"; the form never sets it for any other outcome. */
   next_followup_at: string | null;
   /** Only used when outcome is "order_placed" — creates the linked order in the same step. */
-  order?: { items: string; quantity: number; amount: number; status: OrderStatus };
+  order?: { items: string; quantity: number; status: OrderStatus };
 }
 
 /** A telesales agent can only ever create these, never edit; only a manager can correct
@@ -44,7 +44,6 @@ export async function createCall(input: NewCallInput): Promise<void> {
       source: "call",
       call_id: call.id,
       items: input.order.items,
-      amount: input.order.amount,
       quantity: input.order.quantity,
       status: input.order.status,
     });

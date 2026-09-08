@@ -114,7 +114,6 @@
     "colDate": "التاريخ",
     "colItems": "الأصناف",
     "colBouquets": "الباقات",
-    "colAmount": "المبلغ",
     "colStatus": "الحالة",
     "activityTimeline": "الجدول الزمني للنشاط",
     "noActivityYet": "لا توجد زيارات أو مكالمات مسجلة بعد.",
@@ -193,7 +192,6 @@
     "noSale": "لم يتم البيع",
     "itemsPlaceholder": "الأصناف (مثال: ورد أحمر × ٦، ورد ملون × ٣)",
     "bouquetsPlaceholder": "عدد الباقات",
-    "amountPlaceholder": "المبلغ (دينار عراقي)",
     "reasonPlaceholder": "السبب (اختياري)",
     "notePlaceholder": "ملاحظة (اختياري)",
     "saveVisit": "حفظ الزيارة",
@@ -274,7 +272,6 @@
     "fieldNote": "ملاحظة",
     "fieldItems": "الأصناف",
     "fieldQuantity": "الباقات",
-    "fieldAmount": "المبلغ",
     "fieldStatus": "الحالة",
     "fieldName": "الاسم",
     "orderHint": "تغيير النتيجة هنا لا يؤثر على أي طلب مرتبط بهذه العملية مسبقاً — عدّل الطلب بشكل منفصل عند الحاجة."

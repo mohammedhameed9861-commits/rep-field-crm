@@ -40,7 +40,6 @@ export default function NewVisitPage() {
   const [nextFollowupAt, setNextFollowupAt] = useState<string | null>(null);
   const [items, setItems] = useState("");
   const [quantity, setQuantity] = useState("");
-  const [amount, setAmount] = useState("");
 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +74,6 @@ export default function NewVisitPage() {
             ? {
                 items,
                 quantity: Number(quantity) || 0,
-                amount: Number(amount) || 0,
                 status: "pending",
               }
             : undefined,
@@ -166,28 +164,16 @@ export default function NewVisitPage() {
                 onChange={(e) => setItems(e.target.value)}
                 className={field}
               />
-              <div className="flex gap-3">
-                <input
-                  required
-                  type="number"
-                  min="0"
-                  step="0.5"
-                  placeholder={t("visits.bouquetsPlaceholder")}
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                  className={field}
-                />
-                <input
-                  required
-                  type="number"
-                  min="0"
-                  placeholder={t("visits.amountPlaceholder")}
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  className={field}
-                  dir="ltr"
-                />
-              </div>
+              <input
+                required
+                type="number"
+                min="0"
+                step="0.5"
+                placeholder={t("visits.bouquetsPlaceholder")}
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                className={field}
+              />
             </div>
           ) : (
             <select

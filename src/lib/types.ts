@@ -97,6 +97,8 @@ export interface OrderRow {
   visit_id: string | null;
   call_id: string | null;
   items: string;
+  /** Still a real DB column (kept for old rows' history), but no longer collected, shown,
+   * or editable anywhere in the app — the business only tracks bouquets (quantity), not IQD. */
   amount: number;
   quantity: number;
   status: OrderStatus;
