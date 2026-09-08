@@ -190,7 +190,6 @@
     "takePhoto": "Take a photo of the shop",
     "sold": "Sold",
     "noSale": "No Sale",
-    "itemsPlaceholder": "Items (e.g. Red Roses x6, Colored Roses x3)",
     "bouquetsPlaceholder": "Bouquets",
     "reasonPlaceholder": "Reason (optional)",
     "notePlaceholder": "Note (optional)",
@@ -253,6 +252,11 @@
     "stockLabel": "Stock on hand",
     "thresholdLabel": "Low-stock at",
     "criticalLabel": "Critical at"
+  },
+  "orderLines": {
+    "productPlaceholder": "Select a product",
+    "addProduct": "Add another product",
+    "noTypesYet": "No product types yet — ask a manager to add some from Inventory → Manage Types first."
   },
   "editHistory": {
     "view": "History",

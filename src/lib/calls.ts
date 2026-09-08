@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { insertOrderItems, summarizeLines, type OrderLineDraft } from "./orderLines";
 import type { Call, CallOutcome, CallReason, CallType, OrderStatus } from "./types";
 
 export { searchAccounts } from "./accounts";
@@ -13,8 +14,9 @@ export interface NewCallInput {
   /** A plain "YYYY-MM-DD" date, or null for no follow-up planned — only meaningful when
    * outcome is "interested_callback"; the form never sets it for any other outcome. */
   next_followup_at: string | null;
-  /** Only used when outcome is "order_placed" — creates the linked order in the same step. */
-  order?: { items: string; quantity: number; status: OrderStatus };
+  /** Only used when outcome is "order_placed" — creates the linked order (and its line
+   * items) in the same step. */
+  order?: { lines: OrderLineDraft[]; status: OrderStatus };
 }
 
 /** A telesales agent can only ever create these, never edit; only a manager can correct
@@ -38,16 +40,22 @@ export async function createCall(input: NewCallInput): Promise<void> {
   if (callError) throw callError;
 
   if (input.outcome === "order_placed" && input.order) {
-    const { error: orderError } = await supabase.from("orders").insert({
-      account_id: input.account_id,
-      created_by: input.telesales_id,
-      source: "call",
-      call_id: call.id,
-      items: input.order.items,
-      quantity: input.order.quantity,
-      status: input.order.status,
-    });
+    const { items, quantity, rows } = summarizeLines(input.order.lines);
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .insert({
+        account_id: input.account_id,
+        created_by: input.telesales_id,
+        source: "call",
+        call_id: call.id,
+        items,
+        quantity,
+        status: input.order.status,
+      })
+      .select("id")
+      .single();
     if (orderError) throw orderError;
+    await insertOrderItems(order.id, rows);
   }
 }
 

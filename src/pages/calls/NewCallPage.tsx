@@ -5,8 +5,11 @@ import { useNavigate } from "react-router-dom";
 import { Search, X } from "lucide-react";
 import { useAuth } from "../../lib/auth";
 import { createCall, searchAccounts } from "../../lib/calls";
-import type { Account, CallOutcome, CallReason, CallType } from "../../lib/types";
+import { emptyLine, summarizeLines, type OrderLineDraft } from "../../lib/orderLines";
+import { fetchProductTypes } from "../../lib/productTypes";
+import type { Account, CallOutcome, CallReason, CallType, ProductType } from "../../lib/types";
 import FollowUpPicker from "../../components/FollowUpPicker";
+import OrderLinesEditor from "../../components/OrderLinesEditor";
 
 const field =
   "w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100";
@@ -44,8 +47,8 @@ export default function NewCallPage() {
   const [callReason, setCallReason] = useState<CallReason | "">("");
   const [note, setNote] = useState("");
   const [nextFollowupAt, setNextFollowupAt] = useState<string | null>(null);
-  const [items, setItems] = useState("");
-  const [quantity, setQuantity] = useState("");
+  const [lines, setLines] = useState<OrderLineDraft[]>([emptyLine()]);
+  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,6 +64,16 @@ export default function NewCallPage() {
     };
   }, [search, account]);
 
+  useEffect(() => {
+    let alive = true;
+    fetchProductTypes()
+      .then((data) => alive && setProductTypes(data))
+      .catch((err) => setError(errorMessage(err)));
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   function selectOutcome(o: CallOutcome) {
     setOutcome(o);
     // Reason only ever applies to these two outcomes; the DB forbids it on the others.
@@ -69,10 +82,13 @@ export default function NewCallPage() {
     if (o !== "interested_callback") setNextFollowupAt(null);
   }
 
+  const { rows: lineRows } = summarizeLines(lines);
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     if (!profile || !account || !callType) return;
     if (outcome === "not_interested" && !callReason) return;
+    if (outcome === "order_placed" && lineRows.length === 0) return;
     setBusy(true);
     setError(null);
     try {
@@ -84,14 +100,7 @@ export default function NewCallPage() {
         call_reason: callReason || null,
         note: note || null,
         next_followup_at: outcome === "interested_callback" ? nextFollowupAt : null,
-        order:
-          outcome === "order_placed"
-            ? {
-                items,
-                quantity: Number(quantity) || 0,
-                status: "pending",
-              }
-            : undefined,
+        order: outcome === "order_placed" ? { lines, status: "pending" } : undefined,
       });
       navigate("/calls");
     } catch (err) {
@@ -189,25 +198,7 @@ export default function NewCallPage() {
           </div>
 
           {outcome === "order_placed" && (
-            <div className="space-y-3">
-              <input
-                required
-                placeholder={t("visits.itemsPlaceholder")}
-                value={items}
-                onChange={(e) => setItems(e.target.value)}
-                className={field}
-              />
-              <input
-                required
-                type="number"
-                min="0"
-                step="0.5"
-                placeholder={t("visits.bouquetsPlaceholder")}
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                className={field}
-              />
-            </div>
+            <OrderLinesEditor lines={lines} onChange={setLines} productTypes={productTypes} />
           )}
 
           {outcome === "interested_callback" && (
@@ -255,7 +246,12 @@ export default function NewCallPage() {
           {error && <p className="text-sm text-red-600">{error}</p>}
           <button
             type="submit"
-            disabled={busy || !callType || (outcome === "not_interested" && !callReason)}
+            disabled={
+              busy ||
+              !callType ||
+              (outcome === "not_interested" && !callReason) ||
+              (outcome === "order_placed" && lineRows.length === 0)
+            }
             className="w-full rounded-full bg-teal-500 px-6 py-2.5 font-semibold text-white transition hover:bg-teal-600 disabled:opacity-50"
           >
             {busy ? t("common.saving") : t("calls.saveCall")}

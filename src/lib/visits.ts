@@ -1,5 +1,6 @@
 import imageCompression from "browser-image-compression";
 import { supabase, VISIT_PHOTOS_BUCKET } from "./supabase";
+import { insertOrderItems, summarizeLines, type OrderLineDraft } from "./orderLines";
 import type { NoSaleReason, OrderStatus, Visit, VisitOutcome } from "./types";
 
 export { searchAccounts } from "./accounts";
@@ -13,8 +14,9 @@ export interface NewVisitInput {
   note: string | null;
   /** A plain "YYYY-MM-DD" date, or null for no follow-up planned. */
   next_followup_at: string | null;
-  /** Only used when outcome is "sold" — creates the linked order in the same step. */
-  order?: { items: string; quantity: number; status: OrderStatus };
+  /** Only used when outcome is "sold" — creates the linked order (and its line items) in
+   * the same step. */
+  order?: { lines: OrderLineDraft[]; status: OrderStatus };
 }
 
 /** Compress the photo, upload it, then insert the visit (and its order, if sold) — a rep can
@@ -50,16 +52,22 @@ export async function createVisit(input: NewVisitInput): Promise<void> {
   if (visitError) throw visitError;
 
   if (input.outcome === "sold" && input.order) {
-    const { error: orderError } = await supabase.from("orders").insert({
-      account_id: input.account_id,
-      created_by: input.rep_id,
-      source: "visit",
-      visit_id: visit.id,
-      items: input.order.items,
-      quantity: input.order.quantity,
-      status: input.order.status,
-    });
+    const { items, quantity, rows } = summarizeLines(input.order.lines);
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .insert({
+        account_id: input.account_id,
+        created_by: input.rep_id,
+        source: "visit",
+        visit_id: visit.id,
+        items,
+        quantity,
+        status: input.order.status,
+      })
+      .select("id")
+      .single();
     if (orderError) throw orderError;
+    await insertOrderItems(order.id, rows);
   }
 }
 

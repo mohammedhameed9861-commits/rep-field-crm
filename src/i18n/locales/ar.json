@@ -190,7 +190,6 @@
     "takePhoto": "التقط صورة للمحل",
     "sold": "تم البيع",
     "noSale": "لم يتم البيع",
-    "itemsPlaceholder": "الأصناف (مثال: ورد أحمر × ٦، ورد ملون × ٣)",
     "bouquetsPlaceholder": "عدد الباقات",
     "reasonPlaceholder": "السبب (اختياري)",
     "notePlaceholder": "ملاحظة (اختياري)",
@@ -253,6 +252,11 @@
     "stockLabel": "الكمية المتوفرة",
     "thresholdLabel": "حد المخزون المنخفض",
     "criticalLabel": "حد المخزون الحرج"
+  },
+  "orderLines": {
+    "productPlaceholder": "اختر منتجاً",
+    "addProduct": "إضافة منتج آخر",
+    "noTypesYet": "لا توجد أنواع منتجات بعد — اطلب من المدير إضافتها من المخزون ← إدارة الأنواع أولاً."
   },
   "editHistory": {
     "view": "السجل",

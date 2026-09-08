@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { replaceOrderItems, summarizeLines, type OrderLineDraft } from "./orderLines";
 import type { Account, ActivityItem, Call, OrderRow, OrderStatus, ShopClass, Visit } from "./types";
 
 export async function fetchAccounts(): Promise<Account[]> {
@@ -62,17 +63,19 @@ export async function setAccountActive(id: string, active: boolean): Promise<voi
 }
 
 export interface OrderEditInput {
-  items: string;
-  quantity: number;
+  lines: OrderLineDraft[];
   status: OrderStatus;
 }
 
 /** Manager-only correction of an existing order — audited automatically by a database trigger.
- * The source (visit/call) and which one it's linked to stay fixed; only the sale details change. */
+ * The source (visit/call) and which one it's linked to stay fixed; only the sale details change.
+ * Line items are replaced wholesale rather than diffed field by field. */
 export async function updateOrder(id: string, input: OrderEditInput): Promise<void> {
   if (!supabase) throw new Error("Supabase is not configured");
-  const { error } = await supabase.from("orders").update(input).eq("id", id);
+  const { items, quantity, rows } = summarizeLines(input.lines);
+  const { error } = await supabase.from("orders").update({ items, quantity, status: input.status }).eq("id", id);
   if (error) throw error;
+  await replaceOrderItems(id, rows);
 }
 
 /** Orders, visits and calls for one account, merged into one chronological feed. */

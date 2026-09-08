@@ -30,8 +30,8 @@ password — no more creating accounts by hand in the Supabase dashboard.
 Reps get their own day-to-day nav: **New Visit** (search any shop by
 name, take a live camera photo — no gallery/file uploads on any device,
 see below — mark sold/no-sale with one of nine reasons when it's not a
-sale, log the order in the same step when it is, and optionally set a
-**Next Follow-up**) and **My Visits** (their own visit history with the
+sale, log the order — see "Order line items" below — in the same step
+when it is, and optionally set a **Next Follow-up**) and **My Visits** (their own visit history with the
 photo, outcome, and reason, topped by an **Upcoming Follow-ups** panel —
 see below). Managers monitor all of it from **Visits** — every rep's
 visits, with the photo, shop, outcome, and note, filterable by rep,
@@ -53,14 +53,29 @@ own follow-up fields:
 - **Not Interested** — a required Reason (Price, Already bought from
   competitor, No current demand, Quality, Doesn't want to change
   supplier, Other).
-- **Order Placed** — items/bouquets, the exact same fields a rep fills
-  in for a sold visit.
+- **Order Placed** — a repeatable Product → Quantity picker (see "Order
+  line items" below), the exact same fields a rep fills in for a sold
+  visit.
 - **No Answer** — nothing further; just logged.
 
 An optional note applies to any of them. My Calls is topped by the same
 **Upcoming Follow-ups** panel as My Visits. Managers get a **Telesales
 Activity** rollup: every call across every agent, filterable by agent,
 call type, outcome, and a calendar date range.
+
+**Order line items** — a sold visit or a placed-order call no longer
+takes free-typed "Items" text; it's a repeatable **Product → Quantity**
+picker (`src/components/OrderLinesEditor.tsx`), Product picked from the
+same manager-curated list Inventory's Add Product uses (see below), with
+an "Add another product" row so one order can cover more than one
+product at a time. `orders.items`/`orders.quantity` stay exactly what
+they were (a plain "Red Roses x6, Colored Roses x3" summary string and a
+total) — computed by the app from a new `order_items` table
+(`src/lib/orderLines.ts`) — so Pull Data, the Order History table, and
+the activity timeline read the same two columns as always, unchanged. A
+manager editing an order (Edit Order) gets the same picker, pre-filled
+from that order's real lines; saving replaces every line wholesale
+rather than diffing which ones changed.
 
 **Next Follow-up** — logging (or a manager editing) a visit can set a
 plain follow-up date via presets: Tomorrow / In 3 days / Next week / No
@@ -218,7 +233,7 @@ codebase is inherited later, since `npm audit` will keep flagging it.
 1. Create a new project at [supabase.com](https://supabase.com) — a
    **different** project from the marketing site's.
 2. SQL Editor → New query → paste and run each file in
-   `supabase/migrations/` **in order** (`0001` → `0014`).
+   `supabase/migrations/` **in order** (`0001` → `0015`).
 3. **Turn off public sign-ups**: Authentication → Sign In / Providers →
    turn off "Allow new users to sign up". Staff accounts are created
    through the app's Reps screen (or, before the first manager exists,

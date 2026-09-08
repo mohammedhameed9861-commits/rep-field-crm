@@ -89,6 +89,19 @@ export interface Call {
   account?: Pick<Account, "id" | "name" | "area"> | null;
 }
 
+/** One product line on an order — an order can cover more than one product
+ * (e.g. Red Roses x6 and Colored Roses x3 in the same visit). `orders.items`
+ * stays a plain "Red Roses x6, Colored Roses x3" summary computed from these,
+ * so anything that only reads `items`/`quantity` (Pull Data, Order History,
+ * the activity timeline) needs no changes. */
+export interface OrderLineItem {
+  id: string;
+  order_id: string;
+  product_name: string;
+  quantity: number;
+  created_at: string;
+}
+
 export interface OrderRow {
   id: string;
   account_id: string;

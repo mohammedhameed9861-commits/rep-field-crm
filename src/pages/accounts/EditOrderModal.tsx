@@ -1,9 +1,12 @@
 import { errorMessage } from "../../lib/errors";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 import { updateOrder } from "../../lib/accounts";
-import type { OrderRow, OrderStatus } from "../../lib/types";
+import { fetchOrderItems, type OrderLineDraft } from "../../lib/orderLines";
+import { fetchProductTypes } from "../../lib/productTypes";
+import type { OrderRow, OrderStatus, ProductType } from "../../lib/types";
+import OrderLinesEditor from "../../components/OrderLinesEditor";
 
 const STATUSES: OrderStatus[] = ["pending", "delivered", "cancelled"];
 
@@ -17,22 +20,39 @@ export default function EditOrderModal({
   onSaved: () => void;
 }) {
   const { t } = useTranslation();
-  const [items, setItems] = useState(order.items);
-  const [quantity, setQuantity] = useState(String(order.quantity));
+  const [lines, setLines] = useState<OrderLineDraft[] | null>(null);
+  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
   const [status, setStatus] = useState<OrderStatus>(order.status);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    let alive = true;
+    Promise.all([fetchOrderItems(order.id), fetchProductTypes()])
+      .then(([items, types]) => {
+        if (!alive) return;
+        setProductTypes(types);
+        // A pre-line-items order has nothing to load — start with one line pre-filled
+        // with the old total, so the manager only has to pick which product it was.
+        setLines(
+          items.length > 0
+            ? items.map((i) => ({ product_name: i.product_name, quantity: String(i.quantity) }))
+            : [{ product_name: "", quantity: String(order.quantity) }],
+        );
+      })
+      .catch((err) => alive && setError(errorMessage(err)));
+    return () => {
+      alive = false;
+    };
+  }, [order.id, order.quantity]);
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!lines) return;
     setBusy(true);
     setError(null);
     try {
-      await updateOrder(order.id, {
-        items,
-        quantity: Number(quantity) || 0,
-        status,
-      });
+      await updateOrder(order.id, { lines, status });
       onSaved();
     } catch (err) {
       setError(errorMessage(err));
@@ -53,42 +73,29 @@ export default function EditOrderModal({
             <X size={18} />
           </button>
         </div>
-        <form onSubmit={onSubmit} className="space-y-3">
-          <input
-            required
-            placeholder={t("visits.itemsPlaceholder")}
-            value={items}
-            onChange={(e) => setItems(e.target.value)}
-            className={field}
-          />
-          <input
-            required
-            type="number"
-            min="0"
-            step="0.5"
-            placeholder={t("visits.bouquetsPlaceholder")}
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            className={field}
-            dir="ltr"
-          />
-          <select value={status} onChange={(e) => setStatus(e.target.value as OrderStatus)} className={field}>
-            {STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {t(`orderStatus.${s}`)}
-              </option>
-            ))}
-          </select>
+        {!lines ? (
+          <p className="text-sm text-gray-400">{t("common.loading")}</p>
+        ) : (
+          <form onSubmit={onSubmit} className="space-y-3">
+            <OrderLinesEditor lines={lines} onChange={setLines} productTypes={productTypes} />
+            <select value={status} onChange={(e) => setStatus(e.target.value as OrderStatus)} className={field}>
+              {STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {t(`orderStatus.${s}`)}
+                </option>
+              ))}
+            </select>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <button
-            type="submit"
-            disabled={busy}
-            className="w-full rounded-full bg-teal-500 px-6 py-2.5 font-semibold text-white transition hover:bg-teal-600 disabled:opacity-50"
-          >
-            {busy ? t("common.saving") : t("common.saveChanges")}
-          </button>
-        </form>
+            {error && <p className="text-sm text-red-600">{error}</p>}
+            <button
+              type="submit"
+              disabled={busy}
+              className="w-full rounded-full bg-teal-500 px-6 py-2.5 font-semibold text-white transition hover:bg-teal-600 disabled:opacity-50"
+            >
+              {busy ? t("common.saving") : t("common.saveChanges")}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

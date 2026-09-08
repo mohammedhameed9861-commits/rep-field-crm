@@ -5,9 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { Search, X } from "lucide-react";
 import { useAuth } from "../../lib/auth";
 import { createVisit, searchAccounts } from "../../lib/visits";
-import type { Account, NoSaleReason, VisitOutcome } from "../../lib/types";
+import { emptyLine, summarizeLines, type OrderLineDraft } from "../../lib/orderLines";
+import { fetchProductTypes } from "../../lib/productTypes";
+import type { Account, NoSaleReason, ProductType, VisitOutcome } from "../../lib/types";
 import CameraCapture from "../../components/CameraCapture";
 import FollowUpPicker from "../../components/FollowUpPicker";
+import OrderLinesEditor from "../../components/OrderLinesEditor";
 
 const NO_SALE_REASONS: NoSaleReason[] = [
   "no_need_today",
@@ -38,8 +41,8 @@ export default function NewVisitPage() {
   const [noSaleReason, setNoSaleReason] = useState<NoSaleReason | "">("");
   const [note, setNote] = useState("");
   const [nextFollowupAt, setNextFollowupAt] = useState<string | null>(null);
-  const [items, setItems] = useState("");
-  const [quantity, setQuantity] = useState("");
+  const [lines, setLines] = useState<OrderLineDraft[]>([emptyLine()]);
+  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,9 +58,22 @@ export default function NewVisitPage() {
     };
   }, [search, account]);
 
+  useEffect(() => {
+    let alive = true;
+    fetchProductTypes()
+      .then((data) => alive && setProductTypes(data))
+      .catch((err) => setError(errorMessage(err)));
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const { rows: lineRows } = summarizeLines(lines);
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     if (!profile || !account || !photo) return;
+    if (outcome === "sold" && lineRows.length === 0) return;
     setBusy(true);
     setError(null);
     try {
@@ -69,14 +85,7 @@ export default function NewVisitPage() {
         no_sale_reason: outcome === "no_sale" ? (noSaleReason || "other") : null,
         note: note || null,
         next_followup_at: nextFollowupAt,
-        order:
-          outcome === "sold"
-            ? {
-                items,
-                quantity: Number(quantity) || 0,
-                status: "pending",
-              }
-            : undefined,
+        order: outcome === "sold" ? { lines, status: "pending" } : undefined,
       });
       navigate("/visits");
     } catch (err) {
@@ -156,25 +165,7 @@ export default function NewVisitPage() {
           </div>
 
           {outcome === "sold" ? (
-            <div className="space-y-3">
-              <input
-                required
-                placeholder={t("visits.itemsPlaceholder")}
-                value={items}
-                onChange={(e) => setItems(e.target.value)}
-                className={field}
-              />
-              <input
-                required
-                type="number"
-                min="0"
-                step="0.5"
-                placeholder={t("visits.bouquetsPlaceholder")}
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                className={field}
-              />
-            </div>
+            <OrderLinesEditor lines={lines} onChange={setLines} productTypes={productTypes} />
           ) : (
             <select
               value={noSaleReason}
@@ -203,7 +194,7 @@ export default function NewVisitPage() {
           {error && <p className="text-sm text-red-600">{error}</p>}
           <button
             type="submit"
-            disabled={busy || !photo}
+            disabled={busy || !photo || (outcome === "sold" && lineRows.length === 0)}
             className="w-full rounded-full bg-teal-500 px-6 py-2.5 font-semibold text-white transition hover:bg-teal-600 disabled:opacity-50"
           >
             {busy ? t("common.saving") : t("visits.saveVisit")}
