@@ -329,21 +329,15 @@ npm run dev
    phone, this is the first thing to look at — see "Branches" below.
 4. `vercel.json` already handles SPA routing on refresh.
 
-### Branches — read this before merging anything
+### Branches
 
-`main` and `claude/flower-distributor-website-crm-e2ygrh` are **two
-different apps**. They share migrations `0001`–`0004` in name only (the
-contents differ) and diverge completely after that: `main` has its own
-"Phase 4/5" features, an automated test suite and a migration `0009` that
-creates a `create_sale_visit` function, none of which exist on this
-branch — and this branch's `0005`–`0016` (order line items, call types,
-follow-ups, product types, the audit log, hardening) don't exist on
-`main`. The Supabase project has had *this* branch's migrations run
-against it, and every screen you've been using on the phone is this
-branch. Do not `git merge` one into the other — the migration histories
-would collide. Pick this branch as the source of truth (open a PR from
-it and replace `main`, or point Vercel's Production Branch at it) and
-retire the other lineage.
+`main` is simply behind: it holds the old version this branch was built
+on top of (every commit on `main` is an ancestor of this branch), so a
+PR from `claude/flower-distributor-website-crm-e2ygrh` into `main`
+merges clean with no conflicts and makes `main` the app you use. Vercel
+builds whichever branch is set as Production Branch (Project → Settings
+→ Git) — once `main` is up to date, point it there so future merges
+deploy automatically.
 
 ### Things that will bite later if nobody's watching
 
