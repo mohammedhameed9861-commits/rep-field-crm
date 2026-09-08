@@ -12,7 +12,8 @@ export interface NewCallInput {
   order?: { items: string; quantity: number; amount: number; status: OrderStatus };
 }
 
-/** Insert-only, like visits — no editing a call after the fact. */
+/** A telesales agent can only ever create these, never edit; only a manager can correct
+ * one afterward (see updateCall). */
 export async function createCall(input: NewCallInput): Promise<void> {
   if (!supabase) throw new Error("Supabase is not configured");
 
@@ -41,6 +42,18 @@ export async function createCall(input: NewCallInput): Promise<void> {
     });
     if (orderError) throw orderError;
   }
+}
+
+export interface CallEditInput {
+  outcome: CallOutcome;
+  note: string | null;
+}
+
+/** Manager-only correction of an existing call — audited automatically by a database trigger. */
+export async function updateCall(id: string, input: CallEditInput): Promise<void> {
+  if (!supabase) throw new Error("Supabase is not configured");
+  const { error } = await supabase.from("calls").update(input).eq("id", id);
+  if (error) throw error;
 }
 
 export async function fetchMyCalls(telesalesId: string): Promise<Call[]> {

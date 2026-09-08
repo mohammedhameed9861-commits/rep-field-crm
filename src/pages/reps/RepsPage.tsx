@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { KeyRound, Plus, UserCheck, UserX } from "lucide-react";
+import { KeyRound, Pencil, Plus, UserCheck, UserX } from "lucide-react";
 import { useAuth } from "../../lib/auth";
-import { fetchStaff, resetStaffPassword, setStaffActive } from "../../lib/reps";
+import { fetchStaff, resetStaffPassword, setStaffActive, setStaffName } from "../../lib/reps";
 import type { AppRole, Profile } from "../../lib/types";
 import { formatDate } from "../../lib/format";
 import StaffForm from "./StaffForm";
+import EditHistoryButton from "../../components/EditHistoryButton";
 
 const ROLE_BADGE: Record<AppRole, string> = {
   rep: "bg-teal-100 text-teal-700",
@@ -20,6 +21,9 @@ export default function RepsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showNew, setShowNew] = useState(false);
+  const [editingNameFor, setEditingNameFor] = useState<string | null>(null);
+  const [nameInput, setNameInput] = useState("");
+  const [savingName, setSavingName] = useState(false);
 
   async function reload() {
     setLoading(true);
@@ -44,6 +48,20 @@ export default function RepsPage() {
       await reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  async function saveName(person: Profile) {
+    if (!nameInput.trim()) return;
+    setSavingName(true);
+    try {
+      await setStaffName(person.id, nameInput.trim());
+      setEditingNameFor(null);
+      await reload();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setSavingName(false);
     }
   }
 
@@ -106,7 +124,34 @@ export default function RepsPage() {
                   !p.active ? "opacity-50" : ""
                 }`}
               >
-                <span className="text-sm font-semibold text-gray-900">{p.full_name}</span>
+                {editingNameFor === p.id ? (
+                  <div className="flex items-center gap-1">
+                    <input
+                      value={nameInput}
+                      onChange={(e) => setNameInput(e.target.value)}
+                      className="w-full rounded border border-gray-200 px-2 py-1 text-sm outline-none focus:border-teal-400"
+                      autoFocus
+                    />
+                    <button
+                      onClick={() => void saveName(p)}
+                      disabled={savingName}
+                      className="shrink-0 rounded bg-teal-500 px-2 py-1 text-[10px] font-semibold text-white hover:bg-teal-600 disabled:opacity-50"
+                    >
+                      {t("common.save")}
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setEditingNameFor(p.id);
+                      setNameInput(p.full_name);
+                    }}
+                    className="group flex w-fit items-center gap-1.5 text-start text-sm font-semibold text-gray-900"
+                  >
+                    {p.full_name}
+                    <Pencil size={11} className="text-gray-300 opacity-0 group-hover:opacity-100" />
+                  </button>
+                )}
                 <span
                   className={`w-fit rounded-full px-2 py-0.5 text-[10.5px] font-bold ${ROLE_BADGE[p.role]}`}
                 >
@@ -122,28 +167,40 @@ export default function RepsPage() {
                 <span className="text-xs text-gray-500" dir="ltr">
                   {formatDate(p.created_at)}
                 </span>
-                <div className="flex justify-end gap-2">
-                  <button
-                    onClick={() => void resetPassword(p)}
-                    title={t("reps.reset")}
-                    className="flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50"
-                  >
-                    <KeyRound size={13} /> {t("reps.reset")}
-                  </button>
-                  <button
-                    onClick={() => void toggleActive(p)}
-                    className="flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50"
-                  >
-                    {p.active ? (
-                      <>
-                        <UserX size={13} /> {t("reps.deactivate")}
-                      </>
-                    ) : (
-                      <>
-                        <UserCheck size={13} /> {t("reps.reactivate")}
-                      </>
-                    )}
-                  </button>
+                <div className="flex flex-col items-end gap-1.5">
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => void resetPassword(p)}
+                      title={t("reps.reset")}
+                      className="flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50"
+                    >
+                      <KeyRound size={13} /> {t("reps.reset")}
+                    </button>
+                    <button
+                      onClick={() => void toggleActive(p)}
+                      className="flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50"
+                    >
+                      {p.active ? (
+                        <>
+                          <UserX size={13} /> {t("reps.deactivate")}
+                        </>
+                      ) : (
+                        <>
+                          <UserCheck size={13} /> {t("reps.reactivate")}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  <EditHistoryButton
+                    tableName="profiles"
+                    recordId={p.id}
+                    fields={[
+                      { key: "full_name", label: t("editHistory.fieldName") },
+                      { key: "role", label: t("reps.colRole") },
+                      { key: "active", label: t("reps.colStatus") },
+                      { key: "monthly_target_cartons", label: t("dashboard.manager.target") },
+                    ]}
+                  />
                 </div>
               </div>
             ))

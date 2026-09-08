@@ -101,6 +101,14 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
 
+    if (action === "set_name") {
+      const { id, full_name } = body;
+      if (!id || !full_name) return json({ error: "Missing fields" }, 400);
+      const { error } = await admin.from("profiles").update({ full_name }).eq("id", id);
+      if (error) return json({ error: error.message }, 400);
+      return json({ ok: true });
+    }
+
     if (action === "set_target") {
       const { id, target } = body;
       if (!id || typeof target !== "number" || target < 0) {

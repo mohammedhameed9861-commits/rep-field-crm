@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import type { Account, ActivityItem, Call, OrderRow, ShopClass, Visit } from "./types";
+import type { Account, ActivityItem, Call, OrderRow, OrderStatus, ShopClass, Visit } from "./types";
 
 export async function fetchAccounts(): Promise<Account[]> {
   if (!supabase) return [];
@@ -58,6 +58,21 @@ export async function updateAccount(id: string, input: AccountInput): Promise<vo
 export async function setAccountActive(id: string, active: boolean): Promise<void> {
   if (!supabase) throw new Error("Supabase is not configured");
   const { error } = await supabase.from("accounts").update({ active }).eq("id", id);
+  if (error) throw error;
+}
+
+export interface OrderEditInput {
+  items: string;
+  quantity: number;
+  amount: number;
+  status: OrderStatus;
+}
+
+/** Manager-only correction of an existing order — audited automatically by a database trigger.
+ * The source (visit/call) and which one it's linked to stay fixed; only the sale details change. */
+export async function updateOrder(id: string, input: OrderEditInput): Promise<void> {
+  if (!supabase) throw new Error("Supabase is not configured");
+  const { error } = await supabase.from("orders").update(input).eq("id", id);
   if (error) throw error;
 }
 

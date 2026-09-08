@@ -9,6 +9,8 @@ import { fetchRepPerformance, type RepPerformanceRow } from "../../lib/dashboard
 import type { Profile, Visit, VisitOutcome } from "../../lib/types";
 import { formatDateTime } from "../../lib/format";
 import DateRangePicker from "../../components/DateRangePicker";
+import EditHistoryButton from "../../components/EditHistoryButton";
+import EditVisitModal from "./EditVisitModal";
 
 export default function VisitsActivityPage() {
   const { profile } = useAuth();
@@ -31,6 +33,29 @@ export default function VisitsActivityPage() {
   const [targetInput, setTargetInput] = useState("");
   const [savingTarget, setSavingTarget] = useState(false);
 
+  const [editingVisit, setEditingVisit] = useState<Visit | null>(null);
+
+  async function reloadVisits() {
+    setLoading(true);
+    try {
+      const data = await fetchAllVisits({
+        repId: repId || undefined,
+        outcome: outcome || undefined,
+        dateFrom: dateFrom || undefined,
+        dateTo: dateTo || undefined,
+      });
+      setVisits(data);
+      const entries = await Promise.all(
+        data.map(async (v) => [v.id, await visitPhotoUrl(v.photo_path)] as const),
+      );
+      setPhotos(Object.fromEntries(entries.filter(([, url]) => url)) as Record<string, string>);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function reloadPerformance() {
     setPerformanceLoading(true);
     try {
@@ -52,29 +77,8 @@ export default function VisitsActivityPage() {
 
   useEffect(() => {
     if (profile?.role !== "manager") return;
-    let alive = true;
-    setLoading(true);
-    fetchAllVisits({
-      repId: repId || undefined,
-      outcome: outcome || undefined,
-      dateFrom: dateFrom || undefined,
-      dateTo: dateTo || undefined,
-    })
-      .then(async (data) => {
-        if (!alive) return;
-        setVisits(data);
-        const entries = await Promise.all(
-          data.map(async (v) => [v.id, await visitPhotoUrl(v.photo_path)] as const),
-        );
-        if (alive) {
-          setPhotos(Object.fromEntries(entries.filter(([, url]) => url)) as Record<string, string>);
-        }
-      })
-      .catch((err) => setError(err instanceof Error ? err.message : String(err)))
-      .finally(() => alive && setLoading(false));
-    return () => {
-      alive = false;
-    };
+    void reloadVisits();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, repId, outcome, dateFrom, dateTo]);
 
   async function saveTarget(repIdToSave: string) {
@@ -263,6 +267,11 @@ export default function VisitsActivityPage() {
                     >
                       {v.outcome === "sold" ? t("visits.sold") : t("visits.noSale")}
                     </span>
+                    {v.updated_at && (
+                      <span className="shrink-0 text-[10.5px] font-semibold text-gray-400">
+                        ({t("editHistory.edited")})
+                      </span>
+                    )}
                   </div>
                   <div className="mt-0.5 text-xs text-gray-400">
                     <span className="font-semibold text-gray-600">{v.rep?.full_name ?? "—"}</span> &middot;{" "}
@@ -270,11 +279,39 @@ export default function VisitsActivityPage() {
                   </div>
                   {v.note && <div className="mt-1 text-xs text-gray-500">{v.note}</div>}
                 </div>
+                <div className="flex shrink-0 flex-col items-end gap-1.5">
+                  <button
+                    onClick={() => setEditingVisit(v)}
+                    className="flex items-center gap-1 text-[10.5px] font-semibold text-gray-400 hover:text-teal-700"
+                  >
+                    <Pencil size={11} /> {t("editHistory.edit")}
+                  </button>
+                  <EditHistoryButton
+                    tableName="visits"
+                    recordId={v.id}
+                    fields={[
+                      { key: "outcome", label: t("editHistory.fieldOutcome") },
+                      { key: "no_sale_reason", label: t("editHistory.fieldNoSaleReason") },
+                      { key: "note", label: t("editHistory.fieldNote") },
+                    ]}
+                  />
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {editingVisit && (
+        <EditVisitModal
+          visit={editingVisit}
+          onClose={() => setEditingVisit(null)}
+          onSaved={() => {
+            setEditingVisit(null);
+            void reloadVisits();
+          }}
+        />
+      )}
     </div>
   );
 }

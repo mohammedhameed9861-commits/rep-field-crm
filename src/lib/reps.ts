@@ -45,3 +45,7 @@ export async function changeStaffRole(id: string, role: AppRole): Promise<void> 
 export async function setStaffTarget(id: string, target: number): Promise<void> {
   await callManageRep({ action: "set_target", id, target });
 }
+
+export async function setStaffName(id: string, full_name: string): Promise<void> {
+  await callManageRep({ action: "set_name", id, full_name });
+}

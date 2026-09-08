@@ -107,9 +107,18 @@ Same discipline as the previous implementation, carried over deliberately:
   caller is an active manager (using their own JWT) before ever touching
   the service-role key — `profiles` has no direct client UPDATE policy
   at all, on any field, for any role.
-- **Visits, calls and orders are insert-only.** No UPDATE/DELETE policy
-  exists on any of them for any role — once logged, they can't be edited
-  or removed through the app. That's the account's audit trail.
+- **Visits, calls and orders are insert-only for reps/telesales, editable by managers.**
+  A rep or telesales agent can still only ever create these, never edit
+  or delete them — that discipline is unchanged. A manager, on explicit
+  request, now can correct one directly (Visits, Telesales Activity, and
+  an account's Order History all have an Edit button). Nothing is a
+  silent overwrite: every UPDATE on visits/calls/orders/accounts/products/
+  profiles is captured automatically into `audit_log` by a database
+  trigger — not application code, so it can't be skipped or forgotten,
+  and it still fires even for an edit made directly in the Supabase
+  dashboard. A "History" button next to each editable record shows
+  who changed what and when, diffed field by field. Deletion is still
+  nowhere in the app for any of these — correction, not removal.
 - **A visit needs a photo taken in the app**, not picked from the gallery
   (the file input uses `capture="environment"`, which opens the camera
   directly on a phone). No GPS check this time — just the photo.
@@ -163,7 +172,7 @@ codebase is inherited later, since `npm audit` will keep flagging it.
 1. Create a new project at [supabase.com](https://supabase.com) — a
    **different** project from the marketing site's.
 2. SQL Editor → New query → paste and run each file in
-   `supabase/migrations/` **in order** (`0001` → `0011`).
+   `supabase/migrations/` **in order** (`0001` → `0012`).
 3. **Turn off public sign-ups**: Authentication → Sign In / Providers →
    turn off "Allow new users to sign up". Staff accounts are created
    through the app's Reps screen (or, before the first manager exists,

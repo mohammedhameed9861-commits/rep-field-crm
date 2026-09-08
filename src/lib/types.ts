@@ -39,6 +39,8 @@ export interface Visit {
   no_sale_reason: NoSaleReason | null;
   note: string | null;
   created_at: string;
+  /** Set only once a manager edits the row — null means never touched since it was logged. */
+  updated_at: string | null;
   rep?: Pick<Profile, "id" | "full_name"> | null;
   account?: Pick<Account, "id" | "name" | "area"> | null;
 }
@@ -50,6 +52,7 @@ export interface Call {
   outcome: CallOutcome;
   note: string | null;
   created_at: string;
+  updated_at: string | null;
   telesales?: Pick<Profile, "id" | "full_name"> | null;
   account?: Pick<Account, "id" | "name" | "area"> | null;
 }
@@ -66,6 +69,7 @@ export interface OrderRow {
   quantity: number;
   status: OrderStatus;
   created_at: string;
+  updated_at: string | null;
   created_by_profile?: Pick<Profile, "id" | "full_name"> | null;
   account?: Pick<Account, "id" | "name" | "area"> | null;
 }
@@ -81,6 +85,17 @@ export interface Product {
 
 export interface AppSettings {
   monthly_target_cartons: number;
+}
+
+export interface AuditEntry {
+  id: string;
+  table_name: string;
+  record_id: string;
+  changed_by: string | null;
+  changed_at: string;
+  before: Record<string, unknown>;
+  after: Record<string, unknown>;
+  changed_by_profile?: Pick<Profile, "id" | "full_name"> | null;
 }
 
 /** One combined, chronological feed item for an account's activity timeline. */

@@ -197,6 +197,27 @@
     "thresholdLabel": "Low-stock at",
     "criticalLabel": "Critical at"
   },
+  "editHistory": {
+    "view": "History",
+    "title": "Edit History",
+    "none": "No edits yet.",
+    "unknown": "Unknown",
+    "noFieldChange": "No tracked fields changed.",
+    "edit": "Edit",
+    "editVisit": "Edit Visit",
+    "editCall": "Edit Call",
+    "editOrder": "Edit Order",
+    "edited": "Edited",
+    "fieldOutcome": "Outcome",
+    "fieldNoSaleReason": "No-Sale Reason",
+    "fieldNote": "Note",
+    "fieldItems": "Items",
+    "fieldQuantity": "Bouquets",
+    "fieldAmount": "Amount",
+    "fieldStatus": "Status",
+    "fieldName": "Name",
+    "orderHint": "Changing the outcome here doesn't touch any order already linked to this — edit that separately if needed."
+  },
   "dateRange": {
     "pick": "Date range",
     "clear": "Clear",
@@ -208,7 +229,7 @@
     "managerOnly": "Only managers can export data.",
     "exportButton": "Export to Excel",
     "exporting": "Preparing file…",
-    "exportHint": "Downloads one .xlsx file with a tab for Accounts, Visits, Calls, Orders, Products, and Staff."
+    "exportHint": "Downloads one .xlsx file with a tab for Accounts, Visits, Calls, Orders, Products, Staff, and Edit History."
   },
   "visitsActivity": {
     "title": "Visits Activity",

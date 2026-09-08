@@ -7,19 +7,23 @@ export interface ExportCounts {
   orders: number;
   products: number;
   staff: number;
+  auditLog: number;
 }
 
 export async function fetchExportCounts(): Promise<ExportCounts> {
-  if (!supabase) return { accounts: 0, visits: 0, calls: 0, orders: 0, products: 0, staff: 0 };
-  const [accounts, visits, calls, orders, products, staff] = await Promise.all([
+  if (!supabase) {
+    return { accounts: 0, visits: 0, calls: 0, orders: 0, products: 0, staff: 0, auditLog: 0 };
+  }
+  const [accounts, visits, calls, orders, products, staff, auditLog] = await Promise.all([
     supabase.from("accounts").select("id", { count: "exact", head: true }),
     supabase.from("visits").select("id", { count: "exact", head: true }),
     supabase.from("calls").select("id", { count: "exact", head: true }),
     supabase.from("orders").select("id", { count: "exact", head: true }),
     supabase.from("products").select("id", { count: "exact", head: true }),
     supabase.from("profiles").select("id", { count: "exact", head: true }),
+    supabase.from("audit_log").select("id", { count: "exact", head: true }),
   ]);
-  for (const r of [accounts, visits, calls, orders, products, staff]) {
+  for (const r of [accounts, visits, calls, orders, products, staff, auditLog]) {
     if (r.error) throw r.error;
   }
   return {
@@ -29,6 +33,7 @@ export async function fetchExportCounts(): Promise<ExportCounts> {
     orders: orders.count ?? 0,
     products: products.count ?? 0,
     staff: staff.count ?? 0,
+    auditLog: auditLog.count ?? 0,
   };
 }
 
@@ -38,7 +43,7 @@ export async function fetchExportCounts(): Promise<ExportCounts> {
 export async function exportAllDataToExcel(filenamePrefix = "flowercom-crm-export"): Promise<void> {
   if (!supabase) throw new Error("Supabase is not configured");
 
-  const [XLSX, accountsRes, visitsRes, callsRes, ordersRes, productsRes, staffRes] = await Promise.all([
+  const [XLSX, accountsRes, visitsRes, callsRes, ordersRes, productsRes, staffRes, auditRes] = await Promise.all([
     import("xlsx"),
     supabase
       .from("accounts")
@@ -62,8 +67,12 @@ export async function exportAllDataToExcel(filenamePrefix = "flowercom-crm-expor
       .order("created_at", { ascending: true }),
     supabase.from("products").select("*").order("name", { ascending: true }),
     supabase.from("profiles").select("*").order("full_name", { ascending: true }),
+    supabase
+      .from("audit_log")
+      .select("*, changed_by_profile:profiles!audit_log_changed_by_fkey(full_name)")
+      .order("changed_at", { ascending: true }),
   ]);
-  for (const r of [accountsRes, visitsRes, callsRes, ordersRes, productsRes, staffRes]) {
+  for (const r of [accountsRes, visitsRes, callsRes, ordersRes, productsRes, staffRes, auditRes]) {
     if (r.error) throw r.error;
   }
 
@@ -75,6 +84,7 @@ export async function exportAllDataToExcel(filenamePrefix = "flowercom-crm-expor
   const orders = (ordersRes.data ?? []) as Row[];
   const products = (productsRes.data ?? []) as Row[];
   const staff = (staffRes.data ?? []) as Row[];
+  const auditLog = (auditRes.data ?? []) as Row[];
 
   // Orders link back to the one visit/call that produced them — build both
   // directions so each visit/call row can show its order inline, without a
@@ -162,6 +172,15 @@ export async function exportAllDataToExcel(filenamePrefix = "flowercom-crm-expor
     "Created At": p.created_at,
   }));
 
+  const auditRows = auditLog.map((a) => ({
+    Table: a.table_name,
+    "Record ID": a.record_id,
+    "Changed By": (a.changed_by_profile as Row | null)?.full_name ?? "",
+    "Changed At": a.changed_at,
+    Before: JSON.stringify(a.before),
+    After: JSON.stringify(a.after),
+  }));
+
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(accountRows), "Accounts");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(visitRows), "Visits");
@@ -169,6 +188,7 @@ export async function exportAllDataToExcel(filenamePrefix = "flowercom-crm-expor
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(orderRows), "Orders");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(productRows), "Products");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(staffRows), "Staff");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(auditRows), "Edit History");
 
   const dateStamp = new Date().toISOString().slice(0, 10);
   XLSX.writeFile(wb, `${filenamePrefix}-${dateStamp}.xlsx`);

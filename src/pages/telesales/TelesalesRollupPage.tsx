@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { Pencil } from "lucide-react";
 import { useAuth } from "../../lib/auth";
 import { fetchAllCalls } from "../../lib/calls";
 import { fetchStaff } from "../../lib/reps";
 import type { Call, CallOutcome, Profile } from "../../lib/types";
 import { formatDateTime } from "../../lib/format";
 import DateRangePicker from "../../components/DateRangePicker";
+import EditHistoryButton from "../../components/EditHistoryButton";
+import EditCallModal from "../calls/EditCallModal";
 
 const OUTCOME_BADGE: Record<CallOutcome, string> = {
   order_placed: "bg-teal-50 text-teal-700",
@@ -28,6 +31,26 @@ export default function TelesalesRollupPage() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
+  const [editingCall, setEditingCall] = useState<Call | null>(null);
+
+  async function reloadCalls() {
+    setLoading(true);
+    try {
+      setCalls(
+        await fetchAllCalls({
+          telesalesId: agentId || undefined,
+          outcome: outcome || undefined,
+          dateFrom: dateFrom || undefined,
+          dateTo: dateTo || undefined,
+        }),
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
     if (profile?.role !== "manager") return;
     fetchStaff()
@@ -37,20 +60,8 @@ export default function TelesalesRollupPage() {
 
   useEffect(() => {
     if (profile?.role !== "manager") return;
-    let alive = true;
-    setLoading(true);
-    fetchAllCalls({
-      telesalesId: agentId || undefined,
-      outcome: outcome || undefined,
-      dateFrom: dateFrom || undefined,
-      dateTo: dateTo || undefined,
-    })
-      .then((data) => alive && setCalls(data))
-      .catch((err) => setError(err instanceof Error ? err.message : String(err)))
-      .finally(() => alive && setLoading(false));
-    return () => {
-      alive = false;
-    };
+    void reloadCalls();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, agentId, outcome, dateFrom, dateTo]);
 
   if (profile?.role !== "manager") {
@@ -108,12 +119,13 @@ export default function TelesalesRollupPage() {
 
       <div className="min-h-0 flex-1 overflow-y-auto px-7 pb-6">
         <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-          <div className="grid grid-cols-[140px_140px_1fr_120px_1fr] gap-2 border-b border-gray-100 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
+          <div className="grid grid-cols-[130px_120px_1fr_110px_1fr_140px] gap-2 border-b border-gray-100 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
             <span>{t("telesalesRollup.colDate")}</span>
             <span>{t("telesalesRollup.colAgent")}</span>
             <span>{t("telesalesRollup.colShop")}</span>
             <span>{t("telesalesRollup.colOutcome")}</span>
             <span>{t("telesalesRollup.colNote")}</span>
+            <span className="text-end">{t("reps.colActions")}</span>
           </div>
           {loading ? (
             <p className="p-4 text-sm text-gray-400">{t("common.loading")}</p>
@@ -123,7 +135,7 @@ export default function TelesalesRollupPage() {
             calls.map((c) => (
               <div
                 key={c.id}
-                className="grid grid-cols-[140px_140px_1fr_120px_1fr] items-center gap-2 border-t border-gray-100 px-4 py-2.5"
+                className="grid grid-cols-[130px_120px_1fr_110px_1fr_140px] items-center gap-2 border-t border-gray-100 px-4 py-2.5"
               >
                 <span className="text-xs text-gray-600" dir="ltr">
                   {formatDateTime(c.created_at)}
@@ -137,17 +149,51 @@ export default function TelesalesRollupPage() {
                 >
                   {c.account?.name ?? "—"}
                 </Link>
-                <span
-                  className={`w-fit rounded-full px-2 py-0.5 text-[10.5px] font-bold ${OUTCOME_BADGE[c.outcome]}`}
-                >
-                  {t(`callOutcome.${c.outcome}`)}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={`w-fit rounded-full px-2 py-0.5 text-[10.5px] font-bold ${OUTCOME_BADGE[c.outcome]}`}
+                  >
+                    {t(`callOutcome.${c.outcome}`)}
+                  </span>
+                  {c.updated_at && (
+                    <span className="text-[10.5px] font-semibold text-gray-400">
+                      ({t("editHistory.edited")})
+                    </span>
+                  )}
+                </div>
                 <span className="truncate text-xs text-gray-500">{c.note ?? "—"}</span>
+                <div className="flex flex-col items-end gap-1">
+                  <button
+                    onClick={() => setEditingCall(c)}
+                    className="flex items-center gap-1 text-[10.5px] font-semibold text-gray-400 hover:text-teal-700"
+                  >
+                    <Pencil size={11} /> {t("editHistory.edit")}
+                  </button>
+                  <EditHistoryButton
+                    tableName="calls"
+                    recordId={c.id}
+                    fields={[
+                      { key: "outcome", label: t("editHistory.fieldOutcome") },
+                      { key: "note", label: t("editHistory.fieldNote") },
+                    ]}
+                  />
+                </div>
               </div>
             ))
           )}
         </div>
       </div>
+
+      {editingCall && (
+        <EditCallModal
+          call={editingCall}
+          onClose={() => setEditingCall(null)}
+          onSaved={() => {
+            setEditingCall(null);
+            void reloadCalls();
+          }}
+        />
+      )}
     </div>
   );
 }

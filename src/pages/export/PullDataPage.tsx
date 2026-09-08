@@ -47,6 +47,7 @@ export default function PullDataPage() {
     { key: "orders", labelKey: "accounts.orderHistory" },
     { key: "products", labelKey: "nav.inventory" },
     { key: "staff", labelKey: "reps.title" },
+    { key: "auditLog", labelKey: "editHistory.title" },
   ];
 
   return (

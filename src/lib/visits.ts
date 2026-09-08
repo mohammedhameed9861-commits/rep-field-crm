@@ -15,7 +15,8 @@ export interface NewVisitInput {
   order?: { items: string; quantity: number; amount: number; status: OrderStatus };
 }
 
-/** Compress the photo, upload it, then insert the visit (and its order, if sold) — insert-only, no edits after the fact. */
+/** Compress the photo, upload it, then insert the visit (and its order, if sold) — a rep can
+ * only ever create these, never edit; only a manager can correct one afterward (see updateVisit). */
 export async function createVisit(input: NewVisitInput): Promise<void> {
   if (!supabase) throw new Error("Supabase is not configured");
 
@@ -58,6 +59,20 @@ export async function createVisit(input: NewVisitInput): Promise<void> {
     });
     if (orderError) throw orderError;
   }
+}
+
+export interface VisitEditInput {
+  outcome: VisitOutcome;
+  no_sale_reason: NoSaleReason | null;
+  note: string | null;
+}
+
+/** Manager-only correction of an existing visit — the photo, account, and rep stay fixed;
+ * every change is captured automatically in audit_log by a database trigger. */
+export async function updateVisit(id: string, input: VisitEditInput): Promise<void> {
+  if (!supabase) throw new Error("Supabase is not configured");
+  const { error } = await supabase.from("visits").update(input).eq("id", id);
+  if (error) throw error;
 }
 
 /** A signed URL for a visit photo — the bucket is private, so plain public URLs won't work. */
