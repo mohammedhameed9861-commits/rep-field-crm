@@ -10,6 +10,7 @@ import NewVisitPage from "./pages/visits/NewVisitPage";
 import MyVisitsPage from "./pages/visits/MyVisitsPage";
 import NewCallPage from "./pages/calls/NewCallPage";
 import MyCallsPage from "./pages/calls/MyCallsPage";
+import InventoryPage from "./pages/inventory/InventoryPage";
 
 export default function App() {
   return (
@@ -33,7 +34,7 @@ export default function App() {
             <Route path="calls/new" element={<NewCallPage />} />
             <Route path="calls" element={<MyCallsPage />} />
             <Route path="telesales" element={<ComingSoon title="Telesales" />} />
-            <Route path="inventory" element={<ComingSoon title="Inventory" />} />
+            <Route path="inventory" element={<InventoryPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

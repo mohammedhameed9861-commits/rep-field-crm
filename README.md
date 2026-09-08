@@ -37,8 +37,12 @@ for visits: search any shop by name, log an outcome (order placed /
 follow-up / no answer), and when an order is placed, log it in the same
 step. No photo — a call has nothing to photograph.
 
-Dashboard and Inventory are still placeholders — built in that order,
-one at a time, next.
+**Inventory** — a manager-only screen listing every product with its
+stock on hand and low-stock threshold, plus add/edit. Deliberately
+simple, per the original ask: editing a product's stock is a plain
+manual number, not something orders adjust automatically.
+
+Dashboard is still a placeholder — the last section left to build.
 
 ## How the trust model works
 
