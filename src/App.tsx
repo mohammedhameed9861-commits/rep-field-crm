@@ -8,6 +8,8 @@ import AccountsPage from "./pages/accounts/AccountsPage";
 import RepsPage from "./pages/reps/RepsPage";
 import NewVisitPage from "./pages/visits/NewVisitPage";
 import MyVisitsPage from "./pages/visits/MyVisitsPage";
+import NewCallPage from "./pages/calls/NewCallPage";
+import MyCallsPage from "./pages/calls/MyCallsPage";
 
 export default function App() {
   return (
@@ -28,6 +30,8 @@ export default function App() {
             <Route path="reps" element={<RepsPage />} />
             <Route path="visits/new" element={<NewVisitPage />} />
             <Route path="visits" element={<MyVisitsPage />} />
+            <Route path="calls/new" element={<NewCallPage />} />
+            <Route path="calls" element={<MyCallsPage />} />
             <Route path="telesales" element={<ComingSoon title="Telesales" />} />
             <Route path="inventory" element={<ComingSoon title="Inventory" />} />
           </Route>

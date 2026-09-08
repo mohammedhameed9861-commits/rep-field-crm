@@ -1,16 +1,8 @@
 import imageCompression from "browser-image-compression";
 import { supabase, VISIT_PHOTOS_BUCKET } from "./supabase";
-import type { Account, NoSaleReason, OrderStatus, Visit, VisitOutcome } from "./types";
+import type { NoSaleReason, OrderStatus, Visit, VisitOutcome } from "./types";
 
-/** Search any shop by name — reps can log a visit at any account, not just their assigned ones. */
-export async function searchAccounts(query: string): Promise<Account[]> {
-  if (!supabase) return [];
-  let q = supabase.from("accounts").select("*").eq("active", true).order("name", { ascending: true });
-  if (query.trim()) q = q.ilike("name", `%${query.trim()}%`);
-  const { data, error } = await q.limit(25);
-  if (error) throw error;
-  return (data ?? []) as Account[];
-}
+export { searchAccounts } from "./accounts";
 
 export interface NewVisitInput {
   account_id: string;

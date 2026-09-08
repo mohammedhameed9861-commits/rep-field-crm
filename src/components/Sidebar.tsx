@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Camera, History, LayoutGrid, Users, TrendingUp, Phone, Boxes } from "lucide-react";
+import { Camera, History, LayoutGrid, Users, TrendingUp, Phone, PhoneCall, Boxes } from "lucide-react";
 import { useAuth } from "../lib/auth";
 
 const managerNav = [
@@ -17,10 +17,17 @@ const repNav = [
   { to: "/visits", label: "My Visits", icon: History },
 ];
 
+// Telesales works the phones — same idea as reps, just calls instead of visits.
+const telesalesNav = [
+  { to: "/calls/new", label: "New Call", icon: PhoneCall, end: true },
+  { to: "/calls", label: "My Calls", icon: History },
+];
+
 export default function Sidebar() {
   const { profile, signOut } = useAuth();
 
-  const navItems = profile?.role === "rep" ? repNav : managerNav;
+  const navItems =
+    profile?.role === "rep" ? repNav : profile?.role === "telesales" ? telesalesNav : managerNav;
 
   const initials = (profile?.full_name ?? "?")
     .split(" ")

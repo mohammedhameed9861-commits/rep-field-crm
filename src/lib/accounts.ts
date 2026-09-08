@@ -12,6 +12,16 @@ export async function fetchAccounts(): Promise<Account[]> {
   return (data ?? []) as Account[];
 }
 
+/** Search any active shop by name — reps and telesales can log activity against any account, not just assigned ones. */
+export async function searchAccounts(query: string): Promise<Account[]> {
+  if (!supabase) return [];
+  let q = supabase.from("accounts").select("*").eq("active", true).order("name", { ascending: true });
+  if (query.trim()) q = q.ilike("name", `%${query.trim()}%`);
+  const { data, error } = await q.limit(25);
+  if (error) throw error;
+  return (data ?? []) as Account[];
+}
+
 export async function fetchAccount(id: string): Promise<Account | null> {
   if (!supabase) return null;
   const { data, error } = await supabase

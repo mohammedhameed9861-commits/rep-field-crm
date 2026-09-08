@@ -32,8 +32,13 @@ name, take a camera photo — no gallery uploads, mark sold/no-sale, and
 log the order in the same step when it's a sale) and **My Visits** (their
 own visit history with the photo, outcome, and reason).
 
-Dashboard, Telesales, and Inventory are still placeholders — built in
-that order, one at a time, next.
+**Telesales** — the same New Call / My Calls day-to-day nav as reps get
+for visits: search any shop by name, log an outcome (order placed /
+follow-up / no answer), and when an order is placed, log it in the same
+step. No photo — a call has nothing to photograph.
+
+Dashboard and Inventory are still placeholders — built in that order,
+one at a time, next.
 
 ## How the trust model works
 
@@ -58,9 +63,9 @@ Same discipline as the previous implementation, carried over deliberately:
 
 ## Known gaps (intentional, for now)
 
-- No call-logging screen yet (that's the "Telesales" section) — so a
-  brand-new account's activity timeline only ever shows visits and orders
-  until that exists. That's expected, not a bug.
+- No manager-facing telesales dashboard/reporting screen yet (the
+  "Telesales" item in the manager's sidebar) — call activity already
+  shows up in each account's activity timeline, just no rollup view yet.
 - No bilingual (Arabic/English) UI yet — English only for now, while the
   data model and screens are still settling. Straightforward to add once
   they are (the marketing site's i18next setup is the template).

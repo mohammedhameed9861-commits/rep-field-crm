@@ -49,6 +49,7 @@ export interface Call {
   note: string | null;
   created_at: string;
   telesales?: Pick<Profile, "id" | "full_name"> | null;
+  account?: Pick<Account, "id" | "name" | "area"> | null;
 }
 
 export interface OrderRow {
@@ -91,4 +92,10 @@ export const NO_SALE_REASON_LABEL: Record<NoSaleReason, string> = {
   not_interested: "Not interested",
   already_stocked: "Already stocked up",
   other: "Other",
+};
+
+export const CALL_OUTCOME_LABEL: Record<CallOutcome, string> = {
+  order_placed: "Order placed",
+  follow_up: "Follow up",
+  no_answer: "No answer",
 };
