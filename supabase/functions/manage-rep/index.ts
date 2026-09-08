@@ -101,6 +101,19 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
 
+    if (action === "set_target") {
+      const { id, target } = body;
+      if (!id || typeof target !== "number" || target < 0) {
+        return json({ error: "Missing or invalid fields" }, 400);
+      }
+      const { error } = await admin
+        .from("profiles")
+        .update({ monthly_target_cartons: target })
+        .eq("id", id);
+      if (error) return json({ error: error.message }, 400);
+      return json({ ok: true });
+    }
+
     return json({ error: "Unknown action" }, 400);
   } catch (err) {
     return json({ error: err instanceof Error ? err.message : String(err) }, 500);

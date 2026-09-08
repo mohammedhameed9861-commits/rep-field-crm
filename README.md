@@ -32,7 +32,12 @@ name, take a camera photo — no gallery uploads, mark sold/no-sale, and
 log the order in the same step when it's a sale) and **My Visits** (their
 own visit history with the photo, outcome, and reason). Managers monitor
 all of it from **Visits** — every rep's visits, with the photo, shop,
-outcome, and note, filterable by rep, outcome, and a calendar date range.
+outcome, and note, filterable by rep, outcome, and a calendar date
+range; and above that, a per-rep performance table: bouquets MTD,
+orders MTD, active accounts assigned to them, today's visit count, and
+target achievement % against a monthly cartons target the manager sets
+per rep (click "Set target" on a rep with none yet) — separate from the
+company-wide target on the Dashboard.
 
 **Telesales** — the same New Call / My Calls day-to-day nav as reps get
 for visits: search any shop by name, log an outcome (order placed /
@@ -97,9 +102,11 @@ Same discipline as the previous implementation, carried over deliberately:
 - **Roles are never client-assigned.** New sign-ups always get `role =
   'rep'` via the `handle_new_user` trigger, never from client-supplied
   signup data. Promoting someone to `telesales`/`manager`, deactivating a
-  staff account, or resetting a password all go through the `manage-rep`
-  Edge Function, which re-checks the caller is an active manager (using
-  their own JWT) before ever touching the service-role key.
+  staff account, resetting a password, or setting a rep's monthly target
+  all go through the `manage-rep` Edge Function, which re-checks the
+  caller is an active manager (using their own JWT) before ever touching
+  the service-role key — `profiles` has no direct client UPDATE policy
+  at all, on any field, for any role.
 - **Visits, calls and orders are insert-only.** No UPDATE/DELETE policy
   exists on any of them for any role — once logged, they can't be edited
   or removed through the app. That's the account's audit trail.
@@ -156,7 +163,7 @@ codebase is inherited later, since `npm audit` will keep flagging it.
 1. Create a new project at [supabase.com](https://supabase.com) — a
    **different** project from the marketing site's.
 2. SQL Editor → New query → paste and run each file in
-   `supabase/migrations/` **in order** (`0001` → `0010`).
+   `supabase/migrations/` **in order** (`0001` → `0011`).
 3. **Turn off public sign-ups**: Authentication → Sign In / Providers →
    turn off "Allow new users to sign up". Staff accounts are created
    through the app's Reps screen (or, before the first manager exists,

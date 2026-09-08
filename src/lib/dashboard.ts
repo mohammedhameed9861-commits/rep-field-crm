@@ -409,3 +409,79 @@ export async function fetchMyTelesalesStats(telesalesId: string): Promise<MyTele
     bouquets: orders.reduce((sum, o) => sum + Number(o.quantity), 0),
   };
 }
+
+export interface RepPerformanceRow {
+  id: string;
+  name: string;
+  target: number | null;
+  achievementPct: number | null;
+  bouquetsMTD: number;
+  ordersMTD: number;
+  activeAccounts: number;
+  visitsToday: number;
+}
+
+/** Per-rep performance panel for the Visits Activity page — bouquets/orders MTD, active
+ * accounts assigned to them, target achievement (only when that rep has a target set),
+ * and today's visit count. */
+export async function fetchRepPerformance(): Promise<RepPerformanceRow[]> {
+  if (!supabase) return [];
+  const now = new Date();
+  const monthStart = startOfMonthISO(now);
+  const todayStart = startOfDayISO(now);
+
+  const [repsRes, ordersRes, accountsRes, visitsRes] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("id, full_name, monthly_target_cartons")
+      .eq("active", true)
+      .eq("role", "rep"),
+    supabase
+      .from("orders")
+      .select("created_by, quantity")
+      .eq("source", "visit")
+      .gte("created_at", monthStart),
+    supabase.from("accounts").select("assigned_rep_id").eq("active", true),
+    supabase.from("visits").select("rep_id").gte("created_at", todayStart),
+  ]);
+  if (repsRes.error) throw repsRes.error;
+  if (ordersRes.error) throw ordersRes.error;
+  if (accountsRes.error) throw accountsRes.error;
+  if (visitsRes.error) throw visitsRes.error;
+
+  const reps = (repsRes.data ?? []) as Pick<Profile, "id" | "full_name" | "monthly_target_cartons">[];
+
+  const bouquetsByRep = new Map<string, number>();
+  const ordersByRep = new Map<string, number>();
+  for (const o of (ordersRes.data ?? []) as { created_by: string; quantity: number }[]) {
+    bouquetsByRep.set(o.created_by, (bouquetsByRep.get(o.created_by) ?? 0) + Number(o.quantity));
+    ordersByRep.set(o.created_by, (ordersByRep.get(o.created_by) ?? 0) + 1);
+  }
+
+  const accountsByRep = new Map<string, number>();
+  for (const a of (accountsRes.data ?? []) as { assigned_rep_id: string | null }[]) {
+    if (a.assigned_rep_id) accountsByRep.set(a.assigned_rep_id, (accountsByRep.get(a.assigned_rep_id) ?? 0) + 1);
+  }
+
+  const visitsTodayByRep = new Map<string, number>();
+  for (const v of (visitsRes.data ?? []) as { rep_id: string }[]) {
+    visitsTodayByRep.set(v.rep_id, (visitsTodayByRep.get(v.rep_id) ?? 0) + 1);
+  }
+
+  return reps
+    .map((r) => {
+      const bouquetsMTD = bouquetsByRep.get(r.id) ?? 0;
+      const target = r.monthly_target_cartons;
+      return {
+        id: r.id,
+        name: r.full_name,
+        target,
+        achievementPct: target && target > 0 ? (bouquetsMTD / target) * 100 : null,
+        bouquetsMTD,
+        ordersMTD: ordersByRep.get(r.id) ?? 0,
+        activeAccounts: accountsByRep.get(r.id) ?? 0,
+        visitsToday: visitsTodayByRep.get(r.id) ?? 0,
+      };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
+}

@@ -40,3 +40,8 @@ export async function resetStaffPassword(id: string, password: string): Promise<
 export async function changeStaffRole(id: string, role: AppRole): Promise<void> {
   await callManageRep({ action: "change_role", id, role });
 }
+
+/** A rep's own monthly cartons target — separate from the company-wide one. */
+export async function setStaffTarget(id: string, target: number): Promise<void> {
+  await callManageRep({ action: "set_target", id, target });
+}

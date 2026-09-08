@@ -11,6 +11,8 @@ export interface Profile {
   full_name: string;
   role: AppRole;
   active: boolean;
+  /** A rep's own monthly cartons target, set by a manager — separate from the company-wide one in AppSettings. */
+  monthly_target_cartons: number | null;
   created_at: string;
 }
 

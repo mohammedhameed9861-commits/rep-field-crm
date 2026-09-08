@@ -217,7 +217,15 @@
     "countOther": "{{count}} visits",
     "allReps": "All reps",
     "allOutcomes": "All outcomes",
-    "noVisitsFound": "No visits match these filters."
+    "noVisitsFound": "No visits match these filters.",
+    "colRep": "Rep",
+    "colBouquetsMTD": "Bouquets MTD",
+    "colOrdersMTD": "Orders MTD",
+    "colActiveAccounts": "Active Accounts",
+    "colVisitsToday": "Visits Today",
+    "colAchievement": "Target %",
+    "noRepsYet": "No reps yet.",
+    "setTarget": "Set target"
   },
   "telesalesRollup": {
     "title": "Telesales Activity",

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { Pencil } from "lucide-react";
 import { useAuth } from "../../lib/auth";
 import { fetchAllVisits, visitPhotoUrl } from "../../lib/visits";
-import { fetchStaff } from "../../lib/reps";
+import { fetchStaff, setStaffTarget } from "../../lib/reps";
+import { fetchRepPerformance, type RepPerformanceRow } from "../../lib/dashboard";
 import type { Profile, Visit, VisitOutcome } from "../../lib/types";
 import { formatDateTime } from "../../lib/format";
 import DateRangePicker from "../../components/DateRangePicker";
@@ -13,6 +15,8 @@ export default function VisitsActivityPage() {
   const { t } = useTranslation();
 
   const [reps, setReps] = useState<Profile[]>([]);
+  const [performance, setPerformance] = useState<RepPerformanceRow[]>([]);
+  const [performanceLoading, setPerformanceLoading] = useState(true);
   const [visits, setVisits] = useState<Visit[]>([]);
   const [photos, setPhotos] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
@@ -23,11 +27,27 @@ export default function VisitsActivityPage() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
+  const [editingTargetFor, setEditingTargetFor] = useState<string | null>(null);
+  const [targetInput, setTargetInput] = useState("");
+  const [savingTarget, setSavingTarget] = useState(false);
+
+  async function reloadPerformance() {
+    setPerformanceLoading(true);
+    try {
+      setPerformance(await fetchRepPerformance());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setPerformanceLoading(false);
+    }
+  }
+
   useEffect(() => {
     if (profile?.role !== "manager") return;
     fetchStaff()
       .then((staff) => setReps(staff.filter((p) => p.role === "rep")))
       .catch((err) => setError(err instanceof Error ? err.message : String(err)));
+    void reloadPerformance();
   }, [profile]);
 
   useEffect(() => {
@@ -57,6 +77,21 @@ export default function VisitsActivityPage() {
     };
   }, [profile, repId, outcome, dateFrom, dateTo]);
 
+  async function saveTarget(repIdToSave: string) {
+    const value = Number(targetInput);
+    if (!value || value <= 0) return;
+    setSavingTarget(true);
+    try {
+      await setStaffTarget(repIdToSave, value);
+      setEditingTargetFor(null);
+      await reloadPerformance();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setSavingTarget(false);
+    }
+  }
+
   if (profile?.role !== "manager") {
     return (
       <div className="flex h-full items-center justify-center text-sm text-gray-400">
@@ -77,6 +112,91 @@ export default function VisitsActivityPage() {
             count: visits.length,
           })}
         </p>
+      </div>
+
+      {error && <p className="px-7 pb-3 text-sm text-red-600">{error}</p>}
+
+      <div className="shrink-0 px-7 pb-4">
+        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+          <div className="grid grid-cols-[1fr_90px_90px_100px_90px_130px] gap-2 border-b border-gray-100 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
+            <span>{t("visitsActivity.colRep")}</span>
+            <span>{t("visitsActivity.colBouquetsMTD")}</span>
+            <span>{t("visitsActivity.colOrdersMTD")}</span>
+            <span>{t("visitsActivity.colActiveAccounts")}</span>
+            <span>{t("visitsActivity.colVisitsToday")}</span>
+            <span>{t("visitsActivity.colAchievement")}</span>
+          </div>
+          {performanceLoading ? (
+            <p className="p-4 text-sm text-gray-400">{t("common.loading")}</p>
+          ) : performance.length === 0 ? (
+            <p className="p-4 text-sm text-gray-400">{t("visitsActivity.noRepsYet")}</p>
+          ) : (
+            performance.map((r) => (
+              <div
+                key={r.id}
+                className="grid grid-cols-[1fr_90px_90px_100px_90px_130px] items-center gap-2 border-t border-gray-100 px-4 py-2.5"
+              >
+                <span className="truncate text-sm font-semibold text-gray-900">{r.name}</span>
+                <span className="text-sm text-gray-700" dir="ltr">
+                  {r.bouquetsMTD}
+                </span>
+                <span className="text-sm text-gray-700" dir="ltr">
+                  {r.ordersMTD}
+                </span>
+                <span className="text-sm text-gray-700" dir="ltr">
+                  {r.activeAccounts}
+                </span>
+                <span className="text-sm text-gray-700" dir="ltr">
+                  {r.visitsToday}
+                </span>
+                {editingTargetFor === r.id ? (
+                  <div className="flex items-center gap-1" dir="ltr">
+                    <input
+                      type="number"
+                      min="1"
+                      value={targetInput}
+                      onChange={(e) => setTargetInput(e.target.value)}
+                      className="w-16 rounded border border-gray-200 px-1.5 py-1 text-xs outline-none focus:border-teal-400"
+                      autoFocus
+                    />
+                    <button
+                      onClick={() => void saveTarget(r.id)}
+                      disabled={savingTarget}
+                      className="rounded bg-teal-500 px-2 py-1 text-[10px] font-semibold text-white hover:bg-teal-600 disabled:opacity-50"
+                    >
+                      {t("common.save")}
+                    </button>
+                  </div>
+                ) : r.target ? (
+                  <button
+                    onClick={() => {
+                      setEditingTargetFor(r.id);
+                      setTargetInput(String(r.target));
+                    }}
+                    className="flex w-fit items-center gap-1 rounded-full px-2 py-0.5 text-[10.5px] font-bold hover:opacity-80"
+                    style={{
+                      backgroundColor: (r.achievementPct ?? 0) >= 100 ? "#e7fbfa" : "#fdf1e7",
+                      color: (r.achievementPct ?? 0) >= 100 ? "#188f88" : "#b8551f",
+                    }}
+                    dir="ltr"
+                  >
+                    {r.achievementPct?.toFixed(0)}%
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setEditingTargetFor(r.id);
+                      setTargetInput("");
+                    }}
+                    className="flex w-fit items-center gap-1 text-[10.5px] font-semibold text-gray-400 hover:text-teal-700"
+                  >
+                    <Pencil size={10} /> {t("visitsActivity.setTarget")}
+                  </button>
+                )}
+              </div>
+            ))
+          )}
+        </div>
       </div>
 
       <div className="flex shrink-0 flex-wrap items-center gap-2 px-7 pb-3">
@@ -106,8 +226,6 @@ export default function VisitsActivityPage() {
           }}
         />
       </div>
-
-      {error && <p className="px-7 pb-3 text-sm text-red-600">{error}</p>}
 
       <div className="min-h-0 flex-1 overflow-y-auto px-7 pb-6">
         {loading ? (

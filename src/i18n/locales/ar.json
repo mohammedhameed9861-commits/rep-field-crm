@@ -217,7 +217,15 @@
     "countOther": "{{count}} زيارة",
     "allReps": "كل المندوبين",
     "allOutcomes": "كل النتائج",
-    "noVisitsFound": "لا توجد زيارات مطابقة لهذه الفلاتر."
+    "noVisitsFound": "لا توجد زيارات مطابقة لهذه الفلاتر.",
+    "colRep": "المندوب",
+    "colBouquetsMTD": "الباقات (الشهر)",
+    "colOrdersMTD": "الطلبات (الشهر)",
+    "colActiveAccounts": "الحسابات النشطة",
+    "colVisitsToday": "زيارات اليوم",
+    "colAchievement": "نسبة الهدف",
+    "noRepsYet": "لا يوجد مندوبون بعد.",
+    "setTarget": "تحديد الهدف"
   },
   "telesalesRollup": {
     "title": "نشاط المبيعات الهاتفية",
