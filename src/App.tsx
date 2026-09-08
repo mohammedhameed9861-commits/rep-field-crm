@@ -1,86 +1,48 @@
-import { lazy, Suspense } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
-import { useAuth } from "@/lib/auth";
-import { RequireRole } from "@/components/RequireRole";
-import { FullScreenLoader } from "@/components/FullScreenLoader";
-import { Login } from "@/pages/Login";
-import { NewVisit } from "@/pages/rep/NewVisit";
-import { MyVisits } from "@/pages/rep/MyVisits";
-
-// Manager dashboard pulls in Leaflet/react-leaflet — keep it out of the
-// rep's bundle, since reps are the ones on weak mobile data outdoors.
-const DashboardLayout = lazy(() =>
-  import("@/components/DashboardLayout").then((m) => ({ default: m.DashboardLayout })),
-);
-const Overview = lazy(() => import("@/pages/manager/Overview").then((m) => ({ default: m.Overview })));
-const Reps = lazy(() => import("@/pages/manager/Reps").then((m) => ({ default: m.Reps })));
-const RepDetail = lazy(() => import("@/pages/manager/RepDetail").then((m) => ({ default: m.RepDetail })));
-const Shops = lazy(() => import("@/pages/manager/Shops").then((m) => ({ default: m.Shops })));
-const ShopDetail = lazy(() => import("@/pages/manager/ShopDetail").then((m) => ({ default: m.ShopDetail })));
-const VisitDetail = lazy(() => import("@/pages/manager/VisitDetail").then((m) => ({ default: m.VisitDetail })));
-const ManageReps = lazy(() => import("@/pages/manager/ManageReps").then((m) => ({ default: m.ManageReps })));
-const Products = lazy(() => import("@/pages/manager/Products").then((m) => ({ default: m.Products })));
-const InvoicePrep = lazy(() => import("@/pages/manager/InvoicePrep").then((m) => ({ default: m.InvoicePrep })));
-const Analytics = lazy(() => import("@/pages/manager/Analytics").then((m) => ({ default: m.Analytics })));
-const FieldMonitoring = lazy(() =>
-  import("@/pages/manager/FieldMonitoring").then((m) => ({ default: m.FieldMonitoring })),
-);
-
-function Root() {
-  const { session, profile, loading } = useAuth();
-  if (loading) return <FullScreenLoader />;
-  if (!session) return <Navigate to="/login" replace />;
-  if (!profile) return <FullScreenLoader />;
-  return <Navigate to={profile.role === "manager" ? "/dashboard/overview" : "/visit/new"} replace />;
-}
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./lib/auth";
+import RequireAuth from "./components/RequireAuth";
+import Layout from "./components/Layout";
+import Login from "./pages/Login";
+import AccountsPage from "./pages/accounts/AccountsPage";
+import RepsPage from "./pages/reps/RepsPage";
+import NewVisitPage from "./pages/visits/NewVisitPage";
+import MyVisitsPage from "./pages/visits/MyVisitsPage";
+import VisitsActivityPage from "./pages/visits/VisitsActivityPage";
+import NewCallPage from "./pages/calls/NewCallPage";
+import MyCallsPage from "./pages/calls/MyCallsPage";
+import InventoryPage from "./pages/inventory/InventoryPage";
+import DashboardPage from "./pages/dashboard/DashboardPage";
+import TelesalesRollupPage from "./pages/telesales/TelesalesRollupPage";
+import PullDataPage from "./pages/export/PullDataPage";
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Root />} />
-      <Route path="/login" element={<Login />} />
-
-      <Route
-        path="/visit/new"
-        element={
-          <RequireRole role="rep">
-            <NewVisit />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/my-visits"
-        element={
-          <RequireRole role="rep">
-            <MyVisits />
-          </RequireRole>
-        }
-      />
-
-      <Route
-        path="/dashboard"
-        element={
-          <RequireRole role="manager">
-            <Suspense fallback={<FullScreenLoader />}>
-              <DashboardLayout />
-            </Suspense>
-          </RequireRole>
-        }
-      >
-        <Route path="overview" element={<Overview />} />
-        <Route path="reps" element={<Reps />} />
-        <Route path="reps/manage" element={<ManageReps />} />
-        <Route path="reps/:repId" element={<RepDetail />} />
-        <Route path="shops" element={<Shops />} />
-        <Route path="shops/:shopId" element={<ShopDetail />} />
-        <Route path="products" element={<Products />} />
-        <Route path="invoices" element={<InvoicePrep />} />
-        <Route path="analytics" element={<Analytics />} />
-        <Route path="monitoring" element={<FieldMonitoring />} />
-        <Route path="visit/:id" element={<VisitDetail />} />
-      </Route>
-
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            element={
+              <RequireAuth>
+                <Layout />
+              </RequireAuth>
+            }
+          >
+            <Route index element={<DashboardPage />} />
+            <Route path="accounts" element={<AccountsPage />} />
+            <Route path="accounts/:id" element={<AccountsPage />} />
+            <Route path="reps" element={<RepsPage />} />
+            <Route path="visits/new" element={<NewVisitPage />} />
+            <Route path="visits" element={<MyVisitsPage />} />
+            <Route path="visits-activity" element={<VisitsActivityPage />} />
+            <Route path="calls/new" element={<NewCallPage />} />
+            <Route path="calls" element={<MyCallsPage />} />
+            <Route path="telesales" element={<TelesalesRollupPage />} />
+            <Route path="inventory" element={<InventoryPage />} />
+            <Route path="pull-data" element={<PullDataPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }

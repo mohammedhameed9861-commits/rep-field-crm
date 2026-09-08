@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabase";
-import type { Profile } from "@/types/database";
+import { supabase } from "./supabase";
+import type { Profile } from "./types";
 
 interface AuthState {
   session: Session | null;
@@ -10,7 +10,7 @@ interface AuthState {
   signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthState | undefined>(undefined);
+const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -18,56 +18,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let active = true;
-
-    async function loadProfile(userId: string) {
-      const { data } = await supabase.from("profiles").select("*").eq("id", userId).single();
-      if (active) setProfile(data ?? null);
+    if (!supabase) {
+      setLoading(false);
+      return;
     }
 
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (!active) return;
+    let alive = true;
+
+    async function loadProfile(userId: string) {
+      const { data } = await supabase!.from("profiles").select("*").eq("id", userId).single();
+      if (alive) setProfile((data as Profile) ?? null);
+    }
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!alive) return;
       setSession(data.session);
-      if (data.session) await loadProfile(data.session.user.id);
-      setLoading(false);
+      if (data.session) void loadProfile(data.session.user.id).finally(() => setLoading(false));
+      else setLoading(false);
     });
 
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
-      setSession(newSession);
-      if (newSession) {
-        await loadProfile(newSession.user.id);
-      } else {
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+      if (s) void loadProfile(s.user.id).finally(() => setLoading(false));
+      else {
         setProfile(null);
+        setLoading(false);
       }
     });
 
     return () => {
-      active = false;
+      alive = false;
       sub.subscription.unsubscribe();
     };
   }, []);
 
-  // A deactivated rep/manager must be signed out immediately even if their
-  // token is still technically valid — the account-level ban (set by the
-  // manage-rep edge function) will reject the next refresh, but this catches
-  // the current session right away too.
-  useEffect(() => {
-    if (profile && !profile.active) {
-      supabase.auth.signOut();
-    }
-  }, [profile]);
-
   async function signOut() {
-    await supabase.auth.signOut();
+    await supabase?.auth.signOut();
   }
 
   return (
-    <AuthContext.Provider value={{ session, profile, loading, signOut }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ session, profile, loading, signOut }}>
+      {children}
+    </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
   return ctx;
 }

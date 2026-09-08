@@ -1,81 +1,74 @@
 import { useState, type FormEvent } from "react";
 import { Navigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/lib/auth";
-import { Button } from "@/components/Button";
-import { FullScreenLoader } from "@/components/FullScreenLoader";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { supabase } from "../lib/supabase";
+import { useAuth } from "../lib/auth";
 
-export function Login() {
+export default function Login() {
+  const { session } = useAuth();
   const { t } = useTranslation();
-  const { session, profile, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  if (loading) return <FullScreenLoader />;
-  if (session && profile) {
-    return <Navigate to={profile.role === "manager" ? "/dashboard/overview" : "/visit/new"} replace />;
-  }
+  if (session) return <Navigate to="/" replace />;
 
-  async function handleSubmit(e: FormEvent) {
+  async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!supabase) return;
+    setBusy(true);
     setError(null);
-    setSubmitting(true);
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-    setSubmitting(false);
-    if (signInError) setError(signInError.message);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) setError(error.message);
+    setBusy(false);
   }
+
+  const field =
+    "w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100";
 
   return (
-    <div className="flex min-h-screen flex-col justify-center bg-gray-50 px-6">
-      <div className="mx-auto w-full max-w-sm">
-        <div className="mb-4 flex justify-end">
-          <LanguageSwitcher />
+    <div className="flex min-h-[100dvh] items-center justify-center bg-cream-50 px-4">
+      <div className="w-full max-w-sm rounded-2xl border border-gray-100 bg-white p-8 shadow-sm">
+        <div className="mb-6 flex items-center gap-2.5">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <path d="M13 2C18 6 19 12 13 24C7 12 8 6 13 2Z" stroke="#0b4c49" strokeWidth="1.3" />
+          </svg>
+          <div className="leading-tight">
+            <div className="text-sm font-bold text-sea-800">FLOWERCOM</div>
+            <div className="text-[10px] font-normal tracking-widest text-sea-500">CRM</div>
+          </div>
         </div>
-        <h1 className="mb-1 text-2xl font-bold text-gray-900">{t("login.title")}</h1>
-        <p className="mb-8 text-gray-500">{t("login.subtitle")}</p>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="email">
-              {t("login.email")}
-            </label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="username"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="tap-target w-full rounded-xl border border-gray-300 px-4 text-base"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="password">
-              {t("login.password")}
-            </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="tap-target w-full rounded-xl border border-gray-300 px-4 text-base"
-            />
-          </div>
-
+        <h1 className="text-lg font-bold text-sea-800">{t("login.title")}</h1>
+        <p className="mt-1 text-sm text-gray-500">{t("login.subtitle")}</p>
+        <form onSubmit={onSubmit} className="mt-5 space-y-3">
+          <input
+            type="email"
+            required
+            placeholder={t("login.email")}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={field}
+            dir="ltr"
+          />
+          <input
+            type="password"
+            required
+            placeholder={t("login.password")}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={field}
+            dir="ltr"
+          />
           {error && <p className="text-sm text-red-600">{error}</p>}
-
-          <Button type="submit" disabled={submitting}>
-            {submitting ? t("login.signingIn") : t("login.signIn")}
-          </Button>
+          <button
+            type="submit"
+            disabled={busy}
+            className="w-full rounded-full bg-teal-500 px-6 py-3 font-semibold text-white transition hover:bg-teal-600 disabled:opacity-50"
+          >
+            {busy ? t("login.signingIn") : t("login.signIn")}
+          </button>
         </form>
-
-        <p className="mt-6 text-xs text-gray-400">{t("login.footer")}</p>
       </div>
     </div>
   );

@@ -1,0 +1,380 @@
+{
+  "common": {
+    "save": "حفظ",
+    "saving": "جارٍ الحفظ…",
+    "saveChanges": "حفظ التغييرات",
+    "cancel": "إلغاء",
+    "add": "إضافة",
+    "edit": "تعديل",
+    "loading": "جارٍ التحميل…",
+    "signOut": "تسجيل الخروج",
+    "seeAll": "عرض الكل",
+    "openMenu": "فتح القائمة"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "accounts": "الحسابات",
+    "reps": "المندوبون",
+    "visitsActivity": "الزيارات",
+    "telesales": "المبيعات الهاتفية",
+    "inventory": "المخزون",
+    "pullData": "سحب البيانات",
+    "newVisit": "زيارة جديدة",
+    "myVisits": "زياراتي",
+    "newCall": "مكالمة جديدة",
+    "myCalls": "مكالماتي"
+  },
+  "login": {
+    "title": "تسجيل الدخول",
+    "subtitle": "استخدم الحساب الذي أنشأه لك المدير.",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "signIn": "تسجيل الدخول",
+    "signingIn": "…"
+  },
+  "notConnected": {
+    "title": "لم يتم الربط بعد",
+    "body": "يحتاج هذا النظام إلى مشروع Supabase خاص به. أضف"
+  },
+  "comingSoon": {
+    "notBuilt": "لم يتم إنشاؤه بعد."
+  },
+  "roles": {
+    "rep": "مندوب",
+    "telesales": "مبيعات هاتفية",
+    "manager": "مدير"
+  },
+  "shopClass": {
+    "A": "A · ٤-٦ كراتين أسبوعياً",
+    "B": "B · ٢.٥-٣.٥ كراتين أسبوعياً",
+    "C": "C · ١-٢ كرتون أسبوعياً"
+  },
+  "noSaleReason": {
+    "no_need_today": "لا حاجة اليوم",
+    "price_too_high": "السعر مرتفع",
+    "bought_competitor": "اشترى من منافس",
+    "no_stock_needed": "لا يحتاج مخزوناً",
+    "quality_concern": "مخاوف بشأن الجودة",
+    "shop_closed": "المحل مغلق",
+    "owner_unavailable": "صاحب المحل غير متواجد",
+    "payment_issue": "مشكلة في الدفع",
+    "other": "أخرى"
+  },
+  "callOutcome": {
+    "interested_callback": "مهتم / اتصال لاحقاً",
+    "not_interested": "غير مهتم",
+    "order_placed": "تم الطلب",
+    "no_answer": "لا يوجد رد"
+  },
+  "callType": {
+    "label": "نوع الاتصال",
+    "new_customer": "عميل جديد",
+    "reactivation": "إعادة تفعيل",
+    "follow_up": "متابعة"
+  },
+  "callReason": {
+    "wants_price": "يريد السعر",
+    "wants_availability": "يريد معرفة التوفر",
+    "wants_specific_flower": "يريد نوع زهور معين",
+    "waiting_next_purchase": "بانتظار الشراء القادم",
+    "needs_owner_approval": "يحتاج موافقة صاحب المحل",
+    "price_too_high": "السعر",
+    "bought_competitor": "اشترى من منافس",
+    "no_current_demand": "لا يوجد طلب حالياً",
+    "quality_concern": "الجودة",
+    "doesnt_want_change_supplier": "لا يريد تغيير المورّد",
+    "other": "أخرى"
+  },
+  "orderStatus": {
+    "pending": "قيد الانتظار",
+    "delivered": "تم التسليم",
+    "cancelled": "ملغى"
+  },
+  "accounts": {
+    "title": "الحسابات",
+    "countOne": "{{count}} محل عميل",
+    "countOther": "{{count}} محلات عملاء",
+    "addAccount": "إضافة حساب",
+    "searchPlaceholder": "ابحث عن حساب…",
+    "noAccountsYet": "لا توجد حسابات بعد.",
+    "inactive": "غير نشط",
+    "unassigned": "غير مُعيَّن",
+    "archive": "أرشفة",
+    "reactivate": "إعادة تفعيل",
+    "archiveConfirm": "أرشفة {{name}}؟",
+    "reactivateConfirm": "إعادة تفعيل {{name}}؟",
+    "selectPrompt": "اختر حساباً لعرض سجله.",
+    "statTotalOrders": "إجمالي الطلبات",
+    "statTotalBouquets": "إجمالي الباقات",
+    "statLastActivity": "آخر نشاط",
+    "bouquetOne": "{{count}} باقة",
+    "bouquetOther": "{{count}} باقة",
+    "never": "—",
+    "orderHistory": "سجل الطلبات",
+    "noOrdersYet": "لا توجد طلبات بعد.",
+    "colDate": "التاريخ",
+    "colItems": "الأصناف",
+    "colBouquets": "الباقات",
+    "colStatus": "الحالة",
+    "activityTimeline": "الجدول الزمني للنشاط",
+    "noActivityYet": "لا توجد زيارات أو مكالمات مسجلة بعد.",
+    "visited": "قام بزيارة",
+    "called": "اتصل بـ",
+    "outcomeSold": "تم البيع",
+    "outcomeNoSale": "لم يتم البيع",
+    "orderPlaced": "تم تسجيل الطلب",
+    "backToList": "كل الحسابات"
+  },
+  "accountForm": {
+    "addTitle": "إضافة حساب",
+    "editTitle": "تعديل الحساب",
+    "namePlaceholder": "اسم المحل",
+    "areaPlaceholder": "المنطقة (مثال: الكرخ)",
+    "phonePlaceholder": "رقم الهاتف",
+    "shopClassPlaceholder": "فئة المحل (اختياري)",
+    "repPlaceholder": "المندوب المسؤول (اختياري)",
+    "notesPlaceholder": "ملاحظات (مثال: مغلق أيام الجمعة، يفضل التوصيل صباحاً)"
+  },
+  "reps": {
+    "title": "المندوبون والموظفون",
+    "managerOnly": "المدير فقط يمكنه إدارة حسابات الموظفين.",
+    "countOne": "{{count}} حساب",
+    "countOther": "{{count}} حسابات",
+    "addStaff": "إضافة موظف",
+    "colName": "الاسم",
+    "colRole": "الدور",
+    "colStatus": "الحالة",
+    "colSince": "منذ",
+    "colActions": "الإجراءات",
+    "noStaffYet": "لا يوجد موظفون بعد.",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "reset": "إعادة تعيين",
+    "deactivate": "إيقاف",
+    "reactivate": "إعادة تفعيل",
+    "deactivateConfirm": "إيقاف {{name}}؟",
+    "reactivateConfirm": "إعادة تفعيل {{name}}؟",
+    "resetPrompt": "كلمة مرور مؤقتة جديدة لـ {{name}}:",
+    "resetSuccess": "تمت إعادة تعيين كلمة المرور. شاركها معه مباشرة."
+  },
+  "staffForm": {
+    "title": "إضافة حساب موظف",
+    "fullNamePlaceholder": "الاسم الكامل",
+    "emailPlaceholder": "البريد الإلكتروني",
+    "passwordPlaceholder": "كلمة مرور مؤقتة",
+    "createAccount": "إنشاء الحساب",
+    "creating": "جارٍ الإنشاء…",
+    "shareHint": "شارك البريد الإلكتروني وكلمة المرور المؤقتة معه مباشرة — لا يوجد تسجيل ذاتي."
+  },
+  "camera": {
+    "open": "التقط صورة للمحل",
+    "takePhoto": "التقاط الصورة",
+    "retake": "إعادة التقاط",
+    "denied": "يلزم الوصول إلى الكاميرا لتسجيل الزيارة — فعّله في المتصفح وحاول مرة أخرى."
+  },
+  "followUp": {
+    "label": "المتابعة القادمة",
+    "none": "لا متابعة",
+    "tomorrow": "غداً",
+    "in3days": "خلال 3 أيام",
+    "nextWeek": "الأسبوع القادم",
+    "custom": "مخصص",
+    "due": "متابعة",
+    "overdue": "متأخرة",
+    "today": "اليوم",
+    "upcomingTitle": "المتابعات القادمة",
+    "noneUpcoming": "لا يوجد شيء مجدوَل."
+  },
+  "visits": {
+    "logVisit": "تسجيل زيارة",
+    "searchPlaceholder": "ابحث عن أي محل بالاسم…",
+    "noShopsMatch": "لا توجد محلات مطابقة.",
+    "takePhoto": "التقط صورة للمحل",
+    "sold": "تم البيع",
+    "noSale": "لم يتم البيع",
+    "bouquetsPlaceholder": "عدد الباقات",
+    "reasonPlaceholder": "السبب (اختياري)",
+    "notePlaceholder": "ملاحظة (اختياري)",
+    "saveVisit": "حفظ الزيارة",
+    "myVisitsTitle": "زياراتي",
+    "loggedOne": "{{count}} مسجلة",
+    "loggedOther": "{{count}} مسجلة",
+    "newVisit": "زيارة جديدة",
+    "noVisitsYet": "لا توجد زيارات مسجلة بعد.",
+    "recentOnly": "يتم عرض آخر {{count}} زيارة."
+  },
+  "calls": {
+    "logCall": "تسجيل مكالمة",
+    "searchPlaceholder": "ابحث عن أي محل بالاسم…",
+    "noShopsMatch": "لا توجد محلات مطابقة.",
+    "callTypePlaceholder": "نوع الاتصال",
+    "interestReasonPlaceholder": "السبب / الاهتمام (اختياري)",
+    "notInterestedReasonPlaceholder": "السبب (مطلوب)",
+    "notePlaceholder": "ملاحظة (اختياري)",
+    "saveCall": "حفظ المكالمة",
+    "myCallsTitle": "مكالماتي",
+    "loggedOne": "{{count}} مسجلة",
+    "loggedOther": "{{count}} مسجلة",
+    "newCall": "مكالمة جديدة",
+    "noCallsYet": "لا توجد مكالمات مسجلة بعد.",
+    "allCallTypes": "جميع أنواع الاتصال",
+    "recentOnly": "يتم عرض آخر {{count}} مكالمة."
+  },
+  "inventory": {
+    "title": "المخزون",
+    "managerOnly": "المدير فقط يمكنه إدارة المخزون.",
+    "countOne": "{{count}} منتج",
+    "countOther": "{{count}} منتجات",
+    "addProduct": "إضافة منتج",
+    "manageTypes": "إدارة الأنواع",
+    "colProduct": "المنتج",
+    "colStock": "الكمية المتوفرة",
+    "colThreshold": "منخفض / حرج عند",
+    "colStatus": "الحالة",
+    "colActions": "الإجراءات",
+    "noProductsYet": "لا توجد منتجات بعد.",
+    "status": {
+      "ok": "جيد",
+      "low": "منخفض",
+      "critical": "حرج"
+    }
+  },
+  "productTypes": {
+    "title": "أنواع المنتجات",
+    "subtitle": "القائمة التي تُستخدم عند \"إضافة منتج\" — أضف أو احذف نوعاً من هنا.",
+    "namePlaceholder": "اسم النوع (مثال: ورد أحمر)",
+    "add": "إضافة",
+    "noneYet": "لا توجد أنواع منتجات بعد — أضف نوعاً أدناه.",
+    "deleteConfirm": "إزالة \"{{name}}\" من القائمة؟"
+  },
+  "productForm": {
+    "addTitle": "إضافة منتج",
+    "editTitle": "تعديل المنتج",
+    "namePlaceholder": "اسم المنتج (مثال: ورد أحمر)",
+    "typePlaceholder": "اختر نوع المنتج",
+    "noTypesYet": "لا توجد أنواع منتجات بعد — أضف نوعاً أولاً من \"إدارة الأنواع\".",
+    "stockLabel": "الكمية المتوفرة",
+    "thresholdLabel": "حد المخزون المنخفض",
+    "criticalLabel": "حد المخزون الحرج"
+  },
+  "orderLines": {
+    "productPlaceholder": "اختر منتجاً",
+    "addProduct": "إضافة منتج آخر",
+    "noTypesYet": "لا توجد أنواع منتجات بعد — اطلب من المدير إضافتها من المخزون ← إدارة الأنواع أولاً."
+  },
+  "editHistory": {
+    "view": "السجل",
+    "title": "سجل التعديلات",
+    "none": "لا توجد تعديلات بعد.",
+    "unknown": "غير معروف",
+    "noFieldChange": "لا توجد حقول متتبَّعة تغيّرت.",
+    "edit": "تعديل",
+    "editVisit": "تعديل الزيارة",
+    "editCall": "تعديل المكالمة",
+    "editOrder": "تعديل الطلب",
+    "edited": "معدَّل",
+    "fieldOutcome": "النتيجة",
+    "fieldNoSaleReason": "سبب عدم البيع",
+    "fieldCallType": "نوع الاتصال",
+    "fieldCallReason": "السبب",
+    "fieldNote": "ملاحظة",
+    "fieldItems": "الأصناف",
+    "fieldQuantity": "الباقات",
+    "fieldStatus": "الحالة",
+    "fieldName": "الاسم",
+    "orderHint": "تغيير النتيجة هنا لا يؤثر على أي طلب مرتبط بهذه العملية مسبقاً — عدّل الطلب بشكل منفصل عند الحاجة."
+  },
+  "dateRange": {
+    "pick": "نطاق التاريخ",
+    "clear": "مسح",
+    "done": "تم"
+  },
+  "pullData": {
+    "title": "سحب البيانات",
+    "subtitle": "كل شيء عن المبيعات ونشاطاتها، في ملف واحد.",
+    "managerOnly": "المدير فقط يمكنه تصدير البيانات.",
+    "exportButton": "تصدير إلى إكسل",
+    "exporting": "جارٍ تجهيز الملف…",
+    "exportHint": "يُنزّل ملف .xlsx واحد بتبويب لكل من الحسابات والزيارات والمكالمات والطلبات والمنتجات والموظفين وسجل التعديلات.",
+    "orderItems": "أصناف الطلبات"
+  },
+  "visitsActivity": {
+    "title": "نشاط الزيارات",
+    "managerOnly": "المدير فقط يمكنه عرض نشاط الزيارات على مستوى الفريق.",
+    "countOne": "{{count}} زيارة",
+    "countOther": "{{count}} زيارة",
+    "allReps": "كل المندوبين",
+    "allOutcomes": "كل النتائج",
+    "noVisitsFound": "لا توجد زيارات مطابقة لهذه الفلاتر.",
+    "colRep": "المندوب",
+    "colBouquetsMTD": "الباقات (الشهر)",
+    "colOrdersMTD": "الطلبات (الشهر)",
+    "colActiveAccounts": "الحسابات النشطة",
+    "colVisitsToday": "زيارات اليوم",
+    "colAchievement": "نسبة الهدف",
+    "noRepsYet": "لا يوجد مندوبون بعد.",
+    "setTarget": "تحديد الهدف"
+  },
+  "telesalesRollup": {
+    "title": "نشاط المبيعات الهاتفية",
+    "managerOnly": "المدير فقط يمكنه عرض نشاط المبيعات الهاتفية على مستوى الفريق.",
+    "countOne": "{{count}} مكالمة",
+    "countOther": "{{count}} مكالمة",
+    "allAgents": "كل الموظفين",
+    "allOutcomes": "كل النتائج",
+    "colDate": "التاريخ",
+    "colAgent": "الموظف",
+    "colShop": "المحل",
+    "colOutcome": "النتيجة",
+    "colNote": "ملاحظة",
+    "noCallsFound": "لا توجد مكالمات مطابقة لهذه الفلاتر."
+  },
+  "dashboard": {
+    "manager": {
+      "title": "لوحة التحكم",
+      "salesToday": "مبيعات اليوم",
+      "mtdSales": "مبيعات الشهر",
+      "trendHint": "مقارنة بنفس اليوم من الشهر الماضي",
+      "target": "الهدف",
+      "statAccounts": "الحسابات النشطة",
+      "ordersToday": "طلبات اليوم",
+      "cartons": "كرتون",
+      "monthlyTarget": "الهدف الشهري",
+      "remaining": "المتبقي",
+      "requiredPerDay": "المطلوب/يوم",
+      "currentPerDay": "الحالي/يوم",
+      "last7Days": "المبيعات — آخر ٧ أيام",
+      "inventoryAlerts": "تنبيهات المخزون",
+      "salesTeam": "فريق المبيعات",
+      "noSalesTeamYet": "لا يوجد موظفون بعد.",
+      "needsAttention": "يحتاج انتباه",
+      "inactiveHighValue": "حساب عالي القيمة غير نشط",
+      "declining": "حساب في تراجع",
+      "reactivationOpportunities": "فرصة لإعادة التفعيل",
+      "todaysActivity": "نشاط اليوم",
+      "noActivityToday": "لا يوجد شيء مسجل اليوم.",
+      "unit": {
+        "visits": "زيارة",
+        "calls": "مكالمة"
+      }
+    },
+    "telesales": {
+      "welcome": "مرحباً بعودتك، {{name}}",
+      "subtitle": "نشاطك حتى الآن.",
+      "statCalls": "المكالمات المُجراة",
+      "statOrders": "الطلبات المسجَّلة",
+      "statBouquets": "الباقات المباعة",
+      "recentCalls": "المكالمات الأخيرة",
+      "noCallsYet": "لا توجد مكالمات مسجلة بعد."
+    }
+  },
+  "auth": {
+    "deactivated": "تم إيقاف هذا الحساب. اطلب من المدير إعادة تفعيله.",
+    "profileMissing": "تعذّر تحميل ملف الموظف الخاص بك. سجّل الخروج وحاول مرة أخرى، أو اطلب المساعدة من المدير."
+  },
+  "errorBoundary": {
+    "title": "حدث خطأ ما",
+    "body": "واجهت الشاشة خطأً لم تستطع التعافي منه. إعادة التحميل عادةً تحل المشكلة — إذا تكرر، أخبر المدير بما كنت تفعله.",
+    "reload": "إعادة التحميل"
+  }
+}

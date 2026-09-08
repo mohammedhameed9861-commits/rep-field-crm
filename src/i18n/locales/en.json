@@ -1,0 +1,380 @@
+{
+  "common": {
+    "save": "Save",
+    "saving": "Saving…",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "add": "Add",
+    "edit": "Edit",
+    "loading": "Loading…",
+    "signOut": "Sign out",
+    "seeAll": "See all",
+    "openMenu": "Open menu"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "accounts": "Accounts",
+    "reps": "Reps",
+    "visitsActivity": "Visits",
+    "telesales": "Telesales",
+    "inventory": "Inventory",
+    "pullData": "Pull Data",
+    "newVisit": "New Visit",
+    "myVisits": "My Visits",
+    "newCall": "New Call",
+    "myCalls": "My Calls"
+  },
+  "login": {
+    "title": "Sign in",
+    "subtitle": "Use the account your manager created for you.",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign in",
+    "signingIn": "…"
+  },
+  "notConnected": {
+    "title": "Not connected yet",
+    "body": "This CRM needs its own Supabase project. Add"
+  },
+  "comingSoon": {
+    "notBuilt": "Not built yet."
+  },
+  "roles": {
+    "rep": "Rep",
+    "telesales": "Telesales",
+    "manager": "Manager"
+  },
+  "shopClass": {
+    "A": "A · 4–6 cartons/week",
+    "B": "B · 2.5–3.5 cartons/week",
+    "C": "C · 1–2 cartons/week"
+  },
+  "noSaleReason": {
+    "no_need_today": "No need today",
+    "price_too_high": "Price too high",
+    "bought_competitor": "Bought from competitor",
+    "no_stock_needed": "No stock needed",
+    "quality_concern": "Quality concern",
+    "shop_closed": "Shop closed",
+    "owner_unavailable": "Owner unavailable",
+    "payment_issue": "Payment issue",
+    "other": "Other"
+  },
+  "callOutcome": {
+    "interested_callback": "Interested / Call Back",
+    "not_interested": "Not Interested",
+    "order_placed": "Order Placed",
+    "no_answer": "No Answer"
+  },
+  "callType": {
+    "label": "Call Type",
+    "new_customer": "New Customer",
+    "reactivation": "Reactivation",
+    "follow_up": "Follow-up"
+  },
+  "callReason": {
+    "wants_price": "Wants price",
+    "wants_availability": "Wants availability",
+    "wants_specific_flower": "Wants specific flower",
+    "waiting_next_purchase": "Waiting for next purchase",
+    "needs_owner_approval": "Needs owner approval",
+    "price_too_high": "Price",
+    "bought_competitor": "Already bought from competitor",
+    "no_current_demand": "No current demand",
+    "quality_concern": "Quality",
+    "doesnt_want_change_supplier": "Doesn't want to change supplier",
+    "other": "Other"
+  },
+  "orderStatus": {
+    "pending": "Pending",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled"
+  },
+  "accounts": {
+    "title": "Accounts",
+    "countOne": "{{count}} client shop",
+    "countOther": "{{count}} client shops",
+    "addAccount": "Add Account",
+    "searchPlaceholder": "Search accounts…",
+    "noAccountsYet": "No accounts yet.",
+    "inactive": "Inactive",
+    "unassigned": "Unassigned",
+    "archive": "Archive",
+    "reactivate": "Reactivate",
+    "archiveConfirm": "Archive {{name}}?",
+    "reactivateConfirm": "Reactivate {{name}}?",
+    "selectPrompt": "Select an account to see its history.",
+    "statTotalOrders": "Total Orders",
+    "statTotalBouquets": "Total Bouquets",
+    "statLastActivity": "Last Activity",
+    "bouquetOne": "{{count}} bouquet",
+    "bouquetOther": "{{count}} bouquets",
+    "never": "—",
+    "orderHistory": "Order History",
+    "noOrdersYet": "No orders yet.",
+    "colDate": "Date",
+    "colItems": "Items",
+    "colBouquets": "Bouquets",
+    "colStatus": "Status",
+    "activityTimeline": "Activity Timeline",
+    "noActivityYet": "No visits or calls logged yet.",
+    "visited": "visited",
+    "called": "called",
+    "outcomeSold": "sold",
+    "outcomeNoSale": "no sale",
+    "orderPlaced": "Order placed",
+    "backToList": "All accounts"
+  },
+  "accountForm": {
+    "addTitle": "Add Account",
+    "editTitle": "Edit Account",
+    "namePlaceholder": "Shop name",
+    "areaPlaceholder": "Area (e.g. Karkh)",
+    "phonePlaceholder": "Phone",
+    "shopClassPlaceholder": "Shop class (optional)",
+    "repPlaceholder": "Assigned rep (optional)",
+    "notesPlaceholder": "Notes (e.g. closed Fridays, prefers morning delivery)"
+  },
+  "reps": {
+    "title": "Reps & Staff",
+    "managerOnly": "Only managers can manage staff accounts.",
+    "countOne": "{{count}} account",
+    "countOther": "{{count}} accounts",
+    "addStaff": "Add Staff",
+    "colName": "Name",
+    "colRole": "Role",
+    "colStatus": "Status",
+    "colSince": "Since",
+    "colActions": "Actions",
+    "noStaffYet": "No staff accounts yet.",
+    "active": "Active",
+    "inactive": "Inactive",
+    "reset": "Reset",
+    "deactivate": "Deactivate",
+    "reactivate": "Reactivate",
+    "deactivateConfirm": "Deactivate {{name}}?",
+    "reactivateConfirm": "Reactivate {{name}}?",
+    "resetPrompt": "New temporary password for {{name}}:",
+    "resetSuccess": "Password reset. Share the new password with them directly."
+  },
+  "staffForm": {
+    "title": "Add Staff Account",
+    "fullNamePlaceholder": "Full name",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Temporary password",
+    "createAccount": "Create Account",
+    "creating": "Creating…",
+    "shareHint": "Share the email and temporary password with them directly — there's no self-signup."
+  },
+  "camera": {
+    "open": "Take a photo of the shop",
+    "takePhoto": "Take Photo",
+    "retake": "Retake",
+    "denied": "Camera access is needed to log a visit — allow it in your browser and try again."
+  },
+  "followUp": {
+    "label": "Next Follow-up",
+    "none": "No follow-up",
+    "tomorrow": "Tomorrow",
+    "in3days": "In 3 days",
+    "nextWeek": "Next week",
+    "custom": "Custom",
+    "due": "Follow up",
+    "overdue": "Overdue",
+    "today": "Today",
+    "upcomingTitle": "Upcoming Follow-ups",
+    "noneUpcoming": "Nothing scheduled."
+  },
+  "visits": {
+    "logVisit": "Log a Visit",
+    "searchPlaceholder": "Search any shop by name…",
+    "noShopsMatch": "No shops match.",
+    "takePhoto": "Take a photo of the shop",
+    "sold": "Sold",
+    "noSale": "No Sale",
+    "bouquetsPlaceholder": "Bouquets",
+    "reasonPlaceholder": "Reason (optional)",
+    "notePlaceholder": "Note (optional)",
+    "saveVisit": "Save Visit",
+    "myVisitsTitle": "My Visits",
+    "loggedOne": "{{count}} logged",
+    "loggedOther": "{{count}} logged",
+    "newVisit": "New Visit",
+    "noVisitsYet": "No visits logged yet.",
+    "recentOnly": "Showing your latest {{count}} visits."
+  },
+  "calls": {
+    "logCall": "Log a Call",
+    "searchPlaceholder": "Search any shop by name…",
+    "noShopsMatch": "No shops match.",
+    "callTypePlaceholder": "Call type",
+    "interestReasonPlaceholder": "Reason / Interest (optional)",
+    "notInterestedReasonPlaceholder": "Reason (required)",
+    "notePlaceholder": "Note (optional)",
+    "saveCall": "Save Call",
+    "myCallsTitle": "My Calls",
+    "loggedOne": "{{count}} logged",
+    "loggedOther": "{{count}} logged",
+    "newCall": "New Call",
+    "noCallsYet": "No calls logged yet.",
+    "allCallTypes": "All call types",
+    "recentOnly": "Showing your latest {{count}} calls."
+  },
+  "inventory": {
+    "title": "Inventory",
+    "managerOnly": "Only managers can manage inventory.",
+    "countOne": "{{count}} product",
+    "countOther": "{{count}} products",
+    "addProduct": "Add Product",
+    "manageTypes": "Manage Types",
+    "colProduct": "Product",
+    "colStock": "Stock on hand",
+    "colThreshold": "Low / Critical at",
+    "colStatus": "Status",
+    "colActions": "Actions",
+    "noProductsYet": "No products yet.",
+    "status": {
+      "ok": "OK",
+      "low": "Low",
+      "critical": "Critical"
+    }
+  },
+  "productTypes": {
+    "title": "Product Types",
+    "subtitle": "The picklist \"Add Product\" chooses from — add or remove a type here.",
+    "namePlaceholder": "Type name (e.g. Red Roses)",
+    "add": "Add",
+    "noneYet": "No product types yet — add one below.",
+    "deleteConfirm": "Remove \"{{name}}\" from the picklist?"
+  },
+  "productForm": {
+    "addTitle": "Add Product",
+    "editTitle": "Edit Product",
+    "namePlaceholder": "Product name (e.g. Red Roses)",
+    "typePlaceholder": "Select a product type",
+    "noTypesYet": "No product types yet — add one from \"Manage Types\" first.",
+    "stockLabel": "Stock on hand",
+    "thresholdLabel": "Low-stock at",
+    "criticalLabel": "Critical at"
+  },
+  "orderLines": {
+    "productPlaceholder": "Select a product",
+    "addProduct": "Add another product",
+    "noTypesYet": "No product types yet — ask a manager to add some from Inventory → Manage Types first."
+  },
+  "editHistory": {
+    "view": "History",
+    "title": "Edit History",
+    "none": "No edits yet.",
+    "unknown": "Unknown",
+    "noFieldChange": "No tracked fields changed.",
+    "edit": "Edit",
+    "editVisit": "Edit Visit",
+    "editCall": "Edit Call",
+    "editOrder": "Edit Order",
+    "edited": "Edited",
+    "fieldOutcome": "Outcome",
+    "fieldNoSaleReason": "No-Sale Reason",
+    "fieldCallType": "Call Type",
+    "fieldCallReason": "Reason",
+    "fieldNote": "Note",
+    "fieldItems": "Items",
+    "fieldQuantity": "Bouquets",
+    "fieldStatus": "Status",
+    "fieldName": "Name",
+    "orderHint": "Changing the outcome here doesn't touch any order already linked to this — edit that separately if needed."
+  },
+  "dateRange": {
+    "pick": "Date range",
+    "clear": "Clear",
+    "done": "Done"
+  },
+  "pullData": {
+    "title": "Pull Data",
+    "subtitle": "Everything about sales and sales activity, in one export.",
+    "managerOnly": "Only managers can export data.",
+    "exportButton": "Export to Excel",
+    "exporting": "Preparing file…",
+    "exportHint": "Downloads one .xlsx file with a tab for Accounts, Visits, Calls, Orders, Products, Staff, and Edit History.",
+    "orderItems": "Order Items"
+  },
+  "visitsActivity": {
+    "title": "Visits Activity",
+    "managerOnly": "Only managers can view team-wide visit activity.",
+    "countOne": "{{count}} visit",
+    "countOther": "{{count}} visits",
+    "allReps": "All reps",
+    "allOutcomes": "All outcomes",
+    "noVisitsFound": "No visits match these filters.",
+    "colRep": "Rep",
+    "colBouquetsMTD": "Bouquets MTD",
+    "colOrdersMTD": "Orders MTD",
+    "colActiveAccounts": "Active Accounts",
+    "colVisitsToday": "Visits Today",
+    "colAchievement": "Target %",
+    "noRepsYet": "No reps yet.",
+    "setTarget": "Set target"
+  },
+  "telesalesRollup": {
+    "title": "Telesales Activity",
+    "managerOnly": "Only managers can view team-wide telesales activity.",
+    "countOne": "{{count}} call",
+    "countOther": "{{count}} calls",
+    "allAgents": "All agents",
+    "allOutcomes": "All outcomes",
+    "colDate": "Date",
+    "colAgent": "Agent",
+    "colShop": "Shop",
+    "colOutcome": "Outcome",
+    "colNote": "Note",
+    "noCallsFound": "No calls match these filters."
+  },
+  "dashboard": {
+    "manager": {
+      "title": "Dashboard",
+      "salesToday": "Sales Today",
+      "mtdSales": "MTD Sales",
+      "trendHint": "vs. same point last month",
+      "target": "Target",
+      "statAccounts": "Active Accounts",
+      "ordersToday": "Orders Today",
+      "cartons": "cartons",
+      "monthlyTarget": "Monthly Target",
+      "remaining": "Remaining",
+      "requiredPerDay": "Required/day",
+      "currentPerDay": "Current/day",
+      "last7Days": "Sales — Last 7 Days",
+      "inventoryAlerts": "Inventory Alerts",
+      "salesTeam": "Sales Team",
+      "noSalesTeamYet": "No staff yet.",
+      "needsAttention": "Needs Attention",
+      "inactiveHighValue": "inactive high-value accounts",
+      "declining": "declining accounts",
+      "reactivationOpportunities": "reactivation opportunities",
+      "todaysActivity": "Today's Activity",
+      "noActivityToday": "Nothing logged yet today.",
+      "unit": {
+        "visits": "visits",
+        "calls": "calls"
+      }
+    },
+    "telesales": {
+      "welcome": "Welcome back, {{name}}",
+      "subtitle": "Your activity so far.",
+      "statCalls": "Calls Made",
+      "statOrders": "Orders Placed",
+      "statBouquets": "Bouquets Sold",
+      "recentCalls": "Recent Calls",
+      "noCallsYet": "No calls logged yet."
+    }
+  },
+  "auth": {
+    "deactivated": "This account has been deactivated. Ask a manager to reactivate it.",
+    "profileMissing": "Your staff profile couldn't be loaded. Sign out and try again, or ask a manager."
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "body": "The screen hit an error it couldn't recover from. Reloading usually fixes it — if it keeps happening, tell a manager what you were doing.",
+    "reload": "Reload"
+  }
+}
