@@ -1,11 +1,52 @@
-import { Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { Menu } from "lucide-react";
 import Sidebar from "./Sidebar";
 
+/** Below `md`, the sidebar used to sit permanently at a fixed 224px — on a phone
+ * that's over half the screen, squeezing every page's content into a sliver
+ * (words wrapping one per line). Now it's a slide-in drawer behind a hamburger,
+ * same as any mobile app nav; `md:` and up keeps the old always-visible sidebar. */
 export default function Layout() {
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.language === "ar";
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
+
+  // A nav link click already closes the drawer (see Sidebar's onNavigate), but this
+  // covers any other way the route could change (e.g. clicking a card in the page itself).
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
+
   return (
     <div className="flex h-screen bg-cream-50 text-gray-900">
-      <Sidebar />
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex items-center justify-between border-b border-sea-700 bg-sea-800 px-4 py-3 md:hidden">
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="rounded-md p-1 text-white"
+          aria-label={t("common.openMenu")}
+        >
+          <Menu size={22} />
+        </button>
+        <div className="text-sm font-bold tracking-wide text-white">FLOWERCOM</div>
+        <div className="w-[30px]" />
+      </div>
+
+      {mobileOpen && (
+        <div className="fixed inset-0 z-40 bg-black/40 md:hidden" onClick={() => setMobileOpen(false)} />
+      )}
+
+      <div
+        className={`fixed inset-y-0 z-50 flex h-full transition-transform duration-200 md:static md:z-auto md:translate-x-0 ${
+          mobileOpen ? "translate-x-0" : isRtl ? "translate-x-full" : "-translate-x-full"
+        } ${isRtl ? "end-0" : "start-0"}`}
+      >
+        <Sidebar onNavigate={() => setMobileOpen(false)} />
+      </div>
+
+      <div className="min-w-0 flex-1 overflow-y-auto">
         <Outlet />
       </div>
     </div>

@@ -38,7 +38,7 @@ const telesalesNav = [
   { to: "/calls", labelKey: "nav.myCalls", icon: History },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
   const { profile, signOut } = useAuth();
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language === "ar";
@@ -54,7 +54,7 @@ export default function Sidebar() {
     .toUpperCase();
 
   return (
-    <div className="flex w-56 shrink-0 flex-col gap-1 bg-sea-800 px-4 py-6">
+    <div className="flex w-56 shrink-0 flex-col gap-1 overflow-y-auto bg-sea-800 px-4 py-6">
       <div className="mb-6 flex items-center gap-2.5 px-2">
         <svg width="24" height="24" viewBox="0 0 26 26" fill="none">
           <path d="M13 2C18 6 19 12 13 24C7 12 8 6 13 2Z" stroke="#ffffff" strokeWidth="1.3" />
@@ -70,6 +70,7 @@ export default function Sidebar() {
           key={to}
           to={to}
           end={end}
+          onClick={onNavigate}
           className={({ isActive }) =>
             `flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm ${
               isActive ? "bg-sea-700 font-semibold text-white" : "text-sea-100 hover:bg-sea-700/50"

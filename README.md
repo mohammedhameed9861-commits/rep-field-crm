@@ -201,6 +201,20 @@ runtime, so a mismatched key silently falls back to the English string
 via `fallbackLng`), then `useTranslation()` + `t("namespace.key")` in the
 component.
 
+## Mobile layout
+
+Reps and telesales log visits/calls from their phones in the field, so
+the nav can't just assume a laptop-width screen. Below Tailwind's `md`
+breakpoint, the sidebar (`src/components/Sidebar.tsx`) is a slide-in
+drawer behind a hamburger button in a thin top bar
+(`src/components/Layout.tsx`), instead of the permanent 224px-wide
+column it used to be everywhere — on a phone that fixed width was over
+half the screen, squeezing every page's content into a sliver narrow
+enough that ordinary sentences wrapped one word per line. Tapping a nav
+link, tapping the backdrop, or the route just changing all close the
+drawer. `md:` and up is unchanged — the sidebar stays permanently
+visible like before.
+
 ## Known gaps (intentional, for now)
 
 - **Orders aren't linked to specific products.** `orders.items` is free
