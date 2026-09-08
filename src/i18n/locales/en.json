@@ -1,0 +1,237 @@
+{
+  "common": {
+    "save": "Save",
+    "saving": "Saving…",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "add": "Add",
+    "edit": "Edit",
+    "loading": "Loading…",
+    "signOut": "Sign out",
+    "seeAll": "See all"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "accounts": "Accounts",
+    "reps": "Reps",
+    "telesales": "Telesales",
+    "inventory": "Inventory",
+    "newVisit": "New Visit",
+    "myVisits": "My Visits",
+    "newCall": "New Call",
+    "myCalls": "My Calls"
+  },
+  "login": {
+    "title": "Sign in",
+    "subtitle": "Use the account your manager created for you.",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign in",
+    "signingIn": "…"
+  },
+  "notConnected": {
+    "title": "Not connected yet",
+    "body": "This CRM needs its own Supabase project. Add"
+  },
+  "comingSoon": {
+    "notBuilt": "Not built yet."
+  },
+  "roles": {
+    "rep": "Rep",
+    "telesales": "Telesales",
+    "manager": "Manager"
+  },
+  "shopClass": {
+    "A": "A · 4–6 cartons/week",
+    "B": "B · 2.5–3.5 cartons/week",
+    "C": "C · 1–2 cartons/week"
+  },
+  "noSaleReason": {
+    "closed": "Shop was closed",
+    "not_interested": "Not interested",
+    "already_stocked": "Already stocked up",
+    "other": "Other"
+  },
+  "callOutcome": {
+    "order_placed": "Order placed",
+    "follow_up": "Follow up",
+    "no_answer": "No answer"
+  },
+  "orderStatus": {
+    "pending": "Pending",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled"
+  },
+  "accounts": {
+    "title": "Accounts",
+    "countOne": "{{count}} client shop",
+    "countOther": "{{count}} client shops",
+    "addAccount": "Add Account",
+    "searchPlaceholder": "Search accounts…",
+    "noAccountsYet": "No accounts yet.",
+    "inactive": "Inactive",
+    "unassigned": "Unassigned",
+    "archive": "Archive",
+    "reactivate": "Reactivate",
+    "archiveConfirm": "Archive {{name}}?",
+    "reactivateConfirm": "Reactivate {{name}}?",
+    "selectPrompt": "Select an account to see its history.",
+    "statTotalOrders": "Total Orders",
+    "statTotalBouquets": "Total Bouquets",
+    "statLastActivity": "Last Activity",
+    "bouquetOne": "{{count}} bouquet",
+    "bouquetOther": "{{count}} bouquets",
+    "never": "—",
+    "orderHistory": "Order History",
+    "noOrdersYet": "No orders yet.",
+    "colDate": "Date",
+    "colItems": "Items",
+    "colBouquets": "Bouquets",
+    "colAmount": "Amount",
+    "colStatus": "Status",
+    "activityTimeline": "Activity Timeline",
+    "noActivityYet": "No visits or calls logged yet.",
+    "visited": "visited",
+    "called": "called",
+    "outcomeSold": "sold",
+    "outcomeNoSale": "no sale",
+    "orderPlaced": "Order placed"
+  },
+  "accountForm": {
+    "addTitle": "Add Account",
+    "editTitle": "Edit Account",
+    "namePlaceholder": "Shop name",
+    "areaPlaceholder": "Area (e.g. Karkh)",
+    "phonePlaceholder": "Phone",
+    "shopClassPlaceholder": "Shop class (optional)",
+    "repPlaceholder": "Assigned rep (optional)",
+    "notesPlaceholder": "Notes (e.g. closed Fridays, prefers morning delivery)"
+  },
+  "reps": {
+    "title": "Reps & Staff",
+    "managerOnly": "Only managers can manage staff accounts.",
+    "countOne": "{{count}} account",
+    "countOther": "{{count}} accounts",
+    "addStaff": "Add Staff",
+    "colName": "Name",
+    "colRole": "Role",
+    "colStatus": "Status",
+    "colSince": "Since",
+    "colActions": "Actions",
+    "noStaffYet": "No staff accounts yet.",
+    "active": "Active",
+    "inactive": "Inactive",
+    "reset": "Reset",
+    "deactivate": "Deactivate",
+    "reactivate": "Reactivate",
+    "deactivateConfirm": "Deactivate {{name}}?",
+    "reactivateConfirm": "Reactivate {{name}}?",
+    "resetPrompt": "New temporary password for {{name}}:",
+    "resetSuccess": "Password reset. Share the new password with them directly."
+  },
+  "staffForm": {
+    "title": "Add Staff Account",
+    "fullNamePlaceholder": "Full name",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Temporary password",
+    "createAccount": "Create Account",
+    "creating": "Creating…",
+    "shareHint": "Share the email and temporary password with them directly — there's no self-signup."
+  },
+  "visits": {
+    "logVisit": "Log a Visit",
+    "searchPlaceholder": "Search any shop by name…",
+    "noShopsMatch": "No shops match.",
+    "takePhoto": "Take a photo of the shop",
+    "sold": "Sold",
+    "noSale": "No Sale",
+    "itemsPlaceholder": "Items (e.g. Red Roses x6, Colored Roses x3)",
+    "bouquetsPlaceholder": "Bouquets",
+    "amountPlaceholder": "Amount (IQD)",
+    "reasonPlaceholder": "Reason (optional)",
+    "notePlaceholder": "Note (optional)",
+    "saveVisit": "Save Visit",
+    "myVisitsTitle": "My Visits",
+    "loggedOne": "{{count}} logged",
+    "loggedOther": "{{count}} logged",
+    "newVisit": "New Visit",
+    "noVisitsYet": "No visits logged yet."
+  },
+  "calls": {
+    "logCall": "Log a Call",
+    "searchPlaceholder": "Search any shop by name…",
+    "noShopsMatch": "No shops match.",
+    "notePlaceholder": "Note (optional)",
+    "saveCall": "Save Call",
+    "myCallsTitle": "My Calls",
+    "loggedOne": "{{count}} logged",
+    "loggedOther": "{{count}} logged",
+    "newCall": "New Call",
+    "noCallsYet": "No calls logged yet."
+  },
+  "inventory": {
+    "title": "Inventory",
+    "managerOnly": "Only managers can manage inventory.",
+    "countOne": "{{count}} product",
+    "countOther": "{{count}} products",
+    "addProduct": "Add Product",
+    "colProduct": "Product",
+    "colStock": "Stock on hand",
+    "colThreshold": "Low-stock at",
+    "colActions": "Actions",
+    "noProductsYet": "No products yet."
+  },
+  "productForm": {
+    "addTitle": "Add Product",
+    "editTitle": "Edit Product",
+    "namePlaceholder": "Product name (e.g. Red Roses)",
+    "stockLabel": "Stock on hand",
+    "thresholdLabel": "Low-stock at"
+  },
+  "telesalesRollup": {
+    "title": "Telesales Activity",
+    "managerOnly": "Only managers can view team-wide telesales activity.",
+    "countOne": "{{count}} call",
+    "countOther": "{{count}} calls",
+    "filterAgent": "Agent",
+    "allAgents": "All agents",
+    "filterOutcome": "Outcome",
+    "allOutcomes": "All outcomes",
+    "filterFrom": "From",
+    "filterTo": "To",
+    "colDate": "Date",
+    "colAgent": "Agent",
+    "colShop": "Shop",
+    "colOutcome": "Outcome",
+    "colNote": "Note",
+    "noCallsFound": "No calls match these filters."
+  },
+  "dashboard": {
+    "manager": {
+      "title": "Dashboard",
+      "subtitle": "Everything across the team, at a glance.",
+      "statAccounts": "Active Accounts",
+      "statOrders": "Total Orders",
+      "statBouquets": "Total Bouquets",
+      "recentActivity": "Recent Activity",
+      "nothingLogged": "Nothing logged yet.",
+      "lowStock": "Low Stock",
+      "nothingLowStock": "Nothing low on stock.",
+      "leftSuffix": "left",
+      "staffActivity7d": "Staff Activity · 7 days",
+      "noStaffYet": "No staff yet.",
+      "visited": "visited",
+      "called": "called",
+      "loggedOrderAt": "logged an order at"
+    },
+    "telesales": {
+      "welcome": "Welcome back, {{name}}",
+      "subtitle": "Your activity so far.",
+      "statCalls": "Calls Made",
+      "statOrders": "Orders Placed",
+      "statBouquets": "Bouquets Sold",
+      "recentCalls": "Recent Calls",
+      "noCallsYet": "No calls logged yet."
+    }
+  }
+}

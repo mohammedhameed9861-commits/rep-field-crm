@@ -1,10 +1,12 @@
 import { useState, type FormEvent } from "react";
 import { Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/auth";
 
 export default function Login() {
   const { session } = useAuth();
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -37,24 +39,26 @@ export default function Login() {
             <div className="text-[10px] font-normal tracking-widest text-sea-500">CRM</div>
           </div>
         </div>
-        <h1 className="text-lg font-bold text-sea-800">Sign in</h1>
-        <p className="mt-1 text-sm text-gray-500">Use the account your manager created for you.</p>
+        <h1 className="text-lg font-bold text-sea-800">{t("login.title")}</h1>
+        <p className="mt-1 text-sm text-gray-500">{t("login.subtitle")}</p>
         <form onSubmit={onSubmit} className="mt-5 space-y-3">
           <input
             type="email"
             required
-            placeholder="Email"
+            placeholder={t("login.email")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className={field}
+            dir="ltr"
           />
           <input
             type="password"
             required
-            placeholder="Password"
+            placeholder={t("login.password")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className={field}
+            dir="ltr"
           />
           {error && <p className="text-sm text-red-600">{error}</p>}
           <button
@@ -62,7 +66,7 @@ export default function Login() {
             disabled={busy}
             className="w-full rounded-full bg-teal-500 px-6 py-3 font-semibold text-white transition hover:bg-teal-600 disabled:opacity-50"
           >
-            {busy ? "…" : "Sign in"}
+            {busy ? t("login.signingIn") : t("login.signIn")}
           </button>
         </form>
       </div>

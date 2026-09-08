@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { KeyRound, Plus, UserCheck, UserX } from "lucide-react";
 import { useAuth } from "../../lib/auth";
 import { fetchStaff, resetStaffPassword, setStaffActive } from "../../lib/reps";
@@ -14,6 +15,7 @@ const ROLE_BADGE: Record<AppRole, string> = {
 
 export default function RepsPage() {
   const { profile } = useAuth();
+  const { t } = useTranslation();
   const [staff, setStaff] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,8 +37,8 @@ export default function RepsPage() {
   }, []);
 
   async function toggleActive(person: Profile) {
-    const verb = person.active ? "deactivate" : "reactivate";
-    if (!confirm(`${verb === "deactivate" ? "Deactivate" : "Reactivate"} ${person.full_name}?`)) return;
+    const key = person.active ? "reps.deactivateConfirm" : "reps.reactivateConfirm";
+    if (!confirm(t(key, { name: person.full_name }))) return;
     try {
       await setStaffActive(person.id, !person.active);
       await reload();
@@ -46,11 +48,11 @@ export default function RepsPage() {
   }
 
   async function resetPassword(person: Profile) {
-    const password = prompt(`New temporary password for ${person.full_name}:`);
+    const password = prompt(t("reps.resetPrompt", { name: person.full_name }));
     if (!password) return;
     try {
       await resetStaffPassword(person.id, password);
-      alert("Password reset. Share the new password with them directly.");
+      alert(t("reps.resetSuccess"));
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
@@ -59,7 +61,7 @@ export default function RepsPage() {
   if (profile?.role !== "manager") {
     return (
       <div className="flex h-full items-center justify-center text-sm text-gray-400">
-        Only managers can manage staff accounts.
+        {t("reps.managerOnly")}
       </div>
     );
   }
@@ -68,14 +70,16 @@ export default function RepsPage() {
     <div className="flex h-full flex-col">
       <div className="flex shrink-0 items-center justify-between px-7 pb-4 pt-6">
         <div>
-          <h1 className="text-xl font-bold text-sea-800">Reps &amp; Staff</h1>
-          <p className="mt-0.5 text-sm text-gray-500">{staff.length} accounts</p>
+          <h1 className="text-xl font-bold text-sea-800">{t("reps.title")}</h1>
+          <p className="mt-0.5 text-sm text-gray-500">
+            {t(staff.length === 1 ? "reps.countOne" : "reps.countOther", { count: staff.length })}
+          </p>
         </div>
         <button
           onClick={() => setShowNew(true)}
           className="flex items-center gap-2 rounded-full bg-teal-500 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-600"
         >
-          <Plus size={16} /> Add Staff
+          <Plus size={16} /> {t("reps.addStaff")}
         </button>
       </div>
 
@@ -84,16 +88,16 @@ export default function RepsPage() {
       <div className="min-h-0 flex-1 overflow-y-auto px-7 pb-6">
         <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
           <div className="grid grid-cols-[1fr_110px_100px_110px_1fr] gap-2 border-b border-gray-100 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
-            <span>Name</span>
-            <span>Role</span>
-            <span>Status</span>
-            <span>Since</span>
-            <span className="text-end">Actions</span>
+            <span>{t("reps.colName")}</span>
+            <span>{t("reps.colRole")}</span>
+            <span>{t("reps.colStatus")}</span>
+            <span>{t("reps.colSince")}</span>
+            <span className="text-end">{t("reps.colActions")}</span>
           </div>
           {loading ? (
-            <p className="p-4 text-sm text-gray-400">Loading…</p>
+            <p className="p-4 text-sm text-gray-400">{t("common.loading")}</p>
           ) : staff.length === 0 ? (
-            <p className="p-4 text-sm text-gray-400">No staff accounts yet.</p>
+            <p className="p-4 text-sm text-gray-400">{t("reps.noStaffYet")}</p>
           ) : (
             staff.map((p) => (
               <div
@@ -104,25 +108,27 @@ export default function RepsPage() {
               >
                 <span className="text-sm font-semibold text-gray-900">{p.full_name}</span>
                 <span
-                  className={`w-fit rounded-full px-2 py-0.5 text-[10.5px] font-bold capitalize ${ROLE_BADGE[p.role]}`}
+                  className={`w-fit rounded-full px-2 py-0.5 text-[10.5px] font-bold ${ROLE_BADGE[p.role]}`}
                 >
-                  {p.role}
+                  {t(`roles.${p.role}`)}
                 </span>
                 <span
                   className={`w-fit rounded-full px-2 py-0.5 text-[10.5px] font-bold ${
                     p.active ? "bg-teal-50 text-teal-700" : "bg-gray-100 text-gray-500"
                   }`}
                 >
-                  {p.active ? "Active" : "Inactive"}
+                  {p.active ? t("reps.active") : t("reps.inactive")}
                 </span>
-                <span className="text-xs text-gray-500">{formatDate(p.created_at)}</span>
+                <span className="text-xs text-gray-500" dir="ltr">
+                  {formatDate(p.created_at)}
+                </span>
                 <div className="flex justify-end gap-2">
                   <button
                     onClick={() => void resetPassword(p)}
-                    title="Reset password"
+                    title={t("reps.reset")}
                     className="flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50"
                   >
-                    <KeyRound size={13} /> Reset
+                    <KeyRound size={13} /> {t("reps.reset")}
                   </button>
                   <button
                     onClick={() => void toggleActive(p)}
@@ -130,11 +136,11 @@ export default function RepsPage() {
                   >
                     {p.active ? (
                       <>
-                        <UserX size={13} /> Deactivate
+                        <UserX size={13} /> {t("reps.deactivate")}
                       </>
                     ) : (
                       <>
-                        <UserCheck size={13} /> Reactivate
+                        <UserCheck size={13} /> {t("reps.reactivate")}
                       </>
                     )}
                   </button>

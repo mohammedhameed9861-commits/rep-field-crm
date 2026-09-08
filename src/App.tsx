@@ -3,7 +3,6 @@ import { AuthProvider } from "./lib/auth";
 import RequireAuth from "./components/RequireAuth";
 import Layout from "./components/Layout";
 import Login from "./pages/Login";
-import ComingSoon from "./pages/ComingSoon";
 import AccountsPage from "./pages/accounts/AccountsPage";
 import RepsPage from "./pages/reps/RepsPage";
 import NewVisitPage from "./pages/visits/NewVisitPage";
@@ -12,6 +11,7 @@ import NewCallPage from "./pages/calls/NewCallPage";
 import MyCallsPage from "./pages/calls/MyCallsPage";
 import InventoryPage from "./pages/inventory/InventoryPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
+import TelesalesRollupPage from "./pages/telesales/TelesalesRollupPage";
 
 export default function App() {
   return (
@@ -34,7 +34,7 @@ export default function App() {
             <Route path="visits" element={<MyVisitsPage />} />
             <Route path="calls/new" element={<NewCallPage />} />
             <Route path="calls" element={<MyCallsPage />} />
-            <Route path="telesales" element={<ComingSoon title="Telesales" />} />
+            <Route path="telesales" element={<TelesalesRollupPage />} />
             <Route path="inventory" element={<InventoryPage />} />
           </Route>
         </Routes>

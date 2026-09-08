@@ -53,3 +53,31 @@ export async function fetchMyCalls(telesalesId: string): Promise<Call[]> {
   if (error) throw error;
   return (data ?? []) as Call[];
 }
+
+export interface CallFilters {
+  telesalesId?: string;
+  outcome?: CallOutcome;
+  /** Inclusive, as a plain "YYYY-MM-DD" date. */
+  dateFrom?: string;
+  /** Inclusive, as a plain "YYYY-MM-DD" date. */
+  dateTo?: string;
+}
+
+/** Every call across every agent — the manager's team-wide rollup, not one agent's own history. */
+export async function fetchAllCalls(filters: CallFilters = {}): Promise<Call[]> {
+  if (!supabase) return [];
+  let q = supabase
+    .from("calls")
+    .select(
+      "*, account:accounts!calls_account_id_fkey(id, name, area), telesales:profiles!calls_telesales_id_fkey(id, full_name)",
+    )
+    .order("created_at", { ascending: false })
+    .limit(500);
+  if (filters.telesalesId) q = q.eq("telesales_id", filters.telesalesId);
+  if (filters.outcome) q = q.eq("outcome", filters.outcome);
+  if (filters.dateFrom) q = q.gte("created_at", `${filters.dateFrom}T00:00:00`);
+  if (filters.dateTo) q = q.lte("created_at", `${filters.dateTo}T23:59:59`);
+  const { data, error } = await q;
+  if (error) throw error;
+  return (data ?? []) as Call[];
+}

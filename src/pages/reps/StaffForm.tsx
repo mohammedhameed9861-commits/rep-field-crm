@@ -1,15 +1,13 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 import { createStaffAccount } from "../../lib/reps";
 import type { AppRole } from "../../lib/types";
 
-const ROLE_LABEL: Record<AppRole, string> = {
-  rep: "Rep",
-  telesales: "Telesales",
-  manager: "Manager",
-};
+const ROLES: AppRole[] = ["rep", "telesales", "manager"];
 
 export default function StaffForm({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
+  const { t } = useTranslation();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,7 +36,7 @@ export default function StaffForm({ onClose, onSaved }: { onClose: () => void; o
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-sea-800">Add Staff Account</h2>
+          <h2 className="text-lg font-bold text-sea-800">{t("staffForm.title")}</h2>
           <button onClick={onClose} className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100">
             <X size={18} />
           </button>
@@ -46,7 +44,7 @@ export default function StaffForm({ onClose, onSaved }: { onClose: () => void; o
         <form onSubmit={onSubmit} className="space-y-3">
           <input
             required
-            placeholder="Full name"
+            placeholder={t("staffForm.fullNamePlaceholder")}
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             className={field}
@@ -54,7 +52,7 @@ export default function StaffForm({ onClose, onSaved }: { onClose: () => void; o
           <input
             required
             type="email"
-            placeholder="Email"
+            placeholder={t("staffForm.emailPlaceholder")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className={field}
@@ -63,7 +61,7 @@ export default function StaffForm({ onClose, onSaved }: { onClose: () => void; o
           <input
             required
             type="text"
-            placeholder="Temporary password"
+            placeholder={t("staffForm.passwordPlaceholder")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className={field}
@@ -71,9 +69,9 @@ export default function StaffForm({ onClose, onSaved }: { onClose: () => void; o
             minLength={6}
           />
           <select value={role} onChange={(e) => setRole(e.target.value as AppRole)} className={field}>
-            {(Object.keys(ROLE_LABEL) as AppRole[]).map((r) => (
+            {ROLES.map((r) => (
               <option key={r} value={r}>
-                {ROLE_LABEL[r]}
+                {t(`roles.${r}`)}
               </option>
             ))}
           </select>
@@ -83,11 +81,9 @@ export default function StaffForm({ onClose, onSaved }: { onClose: () => void; o
             disabled={busy}
             className="w-full rounded-full bg-teal-500 px-6 py-2.5 font-semibold text-white transition hover:bg-teal-600 disabled:opacity-50"
           >
-            {busy ? "Creating…" : "Create Account"}
+            {busy ? t("staffForm.creating") : t("staffForm.createAccount")}
           </button>
-          <p className="text-xs text-gray-400">
-            Share the email and temporary password with them directly — there's no self-signup.
-          </p>
+          <p className="text-xs text-gray-400">{t("staffForm.shareHint")}</p>
         </form>
       </div>
     </div>

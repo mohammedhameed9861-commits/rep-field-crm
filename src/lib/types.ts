@@ -81,22 +81,3 @@ export type ActivityItem =
   | { kind: "visit"; at: string; data: Visit }
   | { kind: "call"; at: string; data: Call }
   | { kind: "order"; at: string; data: OrderRow };
-
-export const SHOP_CLASS_LABEL: Record<ShopClass, string> = {
-  A: "A · 4–6 cartons/week",
-  B: "B · 2.5–3.5 cartons/week",
-  C: "C · 1–2 cartons/week",
-};
-
-export const NO_SALE_REASON_LABEL: Record<NoSaleReason, string> = {
-  closed: "Shop was closed",
-  not_interested: "Not interested",
-  already_stocked: "Already stocked up",
-  other: "Other",
-};
-
-export const CALL_OUTCOME_LABEL: Record<CallOutcome, string> = {
-  order_placed: "Order placed",
-  follow_up: "Follow up",
-  no_answer: "No answer",
-};

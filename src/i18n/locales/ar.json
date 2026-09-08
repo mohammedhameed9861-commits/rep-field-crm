@@ -1,0 +1,237 @@
+{
+  "common": {
+    "save": "حفظ",
+    "saving": "جارٍ الحفظ…",
+    "saveChanges": "حفظ التغييرات",
+    "cancel": "إلغاء",
+    "add": "إضافة",
+    "edit": "تعديل",
+    "loading": "جارٍ التحميل…",
+    "signOut": "تسجيل الخروج",
+    "seeAll": "عرض الكل"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "accounts": "الحسابات",
+    "reps": "المندوبون",
+    "telesales": "المبيعات الهاتفية",
+    "inventory": "المخزون",
+    "newVisit": "زيارة جديدة",
+    "myVisits": "زياراتي",
+    "newCall": "مكالمة جديدة",
+    "myCalls": "مكالماتي"
+  },
+  "login": {
+    "title": "تسجيل الدخول",
+    "subtitle": "استخدم الحساب الذي أنشأه لك المدير.",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "signIn": "تسجيل الدخول",
+    "signingIn": "…"
+  },
+  "notConnected": {
+    "title": "لم يتم الربط بعد",
+    "body": "يحتاج هذا النظام إلى مشروع Supabase خاص به. أضف"
+  },
+  "comingSoon": {
+    "notBuilt": "لم يتم إنشاؤه بعد."
+  },
+  "roles": {
+    "rep": "مندوب",
+    "telesales": "مبيعات هاتفية",
+    "manager": "مدير"
+  },
+  "shopClass": {
+    "A": "A · ٤-٦ كراتين أسبوعياً",
+    "B": "B · ٢.٥-٣.٥ كراتين أسبوعياً",
+    "C": "C · ١-٢ كرتون أسبوعياً"
+  },
+  "noSaleReason": {
+    "closed": "المحل كان مغلقاً",
+    "not_interested": "غير مهتم",
+    "already_stocked": "لديه مخزون كافٍ",
+    "other": "أخرى"
+  },
+  "callOutcome": {
+    "order_placed": "تم الطلب",
+    "follow_up": "متابعة لاحقاً",
+    "no_answer": "لا يوجد رد"
+  },
+  "orderStatus": {
+    "pending": "قيد الانتظار",
+    "delivered": "تم التسليم",
+    "cancelled": "ملغى"
+  },
+  "accounts": {
+    "title": "الحسابات",
+    "countOne": "{{count}} محل عميل",
+    "countOther": "{{count}} محلات عملاء",
+    "addAccount": "إضافة حساب",
+    "searchPlaceholder": "ابحث عن حساب…",
+    "noAccountsYet": "لا توجد حسابات بعد.",
+    "inactive": "غير نشط",
+    "unassigned": "غير مُعيَّن",
+    "archive": "أرشفة",
+    "reactivate": "إعادة تفعيل",
+    "archiveConfirm": "أرشفة {{name}}؟",
+    "reactivateConfirm": "إعادة تفعيل {{name}}؟",
+    "selectPrompt": "اختر حساباً لعرض سجله.",
+    "statTotalOrders": "إجمالي الطلبات",
+    "statTotalBouquets": "إجمالي الباقات",
+    "statLastActivity": "آخر نشاط",
+    "bouquetOne": "{{count}} باقة",
+    "bouquetOther": "{{count}} باقة",
+    "never": "—",
+    "orderHistory": "سجل الطلبات",
+    "noOrdersYet": "لا توجد طلبات بعد.",
+    "colDate": "التاريخ",
+    "colItems": "الأصناف",
+    "colBouquets": "الباقات",
+    "colAmount": "المبلغ",
+    "colStatus": "الحالة",
+    "activityTimeline": "الجدول الزمني للنشاط",
+    "noActivityYet": "لا توجد زيارات أو مكالمات مسجلة بعد.",
+    "visited": "قام بزيارة",
+    "called": "اتصل بـ",
+    "outcomeSold": "تم البيع",
+    "outcomeNoSale": "لم يتم البيع",
+    "orderPlaced": "تم تسجيل الطلب"
+  },
+  "accountForm": {
+    "addTitle": "إضافة حساب",
+    "editTitle": "تعديل الحساب",
+    "namePlaceholder": "اسم المحل",
+    "areaPlaceholder": "المنطقة (مثال: الكرخ)",
+    "phonePlaceholder": "رقم الهاتف",
+    "shopClassPlaceholder": "فئة المحل (اختياري)",
+    "repPlaceholder": "المندوب المسؤول (اختياري)",
+    "notesPlaceholder": "ملاحظات (مثال: مغلق أيام الجمعة، يفضل التوصيل صباحاً)"
+  },
+  "reps": {
+    "title": "المندوبون والموظفون",
+    "managerOnly": "المدير فقط يمكنه إدارة حسابات الموظفين.",
+    "countOne": "{{count}} حساب",
+    "countOther": "{{count}} حسابات",
+    "addStaff": "إضافة موظف",
+    "colName": "الاسم",
+    "colRole": "الدور",
+    "colStatus": "الحالة",
+    "colSince": "منذ",
+    "colActions": "الإجراءات",
+    "noStaffYet": "لا يوجد موظفون بعد.",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "reset": "إعادة تعيين",
+    "deactivate": "إيقاف",
+    "reactivate": "إعادة تفعيل",
+    "deactivateConfirm": "إيقاف {{name}}؟",
+    "reactivateConfirm": "إعادة تفعيل {{name}}؟",
+    "resetPrompt": "كلمة مرور مؤقتة جديدة لـ {{name}}:",
+    "resetSuccess": "تمت إعادة تعيين كلمة المرور. شاركها معه مباشرة."
+  },
+  "staffForm": {
+    "title": "إضافة حساب موظف",
+    "fullNamePlaceholder": "الاسم الكامل",
+    "emailPlaceholder": "البريد الإلكتروني",
+    "passwordPlaceholder": "كلمة مرور مؤقتة",
+    "createAccount": "إنشاء الحساب",
+    "creating": "جارٍ الإنشاء…",
+    "shareHint": "شارك البريد الإلكتروني وكلمة المرور المؤقتة معه مباشرة — لا يوجد تسجيل ذاتي."
+  },
+  "visits": {
+    "logVisit": "تسجيل زيارة",
+    "searchPlaceholder": "ابحث عن أي محل بالاسم…",
+    "noShopsMatch": "لا توجد محلات مطابقة.",
+    "takePhoto": "التقط صورة للمحل",
+    "sold": "تم البيع",
+    "noSale": "لم يتم البيع",
+    "itemsPlaceholder": "الأصناف (مثال: ورد أحمر × ٦، ورد ملون × ٣)",
+    "bouquetsPlaceholder": "عدد الباقات",
+    "amountPlaceholder": "المبلغ (دينار عراقي)",
+    "reasonPlaceholder": "السبب (اختياري)",
+    "notePlaceholder": "ملاحظة (اختياري)",
+    "saveVisit": "حفظ الزيارة",
+    "myVisitsTitle": "زياراتي",
+    "loggedOne": "{{count}} مسجلة",
+    "loggedOther": "{{count}} مسجلة",
+    "newVisit": "زيارة جديدة",
+    "noVisitsYet": "لا توجد زيارات مسجلة بعد."
+  },
+  "calls": {
+    "logCall": "تسجيل مكالمة",
+    "searchPlaceholder": "ابحث عن أي محل بالاسم…",
+    "noShopsMatch": "لا توجد محلات مطابقة.",
+    "notePlaceholder": "ملاحظة (اختياري)",
+    "saveCall": "حفظ المكالمة",
+    "myCallsTitle": "مكالماتي",
+    "loggedOne": "{{count}} مسجلة",
+    "loggedOther": "{{count}} مسجلة",
+    "newCall": "مكالمة جديدة",
+    "noCallsYet": "لا توجد مكالمات مسجلة بعد."
+  },
+  "inventory": {
+    "title": "المخزون",
+    "managerOnly": "المدير فقط يمكنه إدارة المخزون.",
+    "countOne": "{{count}} منتج",
+    "countOther": "{{count}} منتجات",
+    "addProduct": "إضافة منتج",
+    "colProduct": "المنتج",
+    "colStock": "الكمية المتوفرة",
+    "colThreshold": "حد المخزون المنخفض",
+    "colActions": "الإجراءات",
+    "noProductsYet": "لا توجد منتجات بعد."
+  },
+  "productForm": {
+    "addTitle": "إضافة منتج",
+    "editTitle": "تعديل المنتج",
+    "namePlaceholder": "اسم المنتج (مثال: ورد أحمر)",
+    "stockLabel": "الكمية المتوفرة",
+    "thresholdLabel": "حد المخزون المنخفض"
+  },
+  "telesalesRollup": {
+    "title": "نشاط المبيعات الهاتفية",
+    "managerOnly": "المدير فقط يمكنه عرض نشاط المبيعات الهاتفية على مستوى الفريق.",
+    "countOne": "{{count}} مكالمة",
+    "countOther": "{{count}} مكالمة",
+    "filterAgent": "الموظف",
+    "allAgents": "كل الموظفين",
+    "filterOutcome": "النتيجة",
+    "allOutcomes": "كل النتائج",
+    "filterFrom": "من",
+    "filterTo": "إلى",
+    "colDate": "التاريخ",
+    "colAgent": "الموظف",
+    "colShop": "المحل",
+    "colOutcome": "النتيجة",
+    "colNote": "ملاحظة",
+    "noCallsFound": "لا توجد مكالمات مطابقة لهذه الفلاتر."
+  },
+  "dashboard": {
+    "manager": {
+      "title": "لوحة التحكم",
+      "subtitle": "كل شيء عن الفريق، بنظرة واحدة.",
+      "statAccounts": "الحسابات النشطة",
+      "statOrders": "إجمالي الطلبات",
+      "statBouquets": "إجمالي الباقات",
+      "recentActivity": "النشاط الأخير",
+      "nothingLogged": "لا يوجد شيء مسجل بعد.",
+      "lowStock": "مخزون منخفض",
+      "nothingLowStock": "لا يوجد نقص في المخزون.",
+      "leftSuffix": "متبقٍ",
+      "staffActivity7d": "نشاط الموظفين · ٧ أيام",
+      "noStaffYet": "لا يوجد موظفون بعد.",
+      "visited": "زار",
+      "called": "اتصل بـ",
+      "loggedOrderAt": "سجّل طلباً في"
+    },
+    "telesales": {
+      "welcome": "مرحباً بعودتك، {{name}}",
+      "subtitle": "نشاطك حتى الآن.",
+      "statCalls": "المكالمات المُجراة",
+      "statOrders": "الطلبات المسجَّلة",
+      "statBouquets": "الباقات المباعة",
+      "recentCalls": "المكالمات الأخيرة",
+      "noCallsYet": "لا توجد مكالمات مسجلة بعد."
+    }
+  }
+}

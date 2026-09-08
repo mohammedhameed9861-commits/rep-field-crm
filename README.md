@@ -35,7 +35,9 @@ own visit history with the photo, outcome, and reason).
 **Telesales** — the same New Call / My Calls day-to-day nav as reps get
 for visits: search any shop by name, log an outcome (order placed /
 follow-up / no answer), and when an order is placed, log it in the same
-step. No photo — a call has nothing to photograph.
+step. No photo — a call has nothing to photograph. Managers get a
+**Telesales Activity** rollup: every call across every agent, filterable
+by agent, outcome, and date range.
 
 **Inventory** — a manager-only screen listing every product with its
 stock on hand and low-stock threshold, plus add/edit. Deliberately
@@ -73,14 +75,31 @@ Same discipline as the previous implementation, carried over deliberately:
   say which, and which visit/call it came from. The account's order
   history looks the same either way.
 
+## Bilingual (English/Arabic)
+
+Same setup as the marketing site: `i18next` + `react-i18next`, resource
+files at `src/i18n/locales/{en,ar}.json`, a toggle in the sidebar footer
+that calls `setLanguage()` from `src/i18n/index.ts`. Switching sets
+`dir`/`lang` on `<html>`, persists the choice (`flowercom_crm_lang` in
+localStorage — a separate key from the site's, since they're separate
+origins), and swaps the body font to Cairo for Arabic via `html[dir="rtl"]
+body { font-family: "Cairo" }` in `index.css`. Layout mirrors mostly for
+free — flexbox's `row` direction already follows `dir`, so the sidebar,
+nav, and most rows flip automatically; a handful of spots
+(dates/amounts/phone numbers embedded in translated sentences) are
+explicitly pinned `dir="ltr"` so digits don't get bidi-reordered.
+
+Every screen is translated. Adding a new one: add its strings to both
+locale files (keep the key sets identical — nothing enforces that at
+runtime, so a mismatched key silently falls back to the English string
+via `fallbackLng`), then `useTranslation()` + `t("namespace.key")` in the
+component.
+
 ## Known gaps (intentional, for now)
 
-- No manager-facing telesales dashboard/reporting screen yet (the
-  "Telesales" item in the manager's sidebar) — call activity already
-  shows up in each account's activity timeline, just no rollup view yet.
-- No bilingual (Arabic/English) UI yet — English only for now, while the
-  data model and screens are still settling. Straightforward to add once
-  they are (the marketing site's i18next setup is the template).
+Everything from the original ask is built and bilingual. Nothing left
+outstanding right now beyond ordinary iteration (new fields, reports,
+etc. as they come up).
 
 ## 1. Set up Supabase
 

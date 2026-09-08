@@ -1,30 +1,34 @@
 import { NavLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Camera, History, LayoutGrid, Users, TrendingUp, Phone, PhoneCall, Boxes } from "lucide-react";
 import { useAuth } from "../lib/auth";
+import { setLanguage } from "../i18n";
 
 const managerNav = [
-  { to: "/", label: "Dashboard", icon: LayoutGrid, end: true },
-  { to: "/accounts", label: "Accounts", icon: Users },
-  { to: "/reps", label: "Reps", icon: TrendingUp },
-  { to: "/telesales", label: "Telesales", icon: Phone },
-  { to: "/inventory", label: "Inventory", icon: Boxes },
+  { to: "/", labelKey: "nav.dashboard", icon: LayoutGrid, end: true },
+  { to: "/accounts", labelKey: "nav.accounts", icon: Users },
+  { to: "/reps", labelKey: "nav.reps", icon: TrendingUp },
+  { to: "/telesales", labelKey: "nav.telesales", icon: Phone },
+  { to: "/inventory", labelKey: "nav.inventory", icon: Boxes },
 ];
 
 // Reps live in the field day-to-day — their nav is just logging visits and
 // checking their own history, not the manager-facing screens above.
 const repNav = [
-  { to: "/visits/new", label: "New Visit", icon: Camera, end: true },
-  { to: "/visits", label: "My Visits", icon: History },
+  { to: "/visits/new", labelKey: "nav.newVisit", icon: Camera, end: true },
+  { to: "/visits", labelKey: "nav.myVisits", icon: History },
 ];
 
 // Telesales works the phones — same idea as reps, just calls instead of visits.
 const telesalesNav = [
-  { to: "/calls/new", label: "New Call", icon: PhoneCall, end: true },
-  { to: "/calls", label: "My Calls", icon: History },
+  { to: "/calls/new", labelKey: "nav.newCall", icon: PhoneCall, end: true },
+  { to: "/calls", labelKey: "nav.myCalls", icon: History },
 ];
 
 export default function Sidebar() {
   const { profile, signOut } = useAuth();
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.language === "ar";
 
   const navItems =
     profile?.role === "rep" ? repNav : profile?.role === "telesales" ? telesalesNav : managerNav;
@@ -48,7 +52,7 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {navItems.map(({ to, label, icon: Icon, end }) => (
+      {navItems.map(({ to, labelKey, icon: Icon, end }) => (
         <NavLink
           key={to}
           to={to}
@@ -60,27 +64,34 @@ export default function Sidebar() {
           }
         >
           <Icon size={18} strokeWidth={1.8} />
-          {label}
+          {t(labelKey)}
         </NavLink>
       ))}
 
       <div className="flex-1" />
 
+      <button
+        onClick={() => setLanguage(isRtl ? "en" : "ar")}
+        className="rounded-lg px-3 py-2 text-start text-xs font-semibold text-sea-200 hover:bg-sea-700 hover:text-white"
+      >
+        {isRtl ? "English" : "العربية"}
+      </button>
+
       <div className="flex items-center gap-2.5 border-t border-sea-600 pt-4">
-        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-teal-500 text-xs font-bold text-white">
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-teal-500 text-xs font-bold text-white">
           {initials}
         </div>
         <div className="flex min-w-0 flex-1 flex-col leading-tight">
           <span className="truncate text-xs font-semibold text-white">
             {profile?.full_name ?? "…"}
           </span>
-          <span className="text-[11px] capitalize text-teal-300">{profile?.role}</span>
+          <span className="text-[11px] text-teal-300">{profile ? t(`roles.${profile.role}`) : ""}</span>
         </div>
         <button
           onClick={() => void signOut()}
           className="rounded-md px-2 py-1 text-[11px] font-semibold text-sea-200 hover:bg-sea-700 hover:text-white"
         >
-          Sign out
+          {t("common.signOut")}
         </button>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 import { createProduct, updateProduct } from "../../lib/inventory";
 import type { Product } from "../../lib/types";
@@ -13,6 +14,7 @@ export default function ProductForm({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const { t } = useTranslation();
   const editing = Boolean(product);
 
   const [name, setName] = useState(product?.name ?? "");
@@ -49,7 +51,7 @@ export default function ProductForm({
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-bold text-sea-800">
-            {editing ? "Edit Product" : "Add Product"}
+            {editing ? t("productForm.editTitle") : t("productForm.addTitle")}
           </h2>
           <button onClick={onClose} className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100">
             <X size={18} />
@@ -58,14 +60,16 @@ export default function ProductForm({
         <form onSubmit={onSubmit} className="space-y-3">
           <input
             required
-            placeholder="Product name (e.g. Red Roses)"
+            placeholder={t("productForm.namePlaceholder")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             className={field}
           />
           <div className="flex gap-3">
             <label className="flex-1">
-              <span className="mb-1 block text-xs font-semibold text-gray-500">Stock on hand</span>
+              <span className="mb-1 block text-xs font-semibold text-gray-500">
+                {t("productForm.stockLabel")}
+              </span>
               <input
                 required
                 type="number"
@@ -74,10 +78,13 @@ export default function ProductForm({
                 value={stockQty}
                 onChange={(e) => setStockQty(e.target.value)}
                 className={field}
+                dir="ltr"
               />
             </label>
             <label className="flex-1">
-              <span className="mb-1 block text-xs font-semibold text-gray-500">Low-stock at</span>
+              <span className="mb-1 block text-xs font-semibold text-gray-500">
+                {t("productForm.thresholdLabel")}
+              </span>
               <input
                 required
                 type="number"
@@ -86,6 +93,7 @@ export default function ProductForm({
                 value={threshold}
                 onChange={(e) => setThreshold(e.target.value)}
                 className={field}
+                dir="ltr"
               />
             </label>
           </div>
@@ -95,7 +103,7 @@ export default function ProductForm({
             disabled={busy}
             className="w-full rounded-full bg-teal-500 px-6 py-2.5 font-semibold text-white transition hover:bg-teal-600 disabled:opacity-50"
           >
-            {busy ? "Saving…" : editing ? "Save Changes" : "Add Product"}
+            {busy ? t("common.saving") : editing ? t("common.saveChanges") : t("productForm.addTitle")}
           </button>
         </form>
       </div>

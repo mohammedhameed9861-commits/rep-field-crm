@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { AlertTriangle, Boxes, TrendingUp, Users } from "lucide-react";
 import {
@@ -13,6 +14,7 @@ import { formatIQD, timeAgo } from "../../lib/format";
 import type { ActivityItem, Product } from "../../lib/types";
 
 export default function ManagerDashboard() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<OverallStats | null>(null);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [lowStock, setLowStock] = useState<Product[]>([]);
@@ -45,8 +47,8 @@ export default function ManagerDashboard() {
   return (
     <div className="flex h-full flex-col">
       <div className="shrink-0 px-7 pb-4 pt-6">
-        <h1 className="text-xl font-bold text-sea-800">Dashboard</h1>
-        <p className="mt-0.5 text-sm text-gray-500">Everything across the team, at a glance.</p>
+        <h1 className="text-xl font-bold text-sea-800">{t("dashboard.manager.title")}</h1>
+        <p className="mt-0.5 text-sm text-gray-500">{t("dashboard.manager.subtitle")}</p>
       </div>
 
       {error && <p className="px-7 pb-3 text-sm text-red-600">{error}</p>}
@@ -55,17 +57,17 @@ export default function ManagerDashboard() {
         <div className="grid grid-cols-3 gap-4">
           <StatTile
             icon={Users}
-            label="Active Accounts"
+            label={t("dashboard.manager.statAccounts")}
             value={loading ? "…" : String(stats?.totalAccounts ?? 0)}
           />
           <StatTile
             icon={TrendingUp}
-            label="Total Orders"
+            label={t("dashboard.manager.statOrders")}
             value={loading ? "…" : String(stats?.totalOrders ?? 0)}
           />
           <StatTile
             icon={Boxes}
-            label="Total Bouquets"
+            label={t("dashboard.manager.statBouquets")}
             value={loading ? "…" : String(stats?.totalBouquets ?? 0)}
           />
         </div>
@@ -73,11 +75,11 @@ export default function ManagerDashboard() {
         <div className="mt-5 grid grid-cols-[1fr_320px] gap-4">
           {/* Recent activity */}
           <div className="rounded-2xl border border-gray-200 bg-white p-5">
-            <h2 className="mb-3 text-sm font-bold text-sea-800">Recent Activity</h2>
+            <h2 className="mb-3 text-sm font-bold text-sea-800">{t("dashboard.manager.recentActivity")}</h2>
             {loading ? (
-              <p className="text-sm text-gray-400">Loading…</p>
+              <p className="text-sm text-gray-400">{t("common.loading")}</p>
             ) : activity.length === 0 ? (
-              <p className="text-sm text-gray-400">Nothing logged yet.</p>
+              <p className="text-sm text-gray-400">{t("dashboard.manager.nothingLogged")}</p>
             ) : (
               <div className="flex flex-col">
                 {activity.map((item) => (
@@ -93,39 +95,53 @@ export default function ManagerDashboard() {
                     <div className="min-w-0 flex-1 text-xs">
                       {item.kind === "visit" && (
                         <p className="text-gray-900">
-                          <span className="font-semibold">{item.data.rep?.full_name ?? "A rep"}</span>{" "}
-                          visited{" "}
-                          <Link to={`/accounts/${item.data.account_id}`} className="font-semibold text-teal-700 hover:underline">
-                            {item.data.account?.name ?? "a shop"}
+                          <span className="font-semibold">
+                            {item.data.rep?.full_name ?? t("roles.rep")}
+                          </span>{" "}
+                          {t("dashboard.manager.visited")}{" "}
+                          <Link
+                            to={`/accounts/${item.data.account_id}`}
+                            className="font-semibold text-teal-700 hover:underline"
+                          >
+                            {item.data.account?.name ?? ""}
                           </Link>{" "}
-                          &middot; {item.data.outcome === "sold" ? "sold" : "no sale"}
+                          &middot;{" "}
+                          {item.data.outcome === "sold" ? t("accounts.outcomeSold") : t("accounts.outcomeNoSale")}
                         </p>
                       )}
                       {item.kind === "call" && (
                         <p className="text-gray-900">
                           <span className="font-semibold">
-                            {item.data.telesales?.full_name ?? "Telesales"}
+                            {item.data.telesales?.full_name ?? t("roles.telesales")}
                           </span>{" "}
-                          called{" "}
-                          <Link to={`/accounts/${item.data.account_id}`} className="font-semibold text-teal-700 hover:underline">
-                            {item.data.account?.name ?? "a shop"}
+                          {t("dashboard.manager.called")}{" "}
+                          <Link
+                            to={`/accounts/${item.data.account_id}`}
+                            className="font-semibold text-teal-700 hover:underline"
+                          >
+                            {item.data.account?.name ?? ""}
                           </Link>{" "}
-                          &middot; {item.data.outcome.replace("_", " ")}
+                          &middot; {t(`callOutcome.${item.data.outcome}`)}
                         </p>
                       )}
                       {item.kind === "order" && (
                         <p className="text-gray-900">
                           <span className="font-semibold">
-                            {item.data.created_by_profile?.full_name ?? "Someone"}
+                            {item.data.created_by_profile?.full_name ?? "—"}
                           </span>{" "}
-                          logged an order at{" "}
-                          <Link to={`/accounts/${item.data.account_id}`} className="font-semibold text-teal-700 hover:underline">
-                            {item.data.account?.name ?? "a shop"}
+                          {t("accounts.orderPlaced")}{" "}
+                          <Link
+                            to={`/accounts/${item.data.account_id}`}
+                            className="font-semibold text-teal-700 hover:underline"
+                          >
+                            {item.data.account?.name ?? ""}
                           </Link>{" "}
-                          &middot; {formatIQD(item.data.amount)}
+                          &middot; <span dir="ltr">{formatIQD(item.data.amount)}</span>
                         </p>
                       )}
-                      <p className="mt-0.5 text-gray-400">{timeAgo(item.at)}</p>
+                      <p className="mt-0.5 text-gray-400" dir="ltr">
+                        {timeAgo(item.at)}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -137,19 +153,19 @@ export default function ManagerDashboard() {
             {/* Low stock */}
             <div className="rounded-2xl border border-gray-200 bg-white p-5">
               <h2 className="mb-3 flex items-center gap-1.5 text-sm font-bold text-sea-800">
-                <AlertTriangle size={15} className="text-warn-600" /> Low Stock
+                <AlertTriangle size={15} className="text-warn-600" /> {t("dashboard.manager.lowStock")}
               </h2>
               {loading ? (
-                <p className="text-sm text-gray-400">Loading…</p>
+                <p className="text-sm text-gray-400">{t("common.loading")}</p>
               ) : lowStock.length === 0 ? (
-                <p className="text-sm text-gray-400">Nothing low on stock.</p>
+                <p className="text-sm text-gray-400">{t("dashboard.manager.nothingLowStock")}</p>
               ) : (
                 <div className="flex flex-col gap-2">
                   {lowStock.map((p) => (
                     <div key={p.id} className="flex items-center justify-between text-xs">
                       <span className="font-semibold text-gray-900">{p.name}</span>
-                      <span className="rounded-full bg-warn-100 px-2 py-0.5 font-bold text-warn-600">
-                        {p.stock_qty} left
+                      <span className="rounded-full bg-warn-100 px-2 py-0.5 font-bold text-warn-600" dir="ltr">
+                        {p.stock_qty} {t("dashboard.manager.leftSuffix")}
                       </span>
                     </div>
                   ))}
@@ -159,17 +175,19 @@ export default function ManagerDashboard() {
 
             {/* Staff activity, last 7 days */}
             <div className="rounded-2xl border border-gray-200 bg-white p-5">
-              <h2 className="mb-3 text-sm font-bold text-sea-800">Staff Activity &middot; 7 days</h2>
+              <h2 className="mb-3 text-sm font-bold text-sea-800">{t("dashboard.manager.staffActivity7d")}</h2>
               {loading ? (
-                <p className="text-sm text-gray-400">Loading…</p>
+                <p className="text-sm text-gray-400">{t("common.loading")}</p>
               ) : staffCounts.length === 0 ? (
-                <p className="text-sm text-gray-400">No staff yet.</p>
+                <p className="text-sm text-gray-400">{t("dashboard.manager.noStaffYet")}</p>
               ) : (
                 <div className="flex flex-col gap-2">
                   {staffCounts.map((sc) => (
                     <div key={sc.profile.id} className="flex items-center justify-between text-xs">
                       <span className="text-gray-900">{sc.profile.full_name}</span>
-                      <span className="font-semibold text-gray-500">{sc.count}</span>
+                      <span className="font-semibold text-gray-500" dir="ltr">
+                        {sc.count}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -197,7 +215,9 @@ function StatTile({
         <Icon size={15} />
         <span className="text-xs font-semibold">{label}</span>
       </div>
-      <div className="mt-2 text-2xl font-bold text-sea-800">{value}</div>
+      <div className="mt-2 text-2xl font-bold text-sea-800" dir="ltr">
+        {value}
+      </div>
     </div>
   );
 }

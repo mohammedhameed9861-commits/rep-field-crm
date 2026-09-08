@@ -1,16 +1,19 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Camera, Search, X } from "lucide-react";
 import { useAuth } from "../../lib/auth";
 import { createVisit, searchAccounts } from "../../lib/visits";
 import type { Account, NoSaleReason, VisitOutcome } from "../../lib/types";
-import { NO_SALE_REASON_LABEL } from "../../lib/types";
+
+const NO_SALE_REASONS: NoSaleReason[] = ["closed", "not_interested", "already_stocked", "other"];
 
 const field =
   "w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100";
 
 export default function NewVisitPage() {
   const { profile } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
@@ -72,7 +75,7 @@ export default function NewVisitPage() {
 
   return (
     <div className="mx-auto h-full max-w-lg overflow-y-auto px-6 py-6">
-      <h1 className="text-xl font-bold text-sea-800">Log a Visit</h1>
+      <h1 className="text-xl font-bold text-sea-800">{t("visits.logVisit")}</h1>
 
       {!account ? (
         <div className="mt-5">
@@ -81,7 +84,7 @@ export default function NewVisitPage() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search any shop by name…"
+              placeholder={t("visits.searchPlaceholder")}
               className="w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
               autoFocus
             />
@@ -94,12 +97,10 @@ export default function NewVisitPage() {
                 className="rounded-lg p-3 text-start text-sm hover:bg-gray-50"
               >
                 <span className="font-semibold text-gray-900">{a.name}</span>
-                <span className="ml-2 text-xs text-gray-400">{a.area ?? ""}</span>
+                <span className="ms-2 text-xs text-gray-400">{a.area ?? ""}</span>
               </button>
             ))}
-            {results.length === 0 && (
-              <p className="p-3 text-sm text-gray-400">No shops match.</p>
-            )}
+            {results.length === 0 && <p className="p-3 text-sm text-gray-400">{t("visits.noShopsMatch")}</p>}
           </div>
         </div>
       ) : (
@@ -120,7 +121,7 @@ export default function NewVisitPage() {
 
           <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-gray-200 py-6 text-sm text-gray-500 hover:border-teal-300 hover:text-teal-600">
             <Camera size={22} />
-            {photo ? photo.name : "Take a photo of the shop"}
+            {photo ? photo.name : t("visits.takePhoto")}
             <input
               required
               type="file"
@@ -139,7 +140,7 @@ export default function NewVisitPage() {
                 outcome === "sold" ? "bg-teal-500 text-white" : "bg-gray-100 text-gray-500"
               }`}
             >
-              Sold
+              {t("visits.sold")}
             </button>
             <button
               type="button"
@@ -148,7 +149,7 @@ export default function NewVisitPage() {
                 outcome === "no_sale" ? "bg-warn-600 text-white" : "bg-gray-100 text-gray-500"
               }`}
             >
-              No Sale
+              {t("visits.noSale")}
             </button>
           </div>
 
@@ -156,7 +157,7 @@ export default function NewVisitPage() {
             <div className="space-y-3">
               <input
                 required
-                placeholder="Items (e.g. Red Roses x6, Colored Roses x3)"
+                placeholder={t("visits.itemsPlaceholder")}
                 value={items}
                 onChange={(e) => setItems(e.target.value)}
                 className={field}
@@ -167,7 +168,7 @@ export default function NewVisitPage() {
                   type="number"
                   min="0"
                   step="0.5"
-                  placeholder="Bouquets"
+                  placeholder={t("visits.bouquetsPlaceholder")}
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
                   className={field}
@@ -176,7 +177,7 @@ export default function NewVisitPage() {
                   required
                   type="number"
                   min="0"
-                  placeholder="Amount (IQD)"
+                  placeholder={t("visits.amountPlaceholder")}
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   className={field}
@@ -190,17 +191,17 @@ export default function NewVisitPage() {
               onChange={(e) => setNoSaleReason(e.target.value as NoSaleReason)}
               className={field}
             >
-              <option value="">Reason (optional)</option>
-              {(Object.keys(NO_SALE_REASON_LABEL) as NoSaleReason[]).map((r) => (
+              <option value="">{t("visits.reasonPlaceholder")}</option>
+              {NO_SALE_REASONS.map((r) => (
                 <option key={r} value={r}>
-                  {NO_SALE_REASON_LABEL[r]}
+                  {t(`noSaleReason.${r}`)}
                 </option>
               ))}
             </select>
           )}
 
           <textarea
-            placeholder="Note (optional)"
+            placeholder={t("visits.notePlaceholder")}
             value={note}
             onChange={(e) => setNote(e.target.value)}
             rows={2}
@@ -213,7 +214,7 @@ export default function NewVisitPage() {
             disabled={busy || !photo}
             className="w-full rounded-full bg-teal-500 px-6 py-2.5 font-semibold text-white transition hover:bg-teal-600 disabled:opacity-50"
           >
-            {busy ? "Saving…" : "Save Visit"}
+            {busy ? t("common.saving") : t("visits.saveVisit")}
           </button>
         </form>
       )}

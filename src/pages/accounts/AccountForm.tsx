@@ -1,9 +1,11 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { createAccount, updateAccount } from "../../lib/accounts";
 import type { Account, Profile, ShopClass } from "../../lib/types";
-import { SHOP_CLASS_LABEL } from "../../lib/types";
+
+const SHOP_CLASSES: ShopClass[] = ["A", "B", "C"];
 
 export default function AccountForm({
   account,
@@ -15,6 +17,7 @@ export default function AccountForm({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const { t } = useTranslation();
   const editing = Boolean(account);
 
   const [name, setName] = useState(account?.name ?? "");
@@ -68,7 +71,7 @@ export default function AccountForm({
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-bold text-sea-800">
-            {editing ? "Edit Account" : "Add Account"}
+            {editing ? t("accountForm.editTitle") : t("accountForm.addTitle")}
           </h2>
           <button onClick={onClose} className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100">
             <X size={18} />
@@ -77,19 +80,19 @@ export default function AccountForm({
         <form onSubmit={onSubmit} className="space-y-3">
           <input
             required
-            placeholder="Shop name"
+            placeholder={t("accountForm.namePlaceholder")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             className={field}
           />
           <input
-            placeholder="Area (e.g. Karkh)"
+            placeholder={t("accountForm.areaPlaceholder")}
             value={area}
             onChange={(e) => setArea(e.target.value)}
             className={field}
           />
           <input
-            placeholder="Phone"
+            placeholder={t("accountForm.phonePlaceholder")}
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className={field}
@@ -100,15 +103,15 @@ export default function AccountForm({
             onChange={(e) => setShopClass(e.target.value as ShopClass | "")}
             className={field}
           >
-            <option value="">Shop class (optional)</option>
-            {(Object.keys(SHOP_CLASS_LABEL) as ShopClass[]).map((c) => (
+            <option value="">{t("accountForm.shopClassPlaceholder")}</option>
+            {SHOP_CLASSES.map((c) => (
               <option key={c} value={c}>
-                {SHOP_CLASS_LABEL[c]}
+                {t(`shopClass.${c}`)}
               </option>
             ))}
           </select>
           <select value={repId} onChange={(e) => setRepId(e.target.value)} className={field}>
-            <option value="">Assigned rep (optional)</option>
+            <option value="">{t("accountForm.repPlaceholder")}</option>
             {reps.map((r) => (
               <option key={r.id} value={r.id}>
                 {r.full_name}
@@ -116,7 +119,7 @@ export default function AccountForm({
             ))}
           </select>
           <textarea
-            placeholder="Notes (e.g. closed Fridays, prefers morning delivery)"
+            placeholder={t("accountForm.notesPlaceholder")}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
@@ -128,7 +131,7 @@ export default function AccountForm({
             disabled={busy}
             className="w-full rounded-full bg-teal-500 px-6 py-2.5 font-semibold text-white transition hover:bg-teal-600 disabled:opacity-50"
           >
-            {busy ? "Saving…" : editing ? "Save Changes" : "Add Account"}
+            {busy ? t("common.saving") : editing ? t("common.saveChanges") : t("accountForm.addTitle")}
           </button>
         </form>
       </div>
