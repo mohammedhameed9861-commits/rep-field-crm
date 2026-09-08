@@ -5,6 +5,7 @@ import { useAuth } from "../../lib/auth";
 import { fetchProducts } from "../../lib/inventory";
 import type { Product } from "../../lib/types";
 import ProductForm from "./ProductForm";
+import EditHistoryButton from "../../components/EditHistoryButton";
 
 export default function InventoryPage() {
   const { profile } = useAuth();
@@ -61,7 +62,7 @@ export default function InventoryPage() {
 
       <div className="min-h-0 flex-1 overflow-y-auto px-7 pb-6">
         <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-          <div className="grid grid-cols-[1fr_110px_140px_100px_90px] gap-2 border-b border-gray-100 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
+          <div className="grid grid-cols-[1fr_110px_140px_100px_140px] gap-2 border-b border-gray-100 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
             <span>{t("inventory.colProduct")}</span>
             <span>{t("inventory.colStock")}</span>
             <span>{t("inventory.colThreshold")}</span>
@@ -79,7 +80,7 @@ export default function InventoryPage() {
               return (
                 <div
                   key={p.id}
-                  className="grid grid-cols-[1fr_110px_140px_100px_90px] items-center gap-2 border-t border-gray-100 px-4 py-3"
+                  className="grid grid-cols-[1fr_110px_140px_100px_140px] items-center gap-2 border-t border-gray-100 px-4 py-3"
                 >
                   <span className="text-sm font-semibold text-gray-900">{p.name}</span>
                   <span className="text-sm text-gray-700" dir="ltr">
@@ -99,13 +100,23 @@ export default function InventoryPage() {
                   >
                     {t(`inventory.status.${status}`)}
                   </span>
-                  <div className="flex justify-end">
+                  <div className="flex flex-col items-end gap-1">
                     <button
                       onClick={() => setEditing(p)}
                       className="flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50"
                     >
                       <Pencil size={13} /> {t("common.edit")}
                     </button>
+                    <EditHistoryButton
+                      tableName="products"
+                      recordId={p.id}
+                      fields={[
+                        { key: "name", label: t("editHistory.fieldName") },
+                        { key: "stock_qty", label: t("inventory.colStock") },
+                        { key: "low_stock_threshold", label: t("productForm.thresholdLabel") },
+                        { key: "critical_threshold", label: t("productForm.criticalLabel") },
+                      ]}
+                    />
                   </div>
                 </div>
               );
