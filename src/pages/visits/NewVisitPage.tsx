@@ -1,12 +1,24 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Camera, Search, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useAuth } from "../../lib/auth";
 import { createVisit, searchAccounts } from "../../lib/visits";
 import type { Account, NoSaleReason, VisitOutcome } from "../../lib/types";
+import CameraCapture from "../../components/CameraCapture";
+import FollowUpPicker from "../../components/FollowUpPicker";
 
-const NO_SALE_REASONS: NoSaleReason[] = ["closed", "not_interested", "already_stocked", "other"];
+const NO_SALE_REASONS: NoSaleReason[] = [
+  "no_need_today",
+  "price_too_high",
+  "bought_competitor",
+  "no_stock_needed",
+  "quality_concern",
+  "shop_closed",
+  "owner_unavailable",
+  "payment_issue",
+  "other",
+];
 
 const field =
   "w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100";
@@ -24,6 +36,7 @@ export default function NewVisitPage() {
   const [outcome, setOutcome] = useState<VisitOutcome>("sold");
   const [noSaleReason, setNoSaleReason] = useState<NoSaleReason | "">("");
   const [note, setNote] = useState("");
+  const [nextFollowupAt, setNextFollowupAt] = useState<string | null>(null);
   const [items, setItems] = useState("");
   const [quantity, setQuantity] = useState("");
   const [amount, setAmount] = useState("");
@@ -55,6 +68,7 @@ export default function NewVisitPage() {
         outcome,
         no_sale_reason: outcome === "no_sale" ? (noSaleReason || "other") : null,
         note: note || null,
+        next_followup_at: nextFollowupAt,
         order:
           outcome === "sold"
             ? {
@@ -119,18 +133,7 @@ export default function NewVisitPage() {
             </button>
           </div>
 
-          <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-gray-200 py-6 text-sm text-gray-500 hover:border-teal-300 hover:text-teal-600">
-            <Camera size={22} />
-            {photo ? photo.name : t("visits.takePhoto")}
-            <input
-              required
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
-            />
-          </label>
+          <CameraCapture captured={photo} onCapture={setPhoto} />
 
           <div className="flex gap-2">
             <button
@@ -207,6 +210,8 @@ export default function NewVisitPage() {
             rows={2}
             className={`${field} resize-none`}
           />
+
+          <FollowUpPicker value={nextFollowupAt} onChange={setNextFollowupAt} />
 
           {error && <p className="text-sm text-red-600">{error}</p>}
           <button

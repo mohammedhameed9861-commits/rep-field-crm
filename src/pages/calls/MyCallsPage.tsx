@@ -6,6 +6,7 @@ import { useAuth } from "../../lib/auth";
 import { fetchMyCalls } from "../../lib/calls";
 import type { Call } from "../../lib/types";
 import { formatDateTime } from "../../lib/format";
+import UpcomingFollowUps from "../../components/UpcomingFollowUps";
 
 const OUTCOME_BADGE: Record<Call["outcome"], string> = {
   order_placed: "bg-teal-50 text-teal-700",
@@ -58,7 +59,9 @@ export default function MyCallsPage() {
         ) : calls.length === 0 ? (
           <p className="text-sm text-gray-400">{t("calls.noCallsYet")}</p>
         ) : (
-          <div className="flex flex-col gap-2">
+          <>
+            <UpcomingFollowUps items={calls} />
+            <div className="flex flex-col gap-2">
             {calls.map((c) => (
               <div
                 key={c.id}
@@ -85,7 +88,8 @@ export default function MyCallsPage() {
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          </>
         )}
       </div>
     </div>

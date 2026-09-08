@@ -49,9 +49,14 @@
     "C": "C · 1–2 cartons/week"
   },
   "noSaleReason": {
-    "closed": "Shop was closed",
-    "not_interested": "Not interested",
-    "already_stocked": "Already stocked up",
+    "no_need_today": "No need today",
+    "price_too_high": "Price too high",
+    "bought_competitor": "Bought from competitor",
+    "no_stock_needed": "No stock needed",
+    "quality_concern": "Quality concern",
+    "shop_closed": "Shop closed",
+    "owner_unavailable": "Owner unavailable",
+    "payment_issue": "Payment issue",
     "other": "Other"
   },
   "callOutcome": {
@@ -140,6 +145,24 @@
     "creating": "Creating…",
     "shareHint": "Share the email and temporary password with them directly — there's no self-signup."
   },
+  "camera": {
+    "open": "Take a photo of the shop",
+    "takePhoto": "Take Photo",
+    "retake": "Retake",
+    "denied": "Camera access is needed to log a visit — allow it in your browser and try again."
+  },
+  "followUp": {
+    "label": "Next Follow-up",
+    "none": "No follow-up",
+    "tomorrow": "Tomorrow",
+    "in3days": "In 3 days",
+    "nextWeek": "Next week",
+    "due": "Follow up",
+    "overdue": "Overdue",
+    "today": "Today",
+    "upcomingTitle": "Upcoming Follow-ups",
+    "noneUpcoming": "Nothing scheduled."
+  },
   "visits": {
     "logVisit": "Log a Visit",
     "searchPlaceholder": "Search any shop by name…",
@@ -177,6 +200,7 @@
     "countOne": "{{count}} product",
     "countOther": "{{count}} products",
     "addProduct": "Add Product",
+    "manageTypes": "Manage Types",
     "colProduct": "Product",
     "colStock": "Stock on hand",
     "colThreshold": "Low / Critical at",
@@ -189,10 +213,20 @@
       "critical": "Critical"
     }
   },
+  "productTypes": {
+    "title": "Product Types",
+    "subtitle": "The picklist \"Add Product\" chooses from — add or remove a type here.",
+    "namePlaceholder": "Type name (e.g. Red Roses)",
+    "add": "Add",
+    "noneYet": "No product types yet — add one below.",
+    "deleteConfirm": "Remove \"{{name}}\" from the picklist?"
+  },
   "productForm": {
     "addTitle": "Add Product",
     "editTitle": "Edit Product",
     "namePlaceholder": "Product name (e.g. Red Roses)",
+    "typePlaceholder": "Select a product type",
+    "noTypesYet": "No product types yet — add one from \"Manage Types\" first.",
     "stockLabel": "Stock on hand",
     "thresholdLabel": "Low-stock at",
     "criticalLabel": "Critical at"

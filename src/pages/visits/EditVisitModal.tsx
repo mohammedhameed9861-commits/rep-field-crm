@@ -3,8 +3,19 @@ import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 import { updateVisit } from "../../lib/visits";
 import type { NoSaleReason, Visit, VisitOutcome } from "../../lib/types";
+import FollowUpPicker from "../../components/FollowUpPicker";
 
-const NO_SALE_REASONS: NoSaleReason[] = ["closed", "not_interested", "already_stocked", "other"];
+const NO_SALE_REASONS: NoSaleReason[] = [
+  "no_need_today",
+  "price_too_high",
+  "bought_competitor",
+  "no_stock_needed",
+  "quality_concern",
+  "shop_closed",
+  "owner_unavailable",
+  "payment_issue",
+  "other",
+];
 
 export default function EditVisitModal({
   visit,
@@ -19,6 +30,7 @@ export default function EditVisitModal({
   const [outcome, setOutcome] = useState<VisitOutcome>(visit.outcome);
   const [noSaleReason, setNoSaleReason] = useState<NoSaleReason | "">(visit.no_sale_reason ?? "");
   const [note, setNote] = useState(visit.note ?? "");
+  const [nextFollowupAt, setNextFollowupAt] = useState<string | null>(visit.next_followup_at);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,6 +43,7 @@ export default function EditVisitModal({
         outcome,
         no_sale_reason: outcome === "no_sale" ? noSaleReason || "other" : null,
         note: note || null,
+        next_followup_at: nextFollowupAt,
       });
       onSaved();
     } catch (err) {
@@ -96,6 +109,8 @@ export default function EditVisitModal({
             rows={2}
             className={`${field} resize-none`}
           />
+
+          <FollowUpPicker value={nextFollowupAt} onChange={setNextFollowupAt} />
 
           {outcome !== visit.outcome && <p className="text-xs text-warn-600">{t("editHistory.orderHint")}</p>}
           {error && <p className="text-sm text-red-600">{error}</p>}

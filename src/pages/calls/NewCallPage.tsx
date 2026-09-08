@@ -5,6 +5,7 @@ import { Search, X } from "lucide-react";
 import { useAuth } from "../../lib/auth";
 import { createCall, searchAccounts } from "../../lib/calls";
 import type { Account, CallOutcome } from "../../lib/types";
+import FollowUpPicker from "../../components/FollowUpPicker";
 
 const field =
   "w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100";
@@ -22,6 +23,7 @@ export default function NewCallPage() {
 
   const [outcome, setOutcome] = useState<CallOutcome>("order_placed");
   const [note, setNote] = useState("");
+  const [nextFollowupAt, setNextFollowupAt] = useState<string | null>(null);
   const [items, setItems] = useState("");
   const [quantity, setQuantity] = useState("");
   const [amount, setAmount] = useState("");
@@ -51,6 +53,7 @@ export default function NewCallPage() {
         telesales_id: profile.id,
         outcome,
         note: note || null,
+        next_followup_at: nextFollowupAt,
         order:
           outcome === "order_placed"
             ? {
@@ -178,6 +181,8 @@ export default function NewCallPage() {
             rows={2}
             className={`${field} resize-none`}
           />
+
+          <FollowUpPicker value={nextFollowupAt} onChange={setNextFollowupAt} />
 
           {error && <p className="text-sm text-red-600">{error}</p>}
           <button

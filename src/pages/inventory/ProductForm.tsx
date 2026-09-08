@@ -1,8 +1,9 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 import { createProduct, updateProduct } from "../../lib/inventory";
-import type { Product } from "../../lib/types";
+import { fetchProductTypes } from "../../lib/productTypes";
+import type { Product, ProductType } from "../../lib/types";
 
 export default function ProductForm({
   product,
@@ -23,6 +24,22 @@ export default function ProductForm({
   const [critical, setCritical] = useState(String(product?.critical_threshold ?? 0));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [types, setTypes] = useState<ProductType[]>([]);
+  const [loadingTypes, setLoadingTypes] = useState(!editing);
+
+  useEffect(() => {
+    if (editing) return;
+    let alive = true;
+    fetchProductTypes()
+      .then((data) => alive && setTypes(data))
+      .catch((err) => alive && setError(err instanceof Error ? err.message : String(err)))
+      .finally(() => alive && setLoadingTypes(false));
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -60,13 +77,28 @@ export default function ProductForm({
           </button>
         </div>
         <form onSubmit={onSubmit} className="space-y-3">
-          <input
-            required
-            placeholder={t("productForm.namePlaceholder")}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className={field}
-          />
+          {editing ? (
+            <input
+              required
+              placeholder={t("productForm.namePlaceholder")}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className={field}
+            />
+          ) : loadingTypes ? (
+            <p className="text-sm text-gray-400">{t("common.loading")}</p>
+          ) : types.length === 0 ? (
+            <p className="text-sm text-warn-600">{t("productForm.noTypesYet")}</p>
+          ) : (
+            <select required value={name} onChange={(e) => setName(e.target.value)} className={field}>
+              <option value="">{t("productForm.typePlaceholder")}</option>
+              {types.map((pt) => (
+                <option key={pt.id} value={pt.name}>
+                  {pt.name}
+                </option>
+              ))}
+            </select>
+          )}
           <div className="flex gap-3">
             <label className="flex-1">
               <span className="mb-1 block text-xs font-semibold text-gray-500">
@@ -117,7 +149,7 @@ export default function ProductForm({
           {error && <p className="text-sm text-red-600">{error}</p>}
           <button
             type="submit"
-            disabled={busy}
+            disabled={busy || (!editing && (loadingTypes || types.length === 0))}
             className="w-full rounded-full bg-teal-500 px-6 py-2.5 font-semibold text-white transition hover:bg-teal-600 disabled:opacity-50"
           >
             {busy ? t("common.saving") : editing ? t("common.saveChanges") : t("productForm.addTitle")}

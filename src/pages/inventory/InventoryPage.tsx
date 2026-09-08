@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pencil, Plus } from "lucide-react";
+import { ListChecks, Pencil, Plus } from "lucide-react";
 import { useAuth } from "../../lib/auth";
 import { fetchProducts } from "../../lib/inventory";
 import type { Product } from "../../lib/types";
 import ProductForm from "./ProductForm";
+import ManageProductTypesModal from "./ManageProductTypesModal";
 import EditHistoryButton from "../../components/EditHistoryButton";
 
 export default function InventoryPage() {
@@ -15,6 +16,7 @@ export default function InventoryPage() {
   const [error, setError] = useState<string | null>(null);
   const [showNew, setShowNew] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
+  const [showManageTypes, setShowManageTypes] = useState(false);
 
   async function reload() {
     setLoading(true);
@@ -50,12 +52,20 @@ export default function InventoryPage() {
             })}
           </p>
         </div>
-        <button
-          onClick={() => setShowNew(true)}
-          className="flex items-center gap-2 rounded-full bg-teal-500 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-600"
-        >
-          <Plus size={16} /> {t("inventory.addProduct")}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowManageTypes(true)}
+            className="flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50"
+          >
+            <ListChecks size={16} /> {t("inventory.manageTypes")}
+          </button>
+          <button
+            onClick={() => setShowNew(true)}
+            className="flex items-center gap-2 rounded-full bg-teal-500 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-600"
+          >
+            <Plus size={16} /> {t("inventory.addProduct")}
+          </button>
+        </div>
       </div>
 
       {error && <p className="px-7 pb-3 text-sm text-red-600">{error}</p>}
@@ -144,6 +154,10 @@ export default function InventoryPage() {
             void reload();
           }}
         />
+      )}
+
+      {showManageTypes && (
+        <ManageProductTypesModal onClose={() => setShowManageTypes(false)} onChanged={() => {}} />
       )}
     </div>
   );

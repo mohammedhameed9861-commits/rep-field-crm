@@ -8,6 +8,8 @@ export interface NewCallInput {
   telesales_id: string;
   outcome: CallOutcome;
   note: string | null;
+  /** A plain "YYYY-MM-DD" date, or null for no follow-up planned. */
+  next_followup_at: string | null;
   /** Only used when outcome is "order_placed" — creates the linked order in the same step. */
   order?: { items: string; quantity: number; amount: number; status: OrderStatus };
 }
@@ -24,6 +26,7 @@ export async function createCall(input: NewCallInput): Promise<void> {
       telesales_id: input.telesales_id,
       outcome: input.outcome,
       note: input.note,
+      next_followup_at: input.next_followup_at,
     })
     .select("*")
     .single();
@@ -47,6 +50,7 @@ export async function createCall(input: NewCallInput): Promise<void> {
 export interface CallEditInput {
   outcome: CallOutcome;
   note: string | null;
+  next_followup_at: string | null;
 }
 
 /** Manager-only correction of an existing call — audited automatically by a database trigger. */

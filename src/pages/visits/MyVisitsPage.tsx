@@ -6,6 +6,7 @@ import { useAuth } from "../../lib/auth";
 import { fetchMyVisits, visitPhotoUrl } from "../../lib/visits";
 import type { Visit } from "../../lib/types";
 import { formatDateTime } from "../../lib/format";
+import UpcomingFollowUps from "../../components/UpcomingFollowUps";
 
 export default function MyVisitsPage() {
   const { profile } = useAuth();
@@ -62,7 +63,9 @@ export default function MyVisitsPage() {
         ) : visits.length === 0 ? (
           <p className="text-sm text-gray-400">{t("visits.noVisitsYet")}</p>
         ) : (
-          <div className="flex flex-col gap-2">
+          <>
+            <UpcomingFollowUps items={visits} />
+            <div className="flex flex-col gap-2">
             {visits.map((v) => (
               <div
                 key={v.id}
@@ -107,7 +110,8 @@ export default function MyVisitsPage() {
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          </>
         )}
       </div>
     </div>

@@ -28,29 +28,49 @@ free-text note on each one.
 (rep/telesales/manager), deactivate/reactivate them, and reset a
 password — no more creating accounts by hand in the Supabase dashboard.
 Reps get their own day-to-day nav: **New Visit** (search any shop by
-name, take a camera photo — no gallery uploads, mark sold/no-sale, and
-log the order in the same step when it's a sale) and **My Visits** (their
-own visit history with the photo, outcome, and reason). Managers monitor
-all of it from **Visits** — every rep's visits, with the photo, shop,
-outcome, and note, filterable by rep, outcome, and a calendar date
-range; and above that, a per-rep performance table: bouquets MTD,
-orders MTD, active accounts assigned to them, today's visit count, and
-target achievement % against a monthly cartons target the manager sets
-per rep (click "Set target" on a rep with none yet) — separate from the
-company-wide target on the Dashboard.
+name, take a live camera photo — no gallery/file uploads on any device,
+see below — mark sold/no-sale with one of nine reasons when it's not a
+sale, log the order in the same step when it is, and optionally set a
+**Next Follow-up**) and **My Visits** (their own visit history with the
+photo, outcome, and reason, topped by an **Upcoming Follow-ups** panel —
+see below). Managers monitor all of it from **Visits** — every rep's
+visits, with the photo, shop, outcome, and note, filterable by rep,
+outcome, and a calendar date range; and above that, a per-rep
+performance table: bouquets MTD, orders MTD, active accounts assigned to
+them, today's visit count, and target achievement % against a monthly
+cartons target the manager sets per rep (click "Set target" on a rep
+with none yet) — separate from the company-wide target on the
+Dashboard.
 
 **Telesales** — the same New Call / My Calls day-to-day nav as reps get
 for visits: search any shop by name, log an outcome (order placed /
-follow-up / no answer), and an optional note for what she was told on
-the call — and when an order is placed, log it in the same step. No
-photo — a call has nothing to photograph. Managers get a **Telesales
-Activity** rollup: every call across every agent, filterable by agent,
-outcome, and a calendar date range.
+follow-up / no answer), an optional note for what she was told on
+the call, and optionally a **Next Follow-up** — and when an order is
+placed, log it in the same step. No photo — a call has nothing to
+photograph. My Calls is topped by the same **Upcoming Follow-ups** panel
+as My Visits. Managers get a **Telesales Activity** rollup: every call
+across every agent, filterable by agent, outcome, and a calendar date
+range.
+
+**Next Follow-up** — logging (or a manager editing) a visit or call can
+set a plain follow-up date via four presets: Tomorrow / In 3 days / Next
+week / No follow-up (`src/components/FollowUpPicker.tsx`). Any visit or
+call with one set shows up in that rep's or agent's own **Upcoming
+Follow-ups** panel, soonest first and flagged Overdue/Today once it's
+due (`src/components/UpcomingFollowUps.tsx`) — this *is* the rep's next
+task; there's no separate task table or notification system.
 
 **Inventory** — a manager-only screen listing every product with its
-stock on hand and low-stock threshold, plus add/edit. Deliberately
-simple, per the original ask: editing a product's stock is a plain
-manual number, not something orders adjust automatically.
+stock on hand and low-stock threshold, plus edit. Deliberately simple,
+per the original ask: editing a product's stock is a plain manual
+number, not something orders adjust automatically. **Add Product** picks
+a **type** from a manager-curated picklist (Product → Quantity) instead
+of typing a name freehand, so "Red Roses" doesn't also show up as "red
+roses" — managers curate that list from **Manage Types** next to Add
+Product (`src/pages/inventory/ManageProductTypesModal.tsx`); everyone
+can read the list, only a manager can add or remove an entry. Editing an
+*existing* product still edits its name as free text, unchanged, so
+this doesn't touch any product already on the shelf.
 
 **Dashboard** — a manager's view is built around today vs. month-to-date:
 today's date at the top (so it's always clear which day you're looking
@@ -119,9 +139,14 @@ Same discipline as the previous implementation, carried over deliberately:
   dashboard. A "History" button next to each editable record shows
   who changed what and when, diffed field by field. Deletion is still
   nowhere in the app for any of these — correction, not removal.
-- **A visit needs a photo taken in the app**, not picked from the gallery
-  (the file input uses `capture="environment"`, which opens the camera
-  directly on a phone). No GPS check this time — just the photo.
+- **A visit needs a photo taken live in the app**, never picked from a
+  gallery or file picker on any device. Earlier this used a plain
+  `<input type="file" capture="environment">`, but `capture` is only a
+  hint some mobile browsers honor — desktop browsers ignore it outright
+  and just open the normal file picker. `src/components/CameraCapture.tsx`
+  replaces that with `getUserMedia` + a `<canvas>` snapshot instead, so
+  there's no file-picker fallback anywhere, desktop included. No GPS
+  check this time — just the photo.
 - **One shared `orders` table** for both a rep's visit-sourced sale and a
   telesales call-sourced sale — a `source` column plus a check constraint
   say which, and which visit/call it came from. The account's order
@@ -172,7 +197,7 @@ codebase is inherited later, since `npm audit` will keep flagging it.
 1. Create a new project at [supabase.com](https://supabase.com) — a
    **different** project from the marketing site's.
 2. SQL Editor → New query → paste and run each file in
-   `supabase/migrations/` **in order** (`0001` → `0012`).
+   `supabase/migrations/` **in order** (`0001` → `0013`).
 3. **Turn off public sign-ups**: Authentication → Sign In / Providers →
    turn off "Allow new users to sign up". Staff accounts are created
    through the app's Reps screen (or, before the first manager exists,

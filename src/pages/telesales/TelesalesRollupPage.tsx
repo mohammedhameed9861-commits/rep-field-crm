@@ -175,6 +175,7 @@ export default function TelesalesRollupPage() {
                     fields={[
                       { key: "outcome", label: t("editHistory.fieldOutcome") },
                       { key: "note", label: t("editHistory.fieldNote") },
+                      { key: "next_followup_at", label: t("followUp.label") },
                     ]}
                   />
                 </div>

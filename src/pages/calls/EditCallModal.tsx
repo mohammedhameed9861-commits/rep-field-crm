@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 import { updateCall } from "../../lib/calls";
 import type { Call, CallOutcome } from "../../lib/types";
+import FollowUpPicker from "../../components/FollowUpPicker";
 
 const OUTCOMES: CallOutcome[] = ["order_placed", "follow_up", "no_answer"];
 
@@ -18,6 +19,7 @@ export default function EditCallModal({
   const { t } = useTranslation();
   const [outcome, setOutcome] = useState<CallOutcome>(call.outcome);
   const [note, setNote] = useState(call.note ?? "");
+  const [nextFollowupAt, setNextFollowupAt] = useState<string | null>(call.next_followup_at);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +28,7 @@ export default function EditCallModal({
     setBusy(true);
     setError(null);
     try {
-      await updateCall(call.id, { outcome, note: note || null });
+      await updateCall(call.id, { outcome, note: note || null, next_followup_at: nextFollowupAt });
       onSaved();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -70,6 +72,8 @@ export default function EditCallModal({
             rows={2}
             className={`${field} resize-none`}
           />
+
+          <FollowUpPicker value={nextFollowupAt} onChange={setNextFollowupAt} />
 
           {outcome !== call.outcome && <p className="text-xs text-warn-600">{t("editHistory.orderHint")}</p>}
           {error && <p className="text-sm text-red-600">{error}</p>}

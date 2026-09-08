@@ -11,6 +11,8 @@ export interface NewVisitInput {
   outcome: VisitOutcome;
   no_sale_reason: NoSaleReason | null;
   note: string | null;
+  /** A plain "YYYY-MM-DD" date, or null for no follow-up planned. */
+  next_followup_at: string | null;
   /** Only used when outcome is "sold" — creates the linked order in the same step. */
   order?: { items: string; quantity: number; amount: number; status: OrderStatus };
 }
@@ -41,6 +43,7 @@ export async function createVisit(input: NewVisitInput): Promise<void> {
       outcome: input.outcome,
       no_sale_reason: input.no_sale_reason,
       note: input.note,
+      next_followup_at: input.next_followup_at,
     })
     .select("*")
     .single();
@@ -65,6 +68,7 @@ export interface VisitEditInput {
   outcome: VisitOutcome;
   no_sale_reason: NoSaleReason | null;
   note: string | null;
+  next_followup_at: string | null;
 }
 
 /** Manager-only correction of an existing visit — the photo, account, and rep stay fixed;

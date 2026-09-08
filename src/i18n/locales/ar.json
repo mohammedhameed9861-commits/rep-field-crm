@@ -49,9 +49,14 @@
     "C": "C · ١-٢ كرتون أسبوعياً"
   },
   "noSaleReason": {
-    "closed": "المحل كان مغلقاً",
-    "not_interested": "غير مهتم",
-    "already_stocked": "لديه مخزون كافٍ",
+    "no_need_today": "لا حاجة اليوم",
+    "price_too_high": "السعر مرتفع",
+    "bought_competitor": "اشترى من منافس",
+    "no_stock_needed": "لا يحتاج مخزوناً",
+    "quality_concern": "مخاوف بشأن الجودة",
+    "shop_closed": "المحل مغلق",
+    "owner_unavailable": "صاحب المحل غير متواجد",
+    "payment_issue": "مشكلة في الدفع",
     "other": "أخرى"
   },
   "callOutcome": {
@@ -140,6 +145,24 @@
     "creating": "جارٍ الإنشاء…",
     "shareHint": "شارك البريد الإلكتروني وكلمة المرور المؤقتة معه مباشرة — لا يوجد تسجيل ذاتي."
   },
+  "camera": {
+    "open": "التقط صورة للمحل",
+    "takePhoto": "التقاط الصورة",
+    "retake": "إعادة التقاط",
+    "denied": "يلزم الوصول إلى الكاميرا لتسجيل الزيارة — فعّله في المتصفح وحاول مرة أخرى."
+  },
+  "followUp": {
+    "label": "المتابعة القادمة",
+    "none": "لا متابعة",
+    "tomorrow": "غداً",
+    "in3days": "خلال 3 أيام",
+    "nextWeek": "الأسبوع القادم",
+    "due": "متابعة",
+    "overdue": "متأخرة",
+    "today": "اليوم",
+    "upcomingTitle": "المتابعات القادمة",
+    "noneUpcoming": "لا يوجد شيء مجدوَل."
+  },
   "visits": {
     "logVisit": "تسجيل زيارة",
     "searchPlaceholder": "ابحث عن أي محل بالاسم…",
@@ -177,6 +200,7 @@
     "countOne": "{{count}} منتج",
     "countOther": "{{count}} منتجات",
     "addProduct": "إضافة منتج",
+    "manageTypes": "إدارة الأنواع",
     "colProduct": "المنتج",
     "colStock": "الكمية المتوفرة",
     "colThreshold": "منخفض / حرج عند",
@@ -189,10 +213,20 @@
       "critical": "حرج"
     }
   },
+  "productTypes": {
+    "title": "أنواع المنتجات",
+    "subtitle": "القائمة التي تُستخدم عند \"إضافة منتج\" — أضف أو احذف نوعاً من هنا.",
+    "namePlaceholder": "اسم النوع (مثال: ورد أحمر)",
+    "add": "إضافة",
+    "noneYet": "لا توجد أنواع منتجات بعد — أضف نوعاً أدناه.",
+    "deleteConfirm": "إزالة \"{{name}}\" من القائمة؟"
+  },
   "productForm": {
     "addTitle": "إضافة منتج",
     "editTitle": "تعديل المنتج",
     "namePlaceholder": "اسم المنتج (مثال: ورد أحمر)",
+    "typePlaceholder": "اختر نوع المنتج",
+    "noTypesYet": "لا توجد أنواع منتجات بعد — أضف نوعاً أولاً من \"إدارة الأنواع\".",
     "stockLabel": "الكمية المتوفرة",
     "thresholdLabel": "حد المخزون المنخفض",
     "criticalLabel": "حد المخزون الحرج"

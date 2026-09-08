@@ -293,6 +293,7 @@ export default function VisitsActivityPage() {
                       { key: "outcome", label: t("editHistory.fieldOutcome") },
                       { key: "no_sale_reason", label: t("editHistory.fieldNoSaleReason") },
                       { key: "note", label: t("editHistory.fieldNote") },
+                      { key: "next_followup_at", label: t("followUp.label") },
                     ]}
                   />
                 </div>
