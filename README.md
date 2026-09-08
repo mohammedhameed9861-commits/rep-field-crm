@@ -20,11 +20,20 @@ client account's order history and activity — plus simple stock tracking.
 **Accounts** — client shop records (name, area, phone, assigned rep, and a
 shop class A/B/C based on expected weekly cartons: A = 4–6, B = 2.5–3.5,
 C = 1–2), each with its full order history and a combined activity
-timeline (visits + calls + orders, chronological). Managers can add new
-accounts.
+timeline (visits + calls + orders, chronological). Managers can add,
+edit, and archive/reactivate accounts (never hard-deleted), plus leave a
+free-text note on each one.
 
-Everything else in the sidebar (Dashboard, Reps, Telesales, Inventory) is a
-placeholder — built in that order, one at a time, next.
+**Reps** — a manager-only "Reps & Staff" screen to create staff logins
+(rep/telesales/manager), deactivate/reactivate them, and reset a
+password — no more creating accounts by hand in the Supabase dashboard.
+Reps get their own day-to-day nav: **New Visit** (search any shop by
+name, take a camera photo — no gallery uploads, mark sold/no-sale, and
+log the order in the same step when it's a sale) and **My Visits** (their
+own visit history with the photo, outcome, and reason).
+
+Dashboard, Telesales, and Inventory are still placeholders — built in
+that order, one at a time, next.
 
 ## How the trust model works
 
@@ -32,9 +41,10 @@ Same discipline as the previous implementation, carried over deliberately:
 
 - **Roles are never client-assigned.** New sign-ups always get `role =
   'rep'` via the `handle_new_user` trigger, never from client-supplied
-  signup data. Promoting someone to `telesales`/`manager` isn't built yet —
-  it needs a proper admin path (an Edge Function using the service-role
-  key), coming with the "Reps" section.
+  signup data. Promoting someone to `telesales`/`manager`, deactivating a
+  staff account, or resetting a password all go through the `manage-rep`
+  Edge Function, which re-checks the caller is an active manager (using
+  their own JWT) before ever touching the service-role key.
 - **Visits, calls and orders are insert-only.** No UPDATE/DELETE policy
   exists on any of them for any role — once logged, they can't be edited
   or removed through the app. That's the account's audit trail.
@@ -48,17 +58,9 @@ Same discipline as the previous implementation, carried over deliberately:
 
 ## Known gaps (intentional, for now)
 
-- No manager-only "Manage Reps" admin screen yet — for now, create the
-  first few accounts (rep/telesales/manager) directly in the Supabase
-  dashboard (Authentication → Users → Add user), then set their role in
-  the SQL Editor:
-  ```sql
-  update public.profiles set role = 'telesales' where id = '<user's UUID>';
-  ```
-- No visit-logging or call-logging screens yet (those are the "Reps" and
-  "Telesales" sections) — so a brand-new account's order history and
-  activity timeline are empty until those exist. That's expected, not a
-  bug.
+- No call-logging screen yet (that's the "Telesales" section) — so a
+  brand-new account's activity timeline only ever shows visits and orders
+  until that exists. That's expected, not a bug.
 - No bilingual (Arabic/English) UI yet — English only for now, while the
   data model and screens are still settling. Straightforward to add once
   they are (the marketing site's i18next setup is the template).
@@ -68,15 +70,24 @@ Same discipline as the previous implementation, carried over deliberately:
 1. Create a new project at [supabase.com](https://supabase.com) — a
    **different** project from the marketing site's.
 2. SQL Editor → New query → paste and run each file in
-   `supabase/migrations/` **in order** (`0001` → `0004`).
+   `supabase/migrations/` **in order** (`0001` → `0008`).
 3. **Turn off public sign-ups**: Authentication → Sign In / Providers →
-   turn off "Allow new users to sign up". Accounts are created directly
-   in the dashboard (see "Known gaps" above), not by anyone signing up.
+   turn off "Allow new users to sign up". Staff accounts are created
+   through the app's Reps screen (or, before the first manager exists,
+   directly in the dashboard — see step 4).
 4. Create the first manager account: Authentication → Users → Add user →
    tick **Auto Confirm User**. Then in the SQL Editor:
    ```sql
    update public.profiles set role = 'manager' where id = '<that user's UUID>';
    ```
+   Every account created after this one, through the Reps screen, is
+   handled automatically — no more manual SQL.
+5. **Deploy the `manage-rep` Edge Function** (Edge Functions → Deploy new
+   function → name it `manage-rep` → paste the contents of
+   `supabase/functions/manage-rep/index.ts`). It needs no extra secrets —
+   `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`
+   are already available to every Edge Function in the project. This
+   powers the manager's Reps screen (create/deactivate/reset password).
 
 ## 2. Configure the frontend
 

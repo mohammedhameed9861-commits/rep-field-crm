@@ -5,6 +5,9 @@ import Layout from "./components/Layout";
 import Login from "./pages/Login";
 import ComingSoon from "./pages/ComingSoon";
 import AccountsPage from "./pages/accounts/AccountsPage";
+import RepsPage from "./pages/reps/RepsPage";
+import NewVisitPage from "./pages/visits/NewVisitPage";
+import MyVisitsPage from "./pages/visits/MyVisitsPage";
 
 export default function App() {
   return (
@@ -22,7 +25,9 @@ export default function App() {
             <Route index element={<ComingSoon title="Dashboard" />} />
             <Route path="accounts" element={<AccountsPage />} />
             <Route path="accounts/:id" element={<AccountsPage />} />
-            <Route path="reps" element={<ComingSoon title="Reps" />} />
+            <Route path="reps" element={<RepsPage />} />
+            <Route path="visits/new" element={<NewVisitPage />} />
+            <Route path="visits" element={<MyVisitsPage />} />
             <Route path="telesales" element={<ComingSoon title="Telesales" />} />
             <Route path="inventory" element={<ComingSoon title="Inventory" />} />
           </Route>

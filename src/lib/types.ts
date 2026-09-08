@@ -1,6 +1,7 @@
 export type AppRole = "rep" | "telesales" | "manager";
 export type ShopClass = "A" | "B" | "C";
 export type VisitOutcome = "sold" | "no_sale";
+export type NoSaleReason = "closed" | "not_interested" | "already_stocked" | "other";
 export type CallOutcome = "order_placed" | "follow_up" | "no_answer";
 export type OrderSource = "visit" | "call";
 export type OrderStatus = "pending" | "delivered" | "cancelled";
@@ -33,9 +34,11 @@ export interface Visit {
   rep_id: string;
   photo_path: string;
   outcome: VisitOutcome;
+  no_sale_reason: NoSaleReason | null;
   note: string | null;
   created_at: string;
   rep?: Pick<Profile, "id" | "full_name"> | null;
+  account?: Pick<Account, "id" | "name" | "area"> | null;
 }
 
 export interface Call {
@@ -81,4 +84,11 @@ export const SHOP_CLASS_LABEL: Record<ShopClass, string> = {
   A: "A · 4–6 cartons/week",
   B: "B · 2.5–3.5 cartons/week",
   C: "C · 1–2 cartons/week",
+};
+
+export const NO_SALE_REASON_LABEL: Record<NoSaleReason, string> = {
+  closed: "Shop was closed",
+  not_interested: "Not interested",
+  already_stocked: "Already stocked up",
+  other: "Other",
 };

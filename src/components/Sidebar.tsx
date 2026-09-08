@@ -1,8 +1,8 @@
 import { NavLink } from "react-router-dom";
-import { LayoutGrid, Users, TrendingUp, Phone, Boxes } from "lucide-react";
+import { Camera, History, LayoutGrid, Users, TrendingUp, Phone, Boxes } from "lucide-react";
 import { useAuth } from "../lib/auth";
 
-const navItems = [
+const managerNav = [
   { to: "/", label: "Dashboard", icon: LayoutGrid, end: true },
   { to: "/accounts", label: "Accounts", icon: Users },
   { to: "/reps", label: "Reps", icon: TrendingUp },
@@ -10,8 +10,17 @@ const navItems = [
   { to: "/inventory", label: "Inventory", icon: Boxes },
 ];
 
+// Reps live in the field day-to-day — their nav is just logging visits and
+// checking their own history, not the manager-facing screens above.
+const repNav = [
+  { to: "/visits/new", label: "New Visit", icon: Camera, end: true },
+  { to: "/visits", label: "My Visits", icon: History },
+];
+
 export default function Sidebar() {
   const { profile, signOut } = useAuth();
+
+  const navItems = profile?.role === "rep" ? repNav : managerNav;
 
   const initials = (profile?.full_name ?? "?")
     .split(" ")
