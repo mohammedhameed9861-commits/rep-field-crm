@@ -11,7 +11,8 @@ import UpcomingFollowUps from "../../components/UpcomingFollowUps";
 
 const OUTCOME_BADGE: Record<Call["outcome"], string> = {
   order_placed: "bg-teal-50 text-teal-700",
-  follow_up: "bg-warn-100 text-warn-600",
+  interested_callback: "bg-warn-100 text-warn-600",
+  not_interested: "bg-red-100 text-red-600",
   no_answer: "bg-gray-100 text-gray-500",
 };
 
@@ -83,8 +84,12 @@ export default function MyCallsPage() {
                     </span>
                   </div>
                   <div className="mt-0.5 text-xs text-gray-400">
+                    {c.call_type && `${t(`callType.${c.call_type}`)} · `}
                     {c.account?.area ?? ""} &middot; <span dir="ltr">{formatDateTime(c.created_at)}</span>
                   </div>
+                  {c.call_reason && (
+                    <div className="mt-1 text-xs text-gray-500">{t(`callReason.${c.call_reason}`)}</div>
+                  )}
                   {c.note && <div className="mt-1 text-xs text-gray-500">{c.note}</div>}
                 </div>
               </div>

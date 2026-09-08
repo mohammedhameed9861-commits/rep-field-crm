@@ -60,9 +60,29 @@
     "other": "Other"
   },
   "callOutcome": {
-    "order_placed": "Order placed",
-    "follow_up": "Follow up",
-    "no_answer": "No answer"
+    "interested_callback": "Interested / Call Back",
+    "not_interested": "Not Interested",
+    "order_placed": "Order Placed",
+    "no_answer": "No Answer"
+  },
+  "callType": {
+    "label": "Call Type",
+    "new_customer": "New Customer",
+    "reactivation": "Reactivation",
+    "follow_up": "Follow-up"
+  },
+  "callReason": {
+    "wants_price": "Wants price",
+    "wants_availability": "Wants availability",
+    "wants_specific_flower": "Wants specific flower",
+    "waiting_next_purchase": "Waiting for next purchase",
+    "needs_owner_approval": "Needs owner approval",
+    "price_too_high": "Price",
+    "bought_competitor": "Already bought from competitor",
+    "no_current_demand": "No current demand",
+    "quality_concern": "Quality",
+    "doesnt_want_change_supplier": "Doesn't want to change supplier",
+    "other": "Other"
   },
   "orderStatus": {
     "pending": "Pending",
@@ -157,6 +177,7 @@
     "tomorrow": "Tomorrow",
     "in3days": "In 3 days",
     "nextWeek": "Next week",
+    "custom": "Custom",
     "due": "Follow up",
     "overdue": "Overdue",
     "today": "Today",
@@ -186,13 +207,17 @@
     "logCall": "Log a Call",
     "searchPlaceholder": "Search any shop by name…",
     "noShopsMatch": "No shops match.",
+    "callTypePlaceholder": "Call type",
+    "interestReasonPlaceholder": "Reason / Interest (optional)",
+    "notInterestedReasonPlaceholder": "Reason (required)",
     "notePlaceholder": "Note (optional)",
     "saveCall": "Save Call",
     "myCallsTitle": "My Calls",
     "loggedOne": "{{count}} logged",
     "loggedOther": "{{count}} logged",
     "newCall": "New Call",
-    "noCallsYet": "No calls logged yet."
+    "noCallsYet": "No calls logged yet.",
+    "allCallTypes": "All call types"
   },
   "inventory": {
     "title": "Inventory",
@@ -244,6 +269,8 @@
     "edited": "Edited",
     "fieldOutcome": "Outcome",
     "fieldNoSaleReason": "No-Sale Reason",
+    "fieldCallType": "Call Type",
+    "fieldCallReason": "Reason",
     "fieldNote": "Note",
     "fieldItems": "Items",
     "fieldQuantity": "Bouquets",

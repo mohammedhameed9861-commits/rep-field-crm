@@ -43,21 +43,33 @@ with none yet) — separate from the company-wide target on the
 Dashboard.
 
 **Telesales** — the same New Call / My Calls day-to-day nav as reps get
-for visits: search any shop by name, log an outcome (order placed /
-follow-up / no answer), an optional note for what she was told on
-the call, and optionally a **Next Follow-up** — and when an order is
-placed, log it in the same step. No photo — a call has nothing to
-photograph. My Calls is topped by the same **Upcoming Follow-ups** panel
-as My Visits. Managers get a **Telesales Activity** rollup: every call
-across every agent, filterable by agent, outcome, and a calendar date
-range.
+for visits: search any shop by name, pick a **Call Type** (New Customer /
+Reactivation / Follow-up), then log an **Outcome** — each revealing its
+own follow-up fields:
+- **Interested / Call Back** — a Next Follow-up date (Tomorrow / In 3
+  days / Next week / Custom / No follow-up) plus an optional
+  Reason/Interest (Wants price, Wants availability, Wants specific
+  flower, Waiting for next purchase, Needs owner approval, Other).
+- **Not Interested** — a required Reason (Price, Already bought from
+  competitor, No current demand, Quality, Doesn't want to change
+  supplier, Other).
+- **Order Placed** — items/bouquets/amount, the exact same fields a rep
+  fills in for a sold visit.
+- **No Answer** — nothing further; just logged.
 
-**Next Follow-up** — logging (or a manager editing) a visit or call can
-set a plain follow-up date via four presets: Tomorrow / In 3 days / Next
-week / No follow-up (`src/components/FollowUpPicker.tsx`). Any visit or
-call with one set shows up in that rep's or agent's own **Upcoming
-Follow-ups** panel, soonest first and flagged Overdue/Today once it's
-due (`src/components/UpcomingFollowUps.tsx`) — this *is* the rep's next
+An optional note applies to any of them. My Calls is topped by the same
+**Upcoming Follow-ups** panel as My Visits. Managers get a **Telesales
+Activity** rollup: every call across every agent, filterable by agent,
+call type, outcome, and a calendar date range.
+
+**Next Follow-up** — logging (or a manager editing) a visit can set a
+plain follow-up date via presets: Tomorrow / In 3 days / Next week / No
+follow-up (`src/components/FollowUpPicker.tsx`); on a call it's scoped
+to the Interested/Call Back outcome and adds a fourth preset, Custom (a
+plain date picker). Any visit or call with one set shows up in that
+rep's or agent's own **Upcoming Follow-ups** panel, soonest first and
+flagged Overdue/Today once it's due
+(`src/components/UpcomingFollowUps.tsx`) — this *is* the rep's next
 task; there's no separate task table or notification system.
 
 **Inventory** — a manager-only screen listing every product with its
@@ -197,7 +209,7 @@ codebase is inherited later, since `npm audit` will keep flagging it.
 1. Create a new project at [supabase.com](https://supabase.com) — a
    **different** project from the marketing site's.
 2. SQL Editor → New query → paste and run each file in
-   `supabase/migrations/` **in order** (`0001` → `0013`).
+   `supabase/migrations/` **in order** (`0001` → `0014`).
 3. **Turn off public sign-ups**: Authentication → Sign In / Providers →
    turn off "Allow new users to sign up". Staff accounts are created
    through the app's Reps screen (or, before the first manager exists,

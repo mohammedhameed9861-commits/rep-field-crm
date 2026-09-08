@@ -11,7 +11,24 @@ export type NoSaleReason =
   | "owner_unavailable"
   | "payment_issue"
   | "other";
-export type CallOutcome = "order_placed" | "follow_up" | "no_answer";
+export type CallOutcome = "interested_callback" | "not_interested" | "order_placed" | "no_answer";
+/** What kind of call this is, independent of how it went. */
+export type CallType = "new_customer" | "reactivation" | "follow_up";
+/** Covers both "why interested" and "why not" — only one applies per call, so one
+ * column does for both (see migration 0014's check constraint for which outcome
+ * requires, allows, or forbids one). */
+export type CallReason =
+  | "wants_price"
+  | "wants_availability"
+  | "wants_specific_flower"
+  | "waiting_next_purchase"
+  | "needs_owner_approval"
+  | "price_too_high"
+  | "bought_competitor"
+  | "no_current_demand"
+  | "quality_concern"
+  | "doesnt_want_change_supplier"
+  | "other";
 export type OrderSource = "visit" | "call";
 export type OrderStatus = "pending" | "delivered" | "cancelled";
 
@@ -61,6 +78,9 @@ export interface Call {
   account_id: string;
   telesales_id: string;
   outcome: CallOutcome;
+  /** Null only for calls logged before Call Type existed — always set on a new one. */
+  call_type: CallType | null;
+  call_reason: CallReason | null;
   note: string | null;
   next_followup_at: string | null;
   created_at: string;

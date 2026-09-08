@@ -1,14 +1,17 @@
 import { supabase } from "./supabase";
-import type { Call, CallOutcome, OrderStatus } from "./types";
+import type { Call, CallOutcome, CallReason, CallType, OrderStatus } from "./types";
 
 export { searchAccounts } from "./accounts";
 
 export interface NewCallInput {
   account_id: string;
   telesales_id: string;
+  call_type: CallType;
   outcome: CallOutcome;
+  call_reason: CallReason | null;
   note: string | null;
-  /** A plain "YYYY-MM-DD" date, or null for no follow-up planned. */
+  /** A plain "YYYY-MM-DD" date, or null for no follow-up planned — only meaningful when
+   * outcome is "interested_callback"; the form never sets it for any other outcome. */
   next_followup_at: string | null;
   /** Only used when outcome is "order_placed" — creates the linked order in the same step. */
   order?: { items: string; quantity: number; amount: number; status: OrderStatus };
@@ -24,7 +27,9 @@ export async function createCall(input: NewCallInput): Promise<void> {
     .insert({
       account_id: input.account_id,
       telesales_id: input.telesales_id,
+      call_type: input.call_type,
       outcome: input.outcome,
+      call_reason: input.call_reason,
       note: input.note,
       next_followup_at: input.next_followup_at,
     })
@@ -48,7 +53,9 @@ export async function createCall(input: NewCallInput): Promise<void> {
 }
 
 export interface CallEditInput {
+  call_type: CallType | null;
   outcome: CallOutcome;
+  call_reason: CallReason | null;
   note: string | null;
   next_followup_at: string | null;
 }
@@ -74,6 +81,7 @@ export async function fetchMyCalls(telesalesId: string): Promise<Call[]> {
 export interface CallFilters {
   telesalesId?: string;
   outcome?: CallOutcome;
+  callType?: CallType;
   /** Inclusive, as a plain "YYYY-MM-DD" date. */
   dateFrom?: string;
   /** Inclusive, as a plain "YYYY-MM-DD" date. */
@@ -92,6 +100,7 @@ export async function fetchAllCalls(filters: CallFilters = {}): Promise<Call[]> 
     .limit(500);
   if (filters.telesalesId) q = q.eq("telesales_id", filters.telesalesId);
   if (filters.outcome) q = q.eq("outcome", filters.outcome);
+  if (filters.callType) q = q.eq("call_type", filters.callType);
   if (filters.dateFrom) q = q.gte("created_at", `${filters.dateFrom}T00:00:00`);
   if (filters.dateTo) q = q.lte("created_at", `${filters.dateTo}T23:59:59`);
   const { data, error } = await q;

@@ -6,7 +6,7 @@ import { Pencil } from "lucide-react";
 import { useAuth } from "../../lib/auth";
 import { fetchAllCalls } from "../../lib/calls";
 import { fetchStaff } from "../../lib/reps";
-import type { Call, CallOutcome, Profile } from "../../lib/types";
+import type { Call, CallOutcome, CallType, Profile } from "../../lib/types";
 import { formatDateTime } from "../../lib/format";
 import DateRangePicker from "../../components/DateRangePicker";
 import EditHistoryButton from "../../components/EditHistoryButton";
@@ -14,9 +14,13 @@ import EditCallModal from "../calls/EditCallModal";
 
 const OUTCOME_BADGE: Record<CallOutcome, string> = {
   order_placed: "bg-teal-50 text-teal-700",
-  follow_up: "bg-warn-100 text-warn-600",
+  interested_callback: "bg-warn-100 text-warn-600",
+  not_interested: "bg-red-100 text-red-600",
   no_answer: "bg-gray-100 text-gray-500",
 };
+
+const OUTCOMES: CallOutcome[] = ["interested_callback", "not_interested", "order_placed", "no_answer"];
+const CALL_TYPES: CallType[] = ["new_customer", "reactivation", "follow_up"];
 
 export default function TelesalesRollupPage() {
   const { profile } = useAuth();
@@ -29,6 +33,7 @@ export default function TelesalesRollupPage() {
 
   const [agentId, setAgentId] = useState("");
   const [outcome, setOutcome] = useState<CallOutcome | "">("");
+  const [callType, setCallType] = useState<CallType | "">("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
@@ -41,6 +46,7 @@ export default function TelesalesRollupPage() {
         await fetchAllCalls({
           telesalesId: agentId || undefined,
           outcome: outcome || undefined,
+          callType: callType || undefined,
           dateFrom: dateFrom || undefined,
           dateTo: dateTo || undefined,
         }),
@@ -63,7 +69,7 @@ export default function TelesalesRollupPage() {
     if (profile?.role !== "manager") return;
     void reloadCalls();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile, agentId, outcome, dateFrom, dateTo]);
+  }, [profile, agentId, outcome, callType, dateFrom, dateTo]);
 
   if (profile?.role !== "manager") {
     return (
@@ -102,9 +108,19 @@ export default function TelesalesRollupPage() {
           className={field}
         >
           <option value="">{t("telesalesRollup.allOutcomes")}</option>
-          <option value="order_placed">{t("callOutcome.order_placed")}</option>
-          <option value="follow_up">{t("callOutcome.follow_up")}</option>
-          <option value="no_answer">{t("callOutcome.no_answer")}</option>
+          {OUTCOMES.map((o) => (
+            <option key={o} value={o}>
+              {t(`callOutcome.${o}`)}
+            </option>
+          ))}
+        </select>
+        <select value={callType} onChange={(e) => setCallType(e.target.value as CallType | "")} className={field}>
+          <option value="">{t("calls.allCallTypes")}</option>
+          {CALL_TYPES.map((ct) => (
+            <option key={ct} value={ct}>
+              {t(`callType.${ct}`)}
+            </option>
+          ))}
         </select>
         <DateRangePicker
           from={dateFrom}
@@ -120,10 +136,11 @@ export default function TelesalesRollupPage() {
 
       <div className="min-h-0 flex-1 overflow-y-auto px-7 pb-6">
         <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-          <div className="grid grid-cols-[130px_120px_1fr_110px_1fr_140px] gap-2 border-b border-gray-100 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
+          <div className="grid grid-cols-[120px_110px_1fr_100px_130px_1fr_140px] gap-2 border-b border-gray-100 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
             <span>{t("telesalesRollup.colDate")}</span>
             <span>{t("telesalesRollup.colAgent")}</span>
             <span>{t("telesalesRollup.colShop")}</span>
+            <span>{t("callType.label")}</span>
             <span>{t("telesalesRollup.colOutcome")}</span>
             <span>{t("telesalesRollup.colNote")}</span>
             <span className="text-end">{t("reps.colActions")}</span>
@@ -136,7 +153,7 @@ export default function TelesalesRollupPage() {
             calls.map((c) => (
               <div
                 key={c.id}
-                className="grid grid-cols-[130px_120px_1fr_110px_1fr_140px] items-center gap-2 border-t border-gray-100 px-4 py-2.5"
+                className="grid grid-cols-[120px_110px_1fr_100px_130px_1fr_140px] items-center gap-2 border-t border-gray-100 px-4 py-2.5"
               >
                 <span className="text-xs text-gray-600" dir="ltr">
                   {formatDateTime(c.created_at)}
@@ -150,6 +167,9 @@ export default function TelesalesRollupPage() {
                 >
                   {c.account?.name ?? "—"}
                 </Link>
+                <span className="truncate text-xs text-gray-500">
+                  {c.call_type ? t(`callType.${c.call_type}`) : "—"}
+                </span>
                 <div className="flex items-center gap-1.5">
                   <span
                     className={`w-fit rounded-full px-2 py-0.5 text-[10.5px] font-bold ${OUTCOME_BADGE[c.outcome]}`}
@@ -162,7 +182,10 @@ export default function TelesalesRollupPage() {
                     </span>
                   )}
                 </div>
-                <span className="truncate text-xs text-gray-500">{c.note ?? "—"}</span>
+                <span className="truncate text-xs text-gray-500">
+                  {c.call_reason && `${t(`callReason.${c.call_reason}`)} — `}
+                  {c.note ?? "—"}
+                </span>
                 <div className="flex flex-col items-end gap-1">
                   <button
                     onClick={() => setEditingCall(c)}
@@ -174,7 +197,9 @@ export default function TelesalesRollupPage() {
                     tableName="calls"
                     recordId={c.id}
                     fields={[
+                      { key: "call_type", label: t("editHistory.fieldCallType") },
                       { key: "outcome", label: t("editHistory.fieldOutcome") },
+                      { key: "call_reason", label: t("editHistory.fieldCallReason") },
                       { key: "note", label: t("editHistory.fieldNote") },
                       { key: "next_followup_at", label: t("followUp.label") },
                     ]}

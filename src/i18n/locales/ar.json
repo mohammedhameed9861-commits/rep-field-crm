@@ -60,9 +60,29 @@
     "other": "أخرى"
   },
   "callOutcome": {
+    "interested_callback": "مهتم / اتصال لاحقاً",
+    "not_interested": "غير مهتم",
     "order_placed": "تم الطلب",
-    "follow_up": "متابعة لاحقاً",
     "no_answer": "لا يوجد رد"
+  },
+  "callType": {
+    "label": "نوع الاتصال",
+    "new_customer": "عميل جديد",
+    "reactivation": "إعادة تفعيل",
+    "follow_up": "متابعة"
+  },
+  "callReason": {
+    "wants_price": "يريد السعر",
+    "wants_availability": "يريد معرفة التوفر",
+    "wants_specific_flower": "يريد نوع زهور معين",
+    "waiting_next_purchase": "بانتظار الشراء القادم",
+    "needs_owner_approval": "يحتاج موافقة صاحب المحل",
+    "price_too_high": "السعر",
+    "bought_competitor": "اشترى من منافس",
+    "no_current_demand": "لا يوجد طلب حالياً",
+    "quality_concern": "الجودة",
+    "doesnt_want_change_supplier": "لا يريد تغيير المورّد",
+    "other": "أخرى"
   },
   "orderStatus": {
     "pending": "قيد الانتظار",
@@ -157,6 +177,7 @@
     "tomorrow": "غداً",
     "in3days": "خلال 3 أيام",
     "nextWeek": "الأسبوع القادم",
+    "custom": "مخصص",
     "due": "متابعة",
     "overdue": "متأخرة",
     "today": "اليوم",
@@ -186,13 +207,17 @@
     "logCall": "تسجيل مكالمة",
     "searchPlaceholder": "ابحث عن أي محل بالاسم…",
     "noShopsMatch": "لا توجد محلات مطابقة.",
+    "callTypePlaceholder": "نوع الاتصال",
+    "interestReasonPlaceholder": "السبب / الاهتمام (اختياري)",
+    "notInterestedReasonPlaceholder": "السبب (مطلوب)",
     "notePlaceholder": "ملاحظة (اختياري)",
     "saveCall": "حفظ المكالمة",
     "myCallsTitle": "مكالماتي",
     "loggedOne": "{{count}} مسجلة",
     "loggedOther": "{{count}} مسجلة",
     "newCall": "مكالمة جديدة",
-    "noCallsYet": "لا توجد مكالمات مسجلة بعد."
+    "noCallsYet": "لا توجد مكالمات مسجلة بعد.",
+    "allCallTypes": "جميع أنواع الاتصال"
   },
   "inventory": {
     "title": "المخزون",
@@ -244,6 +269,8 @@
     "edited": "معدَّل",
     "fieldOutcome": "النتيجة",
     "fieldNoSaleReason": "سبب عدم البيع",
+    "fieldCallType": "نوع الاتصال",
+    "fieldCallReason": "السبب",
     "fieldNote": "ملاحظة",
     "fieldItems": "الأصناف",
     "fieldQuantity": "الباقات",
