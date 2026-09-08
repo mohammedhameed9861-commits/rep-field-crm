@@ -42,7 +42,15 @@ stock on hand and low-stock threshold, plus add/edit. Deliberately
 simple, per the original ask: editing a product's stock is a plain
 manual number, not something orders adjust automatically.
 
-Dashboard is still a placeholder — the last section left to build.
+**Dashboard** — a manager sees top-level stat tiles (active accounts,
+total orders, total bouquets), a sitewide recent-activity feed (every
+visit/call/order across the whole team), low-stock alerts, and each
+rep/telesales agent's activity count for the last 7 days. A telesales
+agent gets their own personal version instead (their own stats + recent
+calls). Reps don't get a dashboard — landing on `/` sends them straight
+to My Visits, matching their New Visit/My Visits-only nav.
+
+Every section from the original ask is now built.
 
 ## How the trust model works
 

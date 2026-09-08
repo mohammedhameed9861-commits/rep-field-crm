@@ -65,6 +65,7 @@ export interface OrderRow {
   status: OrderStatus;
   created_at: string;
   created_by_profile?: Pick<Profile, "id" | "full_name"> | null;
+  account?: Pick<Account, "id" | "name" | "area"> | null;
 }
 
 export interface Product {

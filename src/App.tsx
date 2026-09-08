@@ -11,6 +11,7 @@ import MyVisitsPage from "./pages/visits/MyVisitsPage";
 import NewCallPage from "./pages/calls/NewCallPage";
 import MyCallsPage from "./pages/calls/MyCallsPage";
 import InventoryPage from "./pages/inventory/InventoryPage";
+import DashboardPage from "./pages/dashboard/DashboardPage";
 
 export default function App() {
   return (
@@ -25,7 +26,7 @@ export default function App() {
               </RequireAuth>
             }
           >
-            <Route index element={<ComingSoon title="Dashboard" />} />
+            <Route index element={<DashboardPage />} />
             <Route path="accounts" element={<AccountsPage />} />
             <Route path="accounts/:id" element={<AccountsPage />} />
             <Route path="reps" element={<RepsPage />} />
