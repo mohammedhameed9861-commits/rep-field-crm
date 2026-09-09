@@ -13,6 +13,18 @@ export default function Layout() {
   const isRtl = i18n.language === "ar";
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const [online, setOnline] = useState(typeof navigator === "undefined" ? true : navigator.onLine);
+
+  useEffect(() => {
+    const up = () => setOnline(true);
+    const down = () => setOnline(false);
+    window.addEventListener("online", up);
+    window.addEventListener("offline", down);
+    return () => {
+      window.removeEventListener("online", up);
+      window.removeEventListener("offline", down);
+    };
+  }, []);
 
   // A nav link click already closes the drawer (see Sidebar's onNavigate), but this
   // covers any other way the route could change (e.g. clicking a card in the page itself).
@@ -46,8 +58,15 @@ export default function Layout() {
         <Sidebar onNavigate={() => setMobileOpen(false)} />
       </div>
 
-      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
-        <Outlet />
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        {!online && (
+          <div className="shrink-0 bg-warn-600 px-4 py-2 text-center text-xs font-semibold text-white">
+            {t("errors.offlineBanner")}
+          </div>
+        )}
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <Outlet />
+        </div>
       </div>
     </div>
   );

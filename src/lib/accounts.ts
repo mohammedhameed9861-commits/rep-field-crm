@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import { replaceOrderItems, summarizeLines, type OrderLineDraft } from "./orderLines";
+import { summarizeLines, type OrderLineDraft } from "./orderLines";
 import type { Account, ActivityItem, Call, OrderRow, OrderStatus, ShopClass, Visit } from "./types";
 
 export async function fetchAccounts(): Promise<Account[]> {
@@ -72,10 +72,16 @@ export interface OrderEditInput {
  * Line items are replaced wholesale rather than diffed field by field. */
 export async function updateOrder(id: string, input: OrderEditInput): Promise<void> {
   if (!supabase) throw new Error("Supabase is not configured");
-  const { items, quantity, rows } = summarizeLines(input.lines);
-  const { error } = await supabase.from("orders").update({ items, quantity, status: input.status }).eq("id", id);
+  const { rows } = summarizeLines(input.lines);
+  if (rows.length === 0) throw new Error("An order needs at least one product line");
+  // One transaction: summary, total, status and every line row (replace_order_lines,
+  // migration 0017) — never an order whose lines were deleted but not re-inserted.
+  const { error } = await supabase.rpc("replace_order_lines", {
+    p_order_id: id,
+    p_lines: rows,
+    p_status: input.status,
+  });
   if (error) throw error;
-  await replaceOrderItems(id, rows);
 }
 
 /** Orders, visits and calls for one account, merged into one chronological feed. */

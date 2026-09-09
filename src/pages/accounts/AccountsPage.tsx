@@ -1,4 +1,4 @@
-import { errorMessage } from "../../lib/errors";
+import { friendlyError } from "../../lib/errors";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
@@ -42,7 +42,7 @@ export default function AccountsPage() {
       setOrders(orders);
       setActivity(activity);
     } catch (err) {
-      setError(errorMessage(err));
+      setError(friendlyError(err));
     } finally {
       setDetailLoading(false);
     }
@@ -53,7 +53,7 @@ export default function AccountsPage() {
     try {
       setAccounts(await fetchAccounts());
     } catch (err) {
-      setError(errorMessage(err));
+      setError(friendlyError(err));
     } finally {
       setLoading(false);
     }
@@ -66,7 +66,7 @@ export default function AccountsPage() {
       await setAccountActive(account.id, !account.active);
       await reload();
     } catch (err) {
-      setError(errorMessage(err));
+      setError(friendlyError(err));
     }
   }
 

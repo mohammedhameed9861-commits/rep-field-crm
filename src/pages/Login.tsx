@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/auth";
+import { friendlyError } from "../lib/errors";
 
 export default function Login() {
   const { session } = useAuth();
@@ -20,7 +21,7 @@ export default function Login() {
     setBusy(true);
     setError(null);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setError(error.message);
+    if (error) setError(friendlyError(error, "sign in"));
     setBusy(false);
   }
 

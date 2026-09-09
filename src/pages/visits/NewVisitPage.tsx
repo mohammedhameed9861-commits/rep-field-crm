@@ -1,4 +1,4 @@
-import { errorMessage } from "../../lib/errors";
+import { friendlyError } from "../../lib/errors";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -37,6 +37,9 @@ export default function NewVisitPage() {
   const [account, setAccount] = useState<Account | null>(null);
 
   const [photo, setPhoto] = useState<File | null>(null);
+  // One id per form: a retry after a failed/dropped save reuses it, so the database
+  // can tell "same visit again" from "a new visit" (see createVisit).
+  const [clientId] = useState(() => crypto.randomUUID());
   const [outcome, setOutcome] = useState<VisitOutcome>("sold");
   const [noSaleReason, setNoSaleReason] = useState<NoSaleReason | "">("");
   const [note, setNote] = useState("");
@@ -52,7 +55,7 @@ export default function NewVisitPage() {
     let alive = true;
     searchAccounts(search)
       .then((data) => alive && setResults(data))
-      .catch((err) => setError(errorMessage(err)));
+      .catch((err) => setError(friendlyError(err)));
     return () => {
       alive = false;
     };
@@ -62,7 +65,7 @@ export default function NewVisitPage() {
     let alive = true;
     fetchProductTypes()
       .then((data) => alive && setProductTypes(data))
-      .catch((err) => setError(errorMessage(err)));
+      .catch((err) => setError(friendlyError(err)));
     return () => {
       alive = false;
     };
@@ -78,6 +81,7 @@ export default function NewVisitPage() {
     setError(null);
     try {
       await createVisit({
+        client_id: clientId,
         account_id: account.id,
         rep_id: profile.id,
         photo,
@@ -89,7 +93,7 @@ export default function NewVisitPage() {
       });
       navigate("/visits");
     } catch (err) {
-      setError(errorMessage(err));
+      setError(friendlyError(err));
     } finally {
       setBusy(false);
     }

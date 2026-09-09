@@ -1,11 +1,14 @@
 import imageCompression from "browser-image-compression";
 import { supabase, VISIT_PHOTOS_BUCKET } from "./supabase";
-import { insertOrderItems, summarizeLines, type OrderLineDraft } from "./orderLines";
+import { summarizeLines, type OrderLineDraft } from "./orderLines";
 import type { NoSaleReason, OrderStatus, Visit, VisitOutcome } from "./types";
 
 export { searchAccounts } from "./accounts";
 
 export interface NewVisitInput {
+  /** Generated once by the form and reused on every retry — the database uses it to
+   * make sure a double-tap or a dropped connection can never log the visit twice. */
+  client_id: string;
   account_id: string;
   rep_id: string;
   photo: File;
@@ -19,10 +22,18 @@ export interface NewVisitInput {
   order?: { lines: OrderLineDraft[]; status: OrderStatus };
 }
 
-/** Compress the photo, upload it, then insert the visit (and its order, if sold) — a rep can
- * only ever create these, never edit; only a manager can correct one afterward (see updateVisit). */
-export async function createVisit(input: NewVisitInput): Promise<void> {
+/** Compress the photo, upload it, then log the visit — and, if sold, its order and every
+ * line item — in ONE database transaction (the log_visit function, migration 0017). It
+ * all lands or none of it does, and the same client_id on a retry returns the visit
+ * already logged instead of a duplicate. A rep can only ever create these, never edit;
+ * only a manager can correct one afterward (see updateVisit). */
+export async function createVisit(input: NewVisitInput): Promise<string> {
   if (!supabase) throw new Error("Supabase is not configured");
+
+  const lines = input.order ? summarizeLines(input.order.lines).rows : [];
+  if (input.outcome === "sold" && lines.length === 0) {
+    throw new Error("A sold visit needs at least one product line");
+  }
 
   // A proof-of-visit photo, not a print — ~300KB at 1280px is plenty, and at the
   // team's volume (dozens of visits a day) storage fills ~3x slower than at 0.8MB.
@@ -32,45 +43,26 @@ export async function createVisit(input: NewVisitInput): Promise<void> {
     useWebWorker: true,
   });
 
-  const path = `${input.account_id}/${Date.now()}-${input.photo.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+  // The photo path is derived from client_id too, so a retry re-uploads to the same
+  // key (upsert) instead of leaving a second copy behind.
+  const path = `${input.account_id}/${input.client_id}.jpg`;
   const { error: uploadError } = await supabase.storage
     .from(VISIT_PHOTOS_BUCKET)
-    .upload(path, compressed, { contentType: compressed.type });
+    .upload(path, compressed, { contentType: compressed.type, upsert: true });
   if (uploadError) throw uploadError;
 
-  const { data: visit, error: visitError } = await supabase
-    .from("visits")
-    .insert({
-      account_id: input.account_id,
-      rep_id: input.rep_id,
-      photo_path: path,
-      outcome: input.outcome,
-      no_sale_reason: input.no_sale_reason,
-      note: input.note,
-      next_followup_at: input.next_followup_at,
-    })
-    .select("*")
-    .single();
-  if (visitError) throw visitError;
-
-  if (input.outcome === "sold" && input.order) {
-    const { items, quantity, rows } = summarizeLines(input.order.lines);
-    const { data: order, error: orderError } = await supabase
-      .from("orders")
-      .insert({
-        account_id: input.account_id,
-        created_by: input.rep_id,
-        source: "visit",
-        visit_id: visit.id,
-        items,
-        quantity,
-        status: input.order.status,
-      })
-      .select("id")
-      .single();
-    if (orderError) throw orderError;
-    await insertOrderItems(order.id, rows);
-  }
+  const { data, error } = await supabase.rpc("log_visit", {
+    p_client_id: input.client_id,
+    p_account_id: input.account_id,
+    p_photo_path: path,
+    p_outcome: input.outcome,
+    p_no_sale_reason: input.no_sale_reason,
+    p_note: input.note,
+    p_next_followup_at: input.next_followup_at,
+    p_lines: lines,
+  });
+  if (error) throw error;
+  return data as string;
 }
 
 export interface VisitEditInput {

@@ -281,7 +281,7 @@ codebase is inherited later, since `npm audit` will keep flagging it.
 1. Create a new project at [supabase.com](https://supabase.com) — a
    **different** project from the marketing site's.
 2. SQL Editor → New query → paste and run each file in
-   `supabase/migrations/` **in order** (`0001` → `0016`). Run
+   `supabase/migrations/` **in order** (`0001` → `0017`). Run
    `npm run check:migrations` first if you've edited any of them.
 3. **Turn off public sign-ups**: Authentication → Sign In / Providers →
    turn off "Allow new users to sign up". Staff accounts are created
@@ -338,6 +338,29 @@ merges clean with no conflicts and makes `main` the app you use. Vercel
 builds whichever branch is set as Production Branch (Project → Settings
 → Git) — once `main` is up to date, point it there so future merges
 deploy automatically.
+
+### Backups, recovery, testing
+
+`docs/BACKUP-AND-RECOVERY.md` is the page to read when something has gone
+wrong (or before something might): the nightly off-site database dump with
+its built-in restore test (`.github/workflows/backup.yml` — needs one
+secret set up, see there), the honest RPO/RTO, the manual JSON backup on
+Pull Data, the photo backup script, and the exact `pg_restore` commands.
+`docs/TEST-CHECKLIST.md` is what to tick on a phone before go-live and
+after any migration.
+
+### Data protection, in one paragraph
+
+A visit or call — with its order and every line — is one database
+transaction (`log_visit`/`log_call`, migration `0017`) carrying an id the
+form generated once, so a dropped connection or a double-tap can't half-save
+or double-save it. The database refuses negative stock, zero-quantity lines
+and blank names regardless of client. Stock is never overwritten silently:
+every change lands in `inventory_movements` with type/delta/who/when, and
+every edit of anything lands in `audit_log`. Nothing business-critical can
+be hard-deleted from the app — accounts archive, orders cancel, staff
+deactivate. Users see "the record was NOT saved, try again", never SQL; the
+technical error goes to `client_error_log` for a manager.
 
 ### Things that will bite later if nobody's watching
 

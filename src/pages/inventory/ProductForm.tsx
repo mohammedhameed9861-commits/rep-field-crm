@@ -1,10 +1,12 @@
-import { errorMessage } from "../../lib/errors";
+import { friendlyError } from "../../lib/errors";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 import { createProduct, updateProduct } from "../../lib/inventory";
 import { fetchProductTypes } from "../../lib/productTypes";
-import type { Product, ProductType } from "../../lib/types";
+import type { InventoryMovementType, Product, ProductType } from "../../lib/types";
+
+const MOVEMENT_TYPES: InventoryMovementType[] = ["received", "sold", "damaged", "returned", "adjusted"];
 
 export default function ProductForm({
   product,
@@ -23,6 +25,9 @@ export default function ProductForm({
   const [stockQty, setStockQty] = useState(String(product?.stock_qty ?? 0));
   const [threshold, setThreshold] = useState(String(product?.low_stock_threshold ?? 0));
   const [critical, setCritical] = useState(String(product?.critical_threshold ?? 0));
+  const [movementType, setMovementType] = useState<InventoryMovementType>(editing ? "adjusted" : "received");
+  const [movementNote, setMovementNote] = useState("");
+  const stockChanged = !editing ? Number(stockQty) > 0 : Number(stockQty) !== Number(product?.stock_qty ?? 0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,7 +39,7 @@ export default function ProductForm({
     let alive = true;
     fetchProductTypes()
       .then((data) => alive && setTypes(data))
-      .catch((err) => alive && setError(errorMessage(err)))
+      .catch((err) => alive && setError(friendlyError(err)))
       .finally(() => alive && setLoadingTypes(false));
     return () => {
       alive = false;
@@ -51,13 +56,15 @@ export default function ProductForm({
       stock_qty: Number(stockQty) || 0,
       low_stock_threshold: Number(threshold) || 0,
       critical_threshold: Number(critical) || 0,
+      movement_type: movementType,
+      movement_note: movementNote.trim() || null,
     };
     try {
       if (editing) await updateProduct(product!.id, input);
       else await createProduct(input);
       onSaved();
     } catch (err) {
-      setError(errorMessage(err));
+      setError(friendlyError(err));
     } finally {
       setBusy(false);
     }
@@ -132,6 +139,28 @@ export default function ProductForm({
               />
             </label>
           </div>
+          {stockChanged && (
+            <div className="rounded-lg bg-cream-50 p-3">
+              <span className="mb-1 block text-xs font-semibold text-gray-500">{t("productForm.stockReasonLabel")}</span>
+              <select
+                value={movementType}
+                onChange={(e) => setMovementType(e.target.value as InventoryMovementType)}
+                className={field}
+              >
+                {MOVEMENT_TYPES.map((m) => (
+                  <option key={m} value={m}>
+                    {t(`inventory.movement.${m}`)}
+                  </option>
+                ))}
+              </select>
+              <input
+                placeholder={t("productForm.stockNotePlaceholder")}
+                value={movementNote}
+                onChange={(e) => setMovementNote(e.target.value)}
+                className={`${field} mt-2`}
+              />
+            </div>
+          )}
           <label className="block">
             <span className="mb-1 block text-xs font-semibold text-gray-500">
               {t("productForm.criticalLabel")}

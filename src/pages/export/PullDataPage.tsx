@@ -1,9 +1,9 @@
-import { errorMessage } from "../../lib/errors";
+import { friendlyError } from "../../lib/errors";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Download, FileSpreadsheet } from "lucide-react";
+import { Download, FileSpreadsheet, ShieldCheck } from "lucide-react";
 import { useAuth } from "../../lib/auth";
-import { exportAllDataToExcel, fetchExportCounts, type ExportCounts } from "../../lib/exportData";
+import { exportAllDataToExcel, exportBackupJson, fetchExportCounts, type ExportCounts } from "../../lib/exportData";
 
 export default function PullDataPage() {
   const { profile } = useAuth();
@@ -11,13 +11,14 @@ export default function PullDataPage() {
   const [counts, setCounts] = useState<ExportCounts | null>(null);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
+  const [backingUp, setBackingUp] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (profile?.role !== "manager") return;
     fetchExportCounts()
       .then(setCounts)
-      .catch((err) => setError(errorMessage(err)))
+      .catch((err) => setError(friendlyError(err)))
       .finally(() => setLoading(false));
   }, [profile]);
 
@@ -27,9 +28,21 @@ export default function PullDataPage() {
     try {
       await exportAllDataToExcel();
     } catch (err) {
-      setError(errorMessage(err));
+      setError(friendlyError(err));
     } finally {
       setExporting(false);
+    }
+  }
+
+  async function onBackup() {
+    setBackingUp(true);
+    setError(null);
+    try {
+      await exportBackupJson();
+    } catch (err) {
+      setError(friendlyError(err, "json backup"));
+    } finally {
+      setBackingUp(false);
     }
   }
 
@@ -48,6 +61,7 @@ export default function PullDataPage() {
     { key: "orders", labelKey: "accounts.orderHistory" },
     { key: "orderItems", labelKey: "pullData.orderItems" },
     { key: "products", labelKey: "nav.inventory" },
+    { key: "inventoryMovements", labelKey: "pullData.inventoryMovements" },
     { key: "staff", labelKey: "reps.title" },
     { key: "auditLog", labelKey: "editHistory.title" },
   ];
@@ -93,6 +107,21 @@ export default function PullDataPage() {
       <p className="mt-3 flex items-center gap-1.5 text-xs text-gray-400">
         <FileSpreadsheet size={13} /> {t("pullData.exportHint")}
       </p>
+
+      <button
+        onClick={() => void onBackup()}
+        disabled={backingUp || loading}
+        className="mt-6 flex w-full items-center justify-center gap-2 rounded-full border border-sea-700 px-6 py-3 font-semibold text-sea-800 transition hover:bg-sea-50 disabled:opacity-50"
+      >
+        {backingUp ? (
+          t("pullData.exporting")
+        ) : (
+          <>
+            <ShieldCheck size={16} /> {t("pullData.backupButton")}
+          </>
+        )}
+      </button>
+      <p className="mt-3 text-xs text-gray-400">{t("pullData.backupHint")}</p>
     </div>
   );
 }

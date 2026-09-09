@@ -1,4 +1,4 @@
-import { errorMessage } from "../../lib/errors";
+import { friendlyError } from "../../lib/errors";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
@@ -40,7 +40,7 @@ export default function EditOrderModal({
             : [{ product_name: "", quantity: String(order.quantity) }],
         );
       })
-      .catch((err) => alive && setError(errorMessage(err)));
+      .catch((err) => alive && setError(friendlyError(err)));
     return () => {
       alive = false;
     };
@@ -55,7 +55,7 @@ export default function EditOrderModal({
       await updateOrder(order.id, { lines, status });
       onSaved();
     } catch (err) {
-      setError(errorMessage(err));
+      setError(friendlyError(err));
     } finally {
       setBusy(false);
     }

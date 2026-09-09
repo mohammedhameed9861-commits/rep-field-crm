@@ -1,4 +1,4 @@
-import { errorMessage } from "../../lib/errors";
+import { friendlyError } from "../../lib/errors";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -43,6 +43,7 @@ export default function NewCallPage() {
   const [account, setAccount] = useState<Account | null>(null);
 
   const [callType, setCallType] = useState<CallType | "">("");
+  const [clientId] = useState(() => crypto.randomUUID());
   const [outcome, setOutcome] = useState<CallOutcome>("order_placed");
   const [callReason, setCallReason] = useState<CallReason | "">("");
   const [note, setNote] = useState("");
@@ -58,7 +59,7 @@ export default function NewCallPage() {
     let alive = true;
     searchAccounts(search)
       .then((data) => alive && setResults(data))
-      .catch((err) => setError(errorMessage(err)));
+      .catch((err) => setError(friendlyError(err)));
     return () => {
       alive = false;
     };
@@ -68,7 +69,7 @@ export default function NewCallPage() {
     let alive = true;
     fetchProductTypes()
       .then((data) => alive && setProductTypes(data))
-      .catch((err) => setError(errorMessage(err)));
+      .catch((err) => setError(friendlyError(err)));
     return () => {
       alive = false;
     };
@@ -93,6 +94,7 @@ export default function NewCallPage() {
     setError(null);
     try {
       await createCall({
+        client_id: clientId,
         account_id: account.id,
         telesales_id: profile.id,
         call_type: callType,
@@ -104,7 +106,7 @@ export default function NewCallPage() {
       });
       navigate("/calls");
     } catch (err) {
-      setError(errorMessage(err));
+      setError(friendlyError(err));
     } finally {
       setBusy(false);
     }
