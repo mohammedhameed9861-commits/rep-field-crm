@@ -46,7 +46,14 @@ jobs:
           sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
           echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
           sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client-17
-          pg_dump --version
+          # Ubuntu's /usr/bin/pg_dump is a wrapper that keeps picking the runner's
+          # preinstalled v16 client, which refuses to dump a v17 server. Put the
+          # real 17 binaries first on PATH for every following step, and fail
+          # here (not mid-dump) if that didn't work.
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+          /usr/lib/postgresql/17/bin/pg_dump --version | grep -q "pg_dump (PostgreSQL) 17" \
+            || { echo "::error::PostgreSQL 17 client tools not found"; exit 1; }
+          /usr/lib/postgresql/17/bin/pg_dump --version
 
       - name: Check the secret is configured
         env:
