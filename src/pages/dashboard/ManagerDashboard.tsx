@@ -1,4 +1,4 @@
-import { errorMessage } from "../../lib/errors";
+import { friendlyError } from "../../lib/errors";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -59,7 +59,7 @@ export default function ManagerDashboard() {
       setTodayActivity(ta);
       setNeedsAttention(na);
     } catch (err) {
-      setError(errorMessage(err));
+      setError(friendlyError(err));
     } finally {
       setLoading(false);
     }
@@ -78,7 +78,7 @@ export default function ManagerDashboard() {
       setEditingTarget(false);
       await reload();
     } catch (err) {
-      setError(errorMessage(err));
+      setError(friendlyError(err));
     } finally {
       setSavingTarget(false);
     }

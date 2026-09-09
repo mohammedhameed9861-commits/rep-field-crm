@@ -1,0 +1,129 @@
+# Daily off-site backup of the production database, with a real restore test.
+#
+# Why this exists: Supabase's free tier keeps NO backups at all, and even the
+# Pro tier's daily backup lives inside the same Supabase account as production.
+# This job dumps the database every night into GitHub's artifact storage — a
+# separate provider, separate account — and then restores that dump into a
+# throwaway Postgres to prove it actually restores, comparing row counts table
+# by table. A backup that has never been restored is a hope, not a backup.
+#
+# Alerting: GitHub emails the repository owner whenever a scheduled workflow
+# fails (Settings → Notifications → "Actions" must stay enabled). So a night
+# the backup doesn't happen is a night you get an email about it.
+#
+# Setup (once): repo → Settings → Secrets and variables → Actions → New secret
+#   SUPABASE_DB_URL = the "Session pooler" connection string from
+#   Supabase → Connect (NOT the direct one: direct connections are IPv6-only
+#   and GitHub's runners have no IPv6). It looks like
+#   postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres
+name: Database backup
+
+on:
+  schedule:
+    - cron: "0 2 * * *" # 02:00 UTC daily (05:00 Baghdad)
+  workflow_dispatch: # "Run workflow" button — use it right before any migration
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      restore-test:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: restoretest
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    steps:
+      - name: "Install PostgreSQL 17 client (pg_dump/pg_restore must be >= the server major)"
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client-17
+          pg_dump --version
+
+      - name: Check the secret is configured
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::error::SUPABASE_DB_URL secret is not set — no backup was taken. See the comment at the top of .github/workflows/backup.yml"
+            exit 1
+          fi
+
+      - name: "Dump production (schema + data: public, auth, storage metadata)"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          STAMP=$(date -u +%Y-%m-%d_%H%M)
+          echo "STAMP=$STAMP" >> "$GITHUB_ENV"
+          mkdir -p out
+          # Custom format: compressed, restorable selectively with pg_restore.
+          pg_dump "$SUPABASE_DB_URL" --format=custom --no-owner --no-privileges \
+            --schema=public --schema=auth --schema=storage \
+            --file "out/flowercom-crm-$STAMP.dump"
+          # Plain SQL of the business data only — readable by a human, restorable by psql.
+          pg_dump "$SUPABASE_DB_URL" --format=plain --no-owner --no-privileges --data-only \
+            --schema=public --file "out/flowercom-crm-$STAMP-public-data.sql"
+          ls -la out
+
+      - name: Record production row counts
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          psql "$SUPABASE_DB_URL" -At -c "
+            select table_name || '=' || (xpath('/row/c/text()', query_to_xml('select count(*) as c from public.' || quote_ident(table_name), false, true, '')))[1]::text
+            from information_schema.tables where table_schema='public' and table_type='BASE TABLE' order by 1" \
+            | tee out/counts-production.txt
+
+      - name: Restore into a throwaway Postgres (proves the dump is restorable)
+        env:
+          PGPASSWORD: restoretest
+        run: |
+          # Supabase-specific roles/extensions referenced by the auth/storage
+          # schemas don't exist in vanilla Postgres; create what the dump needs.
+          psql -h localhost -U postgres -c "create role anon nologin; create role authenticated nologin; create role service_role nologin; create role supabase_admin nologin; create role supabase_auth_admin nologin; create role supabase_storage_admin nologin;" || true
+          psql -h localhost -U postgres -c "create extension if not exists pgcrypto; create extension if not exists \"uuid-ossp\";"
+          # --exit-on-error is deliberately NOT used for the whole dump: auth/storage
+          # carry Supabase-internal objects that vanilla Postgres can't recreate.
+          # What must succeed is the business schema — checked strictly below.
+          pg_restore -h localhost -U postgres -d postgres --no-owner --no-privileges \
+            "out/flowercom-crm-$STAMP.dump" 2> out/restore.log || true
+          echo "restore warnings/errors: $(wc -l < out/restore.log)"
+          grep -i "error" out/restore.log | grep -i "public\." && { echo "::error::errors restoring the public schema"; exit 1; } || true
+
+      - name: Verify restored row counts match production
+        env:
+          PGPASSWORD: restoretest
+        run: |
+          psql -h localhost -U postgres -At -c "
+            select table_name || '=' || (xpath('/row/c/text()', query_to_xml('select count(*) as c from public.' || quote_ident(table_name), false, true, '')))[1]::text
+            from information_schema.tables where table_schema='public' and table_type='BASE TABLE' order by 1" \
+            > out/counts-restored.txt
+          echo "--- production ---"; cat out/counts-production.txt
+          echo "--- restored ---";   cat out/counts-restored.txt
+          diff out/counts-production.txt out/counts-restored.txt && echo "Row counts identical."
+          # Relationships survive: every order still points at a real account and creator,
+          # every line at a real order, every visit/call at a real account and staff member.
+          psql -h localhost -U postgres -v ON_ERROR_STOP=1 -c "
+            do \$\$ begin
+              if exists (select 1 from public.orders o left join public.accounts a on a.id=o.account_id where a.id is null) then raise exception 'orphan orders'; end if;
+              if exists (select 1 from public.order_items i left join public.orders o on o.id=i.order_id where o.id is null) then raise exception 'orphan order_items'; end if;
+              if exists (select 1 from public.visits v left join public.profiles p on p.id=v.rep_id where p.id is null) then raise exception 'orphan visits'; end if;
+              if exists (select 1 from public.calls c left join public.profiles p on p.id=c.telesales_id where p.id is null) then raise exception 'orphan calls'; end if;
+              raise notice 'Relationships intact.';
+            end \$\$;"
+
+      - name: "Upload backup (kept 90 days; artifacts live in GitHub, not Supabase)"
+        uses: actions/upload-artifact@v4
+        with:
+          name: flowercom-crm-backup-${{ env.STAMP }}
+          path: out/
+          retention-days: 90
+          if-no-files-found: error

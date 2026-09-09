@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import i18n from "../i18n";
+import { logClientError } from "../lib/errors";
 
 /** Last line of defence: without this, any uncaught render error anywhere in the
  * tree unmounts the whole app into a blank white screen with nothing to tap on.
@@ -12,7 +13,7 @@ export default class ErrorBoundary extends Component<{ children: ReactNode }, { 
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error("Uncaught render error", error, info.componentStack);
+    logClientError(error, "render crash " + (info.componentStack ?? "").split("\n")[1]?.trim());
   }
 
   render() {

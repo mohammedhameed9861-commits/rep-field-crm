@@ -237,6 +237,13 @@
       "ok": "OK",
       "low": "Low",
       "critical": "Critical"
+    },
+    "movement": {
+      "received": "Received (new stock)",
+      "sold": "Sold",
+      "damaged": "Damaged",
+      "returned": "Returned",
+      "adjusted": "Adjustment / correction"
     }
   },
   "productTypes": {
@@ -255,7 +262,9 @@
     "noTypesYet": "No product types yet — add one from \"Manage Types\" first.",
     "stockLabel": "Stock on hand",
     "thresholdLabel": "Low-stock at",
-    "criticalLabel": "Critical at"
+    "criticalLabel": "Critical at",
+    "stockReasonLabel": "Reason for the stock change",
+    "stockNotePlaceholder": "Note (e.g. shipment 12 Sep, 3 boxes wilted)"
   },
   "orderLines": {
     "productPlaceholder": "Select a product",
@@ -296,7 +305,10 @@
     "exportButton": "Export to Excel",
     "exporting": "Preparing file…",
     "exportHint": "Downloads one .xlsx file with a tab for Accounts, Visits, Calls, Orders, Products, Staff, and Edit History.",
-    "orderItems": "Order Items"
+    "orderItems": "Order Items",
+    "backupButton": "Download full backup (JSON)",
+    "backupHint": "Every table, every ID, with a header showing when it was taken and how many records — the file to keep somewhere safe before any big change.",
+    "inventoryMovements": "Inventory movements"
   },
   "visitsActivity": {
     "title": "Visits Activity",
@@ -376,5 +388,16 @@
     "title": "Something went wrong",
     "body": "The screen hit an error it couldn't recover from. Reloading usually fixes it — if it keeps happening, tell a manager what you were doing.",
     "reload": "Reload"
+  },
+  "errors": {
+    "generic": "Something went wrong. The record was NOT saved. Please try again.",
+    "network": "No connection. The record was NOT saved — check the internet and try again; nothing was lost from the form.",
+    "duplicate": "This already exists — it was not saved twice.",
+    "invalid": "Some of the values aren't valid (check quantities and required fields). Nothing was saved.",
+    "permission": "Your account isn't allowed to do this. Ask a manager.",
+    "notFound": "That record no longer exists. Refresh and try again.",
+    "auth": "Sign-in problem. Please sign in again.",
+    "badCredentials": "Email or password is incorrect.",
+    "offlineBanner": "You're offline — anything you save now will fail until the connection is back."
   }
 }

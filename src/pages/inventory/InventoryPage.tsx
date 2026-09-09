@@ -1,4 +1,4 @@
-import { errorMessage } from "../../lib/errors";
+import { friendlyError } from "../../lib/errors";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ListChecks, Pencil, Plus } from "lucide-react";
@@ -24,7 +24,7 @@ export default function InventoryPage() {
     try {
       setProducts(await fetchProducts());
     } catch (err) {
-      setError(errorMessage(err));
+      setError(friendlyError(err));
     } finally {
       setLoading(false);
     }

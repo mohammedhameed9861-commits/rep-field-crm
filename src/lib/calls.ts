@@ -1,10 +1,12 @@
 import { supabase } from "./supabase";
-import { insertOrderItems, summarizeLines, type OrderLineDraft } from "./orderLines";
+import { summarizeLines, type OrderLineDraft } from "./orderLines";
 import type { Call, CallOutcome, CallReason, CallType, OrderStatus } from "./types";
 
 export { searchAccounts } from "./accounts";
 
 export interface NewCallInput {
+  /** See NewVisitInput.client_id — the retry/double-tap guard. */
+  client_id: string;
   account_id: string;
   telesales_id: string;
   call_type: CallType;
@@ -19,44 +21,27 @@ export interface NewCallInput {
   order?: { lines: OrderLineDraft[]; status: OrderStatus };
 }
 
-/** A telesales agent can only ever create these, never edit; only a manager can correct
- * one afterward (see updateCall). */
-export async function createCall(input: NewCallInput): Promise<void> {
+/** Logs the call — and, for a placed order, the order and its lines — in one database
+ * transaction, idempotent on client_id (log_call, migration 0017). An agent can only
+ * ever create these, never edit; only a manager can correct one afterward (updateCall). */
+export async function createCall(input: NewCallInput): Promise<string> {
   if (!supabase) throw new Error("Supabase is not configured");
-
-  const { data: call, error: callError } = await supabase
-    .from("calls")
-    .insert({
-      account_id: input.account_id,
-      telesales_id: input.telesales_id,
-      call_type: input.call_type,
-      outcome: input.outcome,
-      call_reason: input.call_reason,
-      note: input.note,
-      next_followup_at: input.next_followup_at,
-    })
-    .select("*")
-    .single();
-  if (callError) throw callError;
-
-  if (input.outcome === "order_placed" && input.order) {
-    const { items, quantity, rows } = summarizeLines(input.order.lines);
-    const { data: order, error: orderError } = await supabase
-      .from("orders")
-      .insert({
-        account_id: input.account_id,
-        created_by: input.telesales_id,
-        source: "call",
-        call_id: call.id,
-        items,
-        quantity,
-        status: input.order.status,
-      })
-      .select("id")
-      .single();
-    if (orderError) throw orderError;
-    await insertOrderItems(order.id, rows);
+  const lines = input.order ? summarizeLines(input.order.lines).rows : [];
+  if (input.outcome === "order_placed" && lines.length === 0) {
+    throw new Error("A placed order needs at least one product line");
   }
+  const { data, error } = await supabase.rpc("log_call", {
+    p_client_id: input.client_id,
+    p_account_id: input.account_id,
+    p_call_type: input.call_type,
+    p_outcome: input.outcome,
+    p_call_reason: input.call_reason,
+    p_note: input.note,
+    p_next_followup_at: input.next_followup_at,
+    p_lines: lines,
+  });
+  if (error) throw error;
+  return data as string;
 }
 
 export interface CallEditInput {

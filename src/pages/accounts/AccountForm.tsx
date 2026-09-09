@@ -1,4 +1,4 @@
-import { errorMessage } from "../../lib/errors";
+import { friendlyError } from "../../lib/errors";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
@@ -58,7 +58,7 @@ export default function AccountForm({
       else await createAccount(input);
       onSaved();
     } catch (err) {
-      setError(errorMessage(err));
+      setError(friendlyError(err));
     } finally {
       setBusy(false);
     }

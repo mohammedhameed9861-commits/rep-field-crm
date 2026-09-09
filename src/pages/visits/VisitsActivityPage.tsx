@@ -1,4 +1,4 @@
-import { errorMessage } from "../../lib/errors";
+import { friendlyError } from "../../lib/errors";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -49,7 +49,7 @@ export default function VisitsActivityPage() {
       const urls = await visitPhotoUrls(data.map((v) => v.photo_path));
       setPhotos(Object.fromEntries(data.map((v) => [v.id, urls[v.photo_path]]).filter(([, u]) => u)));
     } catch (err) {
-      setError(errorMessage(err));
+      setError(friendlyError(err));
     } finally {
       setLoading(false);
     }
@@ -60,7 +60,7 @@ export default function VisitsActivityPage() {
     try {
       setPerformance(await fetchRepPerformance());
     } catch (err) {
-      setError(errorMessage(err));
+      setError(friendlyError(err));
     } finally {
       setPerformanceLoading(false);
     }
@@ -70,7 +70,7 @@ export default function VisitsActivityPage() {
     if (profile?.role !== "manager") return;
     fetchStaff()
       .then((staff) => setReps(staff.filter((p) => p.role === "rep")))
-      .catch((err) => setError(errorMessage(err)));
+      .catch((err) => setError(friendlyError(err)));
     void reloadPerformance();
   }, [profile]);
 
@@ -89,7 +89,7 @@ export default function VisitsActivityPage() {
       setEditingTargetFor(null);
       await reloadPerformance();
     } catch (err) {
-      setError(errorMessage(err));
+      setError(friendlyError(err));
     } finally {
       setSavingTarget(false);
     }

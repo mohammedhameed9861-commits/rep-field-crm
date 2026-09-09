@@ -130,6 +130,21 @@ export interface Product {
   created_at: string;
 }
 
+export type InventoryMovementType = "received" | "sold" | "damaged" | "returned" | "adjusted";
+
+/** One line of the inventory ledger — written by a database trigger on every stock
+ * change, so the stock number is never silently overwritten (migration 0017). */
+export interface InventoryMovement {
+  id: string;
+  product_id: string;
+  movement_type: InventoryMovementType;
+  quantity_delta: number;
+  stock_after: number;
+  note: string | null;
+  created_by: string | null;
+  created_at: string;
+}
+
 export interface AppSettings {
   monthly_target_cartons: number;
 }

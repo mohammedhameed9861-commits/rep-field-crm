@@ -7,25 +7,27 @@ export interface ExportCounts {
   orders: number;
   orderItems: number;
   products: number;
+  inventoryMovements: number;
   staff: number;
   auditLog: number;
 }
 
 export async function fetchExportCounts(): Promise<ExportCounts> {
   if (!supabase) {
-    return { accounts: 0, visits: 0, calls: 0, orders: 0, orderItems: 0, products: 0, staff: 0, auditLog: 0 };
+    return { accounts: 0, visits: 0, calls: 0, orders: 0, orderItems: 0, products: 0, inventoryMovements: 0, staff: 0, auditLog: 0 };
   }
-  const [accounts, visits, calls, orders, orderItems, products, staff, auditLog] = await Promise.all([
+  const [accounts, visits, calls, orders, orderItems, products, inventoryMovements, staff, auditLog] = await Promise.all([
     supabase.from("accounts").select("id", { count: "exact", head: true }),
     supabase.from("visits").select("id", { count: "exact", head: true }),
     supabase.from("calls").select("id", { count: "exact", head: true }),
     supabase.from("orders").select("id", { count: "exact", head: true }),
     supabase.from("order_items").select("id", { count: "exact", head: true }),
     supabase.from("products").select("id", { count: "exact", head: true }),
+    supabase.from("inventory_movements").select("id", { count: "exact", head: true }),
     supabase.from("profiles").select("id", { count: "exact", head: true }),
     supabase.from("audit_log").select("id", { count: "exact", head: true }),
   ]);
-  for (const r of [accounts, visits, calls, orders, orderItems, products, staff, auditLog]) {
+  for (const r of [accounts, visits, calls, orders, orderItems, products, inventoryMovements, staff, auditLog]) {
     if (r.error) throw r.error;
   }
   return {
@@ -35,6 +37,7 @@ export async function fetchExportCounts(): Promise<ExportCounts> {
     orders: orders.count ?? 0,
     orderItems: orderItems.count ?? 0,
     products: products.count ?? 0,
+    inventoryMovements: inventoryMovements.count ?? 0,
     staff: staff.count ?? 0,
     auditLog: auditLog.count ?? 0,
   };
@@ -60,60 +63,119 @@ async function fetchAllRows(
   }
 }
 
+/** Every row of every table, paged past the 1000-row cap, joined with the names a
+ * human needs. Shared by the Excel export and the JSON backup. */
+async function fetchSnapshot(sb: NonNullable<typeof supabase>) {
+  const [accounts, visits, calls, orders, orderItems, products, productTypes, inventoryMovements, settings, staff, auditLog] =
+    await Promise.all([
+      fetchAllRows((f, t) =>
+        sb
+          .from("accounts")
+          .select("*, assigned_rep:profiles!accounts_assigned_rep_id_fkey(full_name)")
+          .order("created_at", { ascending: true })
+          .range(f, t),
+      ),
+      fetchAllRows((f, t) =>
+        sb
+          .from("visits")
+          .select("*, account:accounts!visits_account_id_fkey(name), rep:profiles!visits_rep_id_fkey(full_name)")
+          .order("created_at", { ascending: true })
+          .range(f, t),
+      ),
+      fetchAllRows((f, t) =>
+        sb
+          .from("calls")
+          .select(
+            "*, account:accounts!calls_account_id_fkey(name), telesales:profiles!calls_telesales_id_fkey(full_name)",
+          )
+          .order("created_at", { ascending: true })
+          .range(f, t),
+      ),
+      fetchAllRows((f, t) =>
+        sb
+          .from("orders")
+          .select(
+            "*, account:accounts!orders_account_id_fkey(name), created_by_profile:profiles!orders_created_by_fkey(full_name)",
+          )
+          .order("created_at", { ascending: true })
+          .range(f, t),
+      ),
+      fetchAllRows((f, t) => sb.from("order_items").select("*").order("created_at", { ascending: true }).range(f, t)),
+      fetchAllRows((f, t) => sb.from("products").select("*").order("name", { ascending: true }).range(f, t)),
+      fetchAllRows((f, t) => sb.from("product_types").select("*").order("name", { ascending: true }).range(f, t)),
+      fetchAllRows((f, t) =>
+        sb
+          .from("inventory_movements")
+          .select("*, product:products!inventory_movements_product_id_fkey(name), by:profiles!inventory_movements_created_by_fkey(full_name)")
+          .order("created_at", { ascending: true })
+          .range(f, t),
+      ),
+      fetchAllRows((f, t) => sb.from("app_settings").select("*").range(f, t)),
+      fetchAllRows((f, t) => sb.from("profiles").select("*").order("full_name", { ascending: true }).range(f, t)),
+      fetchAllRows((f, t) =>
+        sb
+          .from("audit_log")
+          .select("*, changed_by_profile:profiles!audit_log_changed_by_fkey(full_name)")
+          .order("changed_at", { ascending: true })
+          .range(f, t),
+      ),
+    ]);
+  return { accounts, visits, calls, orders, orderItems, products, productTypes, inventoryMovements, settings, staff, auditLog };
+}
+
+/** The emergency copy: every table, every column, every ID, exactly as stored — plus a
+ * manifest (when, which build, how many rows of what). Relationships are preserved as
+ * the raw foreign-key columns, so the file can rebuild the database, not just read it.
+ * Take one before any migration or infrastructure change and keep it off the server. */
+export async function exportBackupJson(filenamePrefix = "flowercom-crm-backup"): Promise<void> {
+  if (!supabase) throw new Error("Supabase is not configured");
+  const snap = await fetchSnapshot(supabase);
+  const strip = (rows: Row[], joined: string[]) =>
+    rows.map((r) => {
+      const copy: Row = { ...r };
+      for (const k of joined) delete copy[k];
+      return copy;
+    });
+  const tables: Record<string, Row[]> = {
+    profiles: snap.staff,
+    accounts: strip(snap.accounts, ["assigned_rep"]),
+    visits: strip(snap.visits, ["account", "rep"]),
+    calls: strip(snap.calls, ["account", "telesales"]),
+    orders: strip(snap.orders, ["account", "created_by_profile"]),
+    order_items: snap.orderItems,
+    products: snap.products,
+    product_types: snap.productTypes,
+    inventory_movements: strip(snap.inventoryMovements, ["product", "by"]),
+    app_settings: snap.settings,
+    audit_log: strip(snap.auditLog, ["changed_by_profile"]),
+  };
+  const allDates = [...snap.visits, ...snap.calls, ...snap.orders].map((r) => r.created_at as string).sort();
+  const manifest = {
+    format: "flowercom-crm-backup/1",
+    exported_at: new Date().toISOString(),
+    app_version: __APP_VERSION__,
+    app_commit: __APP_COMMIT__,
+    data_period: { from: allDates[0] ?? null, to: allDates[allDates.length - 1] ?? null },
+    record_counts: Object.fromEntries(Object.entries(tables).map(([k, v]) => [k, v.length])),
+    restore_order: ["profiles", "accounts", "product_types", "products", "visits", "calls", "orders", "order_items", "inventory_movements", "app_settings", "audit_log"],
+    note: "Rows are verbatim database rows (UUID primary keys and foreign keys intact). Restore in restore_order. profiles.id matches auth.users.id — staff logins themselves live in Supabase Auth and are covered by the pg_dump backup, not this file.",
+  };
+  const blob = new Blob([JSON.stringify({ manifest, tables }, null, 1)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filenamePrefix}-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 /** Pulls every row of every table — literally everything — and writes one .xlsx with a tab per table.
  * The xlsx library is large and only ever needed on this one page, so it's loaded on demand here
  * rather than bundled into every user's initial page load. */
 export async function exportAllDataToExcel(filenamePrefix = "flowercom-crm-export"): Promise<void> {
   if (!supabase) throw new Error("Supabase is not configured");
-  const sb = supabase;
-
-  const [XLSX, accounts, visits, calls, orders, orderItems, products, staff, auditLog] = await Promise.all([
-    import("xlsx"),
-    fetchAllRows((f, t) =>
-      sb
-        .from("accounts")
-        .select("*, assigned_rep:profiles!accounts_assigned_rep_id_fkey(full_name)")
-        .order("created_at", { ascending: true })
-        .range(f, t),
-    ),
-    fetchAllRows((f, t) =>
-      sb
-        .from("visits")
-        .select("*, account:accounts!visits_account_id_fkey(name), rep:profiles!visits_rep_id_fkey(full_name)")
-        .order("created_at", { ascending: true })
-        .range(f, t),
-    ),
-    fetchAllRows((f, t) =>
-      sb
-        .from("calls")
-        .select(
-          "*, account:accounts!calls_account_id_fkey(name), telesales:profiles!calls_telesales_id_fkey(full_name)",
-        )
-        .order("created_at", { ascending: true })
-        .range(f, t),
-    ),
-    fetchAllRows((f, t) =>
-      sb
-        .from("orders")
-        .select(
-          "*, account:accounts!orders_account_id_fkey(name), created_by_profile:profiles!orders_created_by_fkey(full_name)",
-        )
-        .order("created_at", { ascending: true })
-        .range(f, t),
-    ),
-    fetchAllRows((f, t) =>
-      sb.from("order_items").select("*").order("created_at", { ascending: true }).range(f, t),
-    ),
-    fetchAllRows((f, t) => sb.from("products").select("*").order("name", { ascending: true }).range(f, t)),
-    fetchAllRows((f, t) => sb.from("profiles").select("*").order("full_name", { ascending: true }).range(f, t)),
-    fetchAllRows((f, t) =>
-      sb
-        .from("audit_log")
-        .select("*, changed_by_profile:profiles!audit_log_changed_by_fkey(full_name)")
-        .order("changed_at", { ascending: true })
-        .range(f, t),
-    ),
-  ]);
+  const [XLSX, snap] = await Promise.all([import("xlsx"), fetchSnapshot(supabase)]);
+  const { accounts, visits, calls, orders, orderItems, products, productTypes, inventoryMovements, settings, staff, auditLog } = snap;
 
   // Orders link back to the one visit/call that produced them — build both
   // directions so each visit/call row can show its order inline, without a
@@ -228,6 +290,24 @@ export async function exportAllDataToExcel(filenamePrefix = "flowercom-crm-expor
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(orderRows), "Orders");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(orderItemRows), "Order Items");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(productRows), "Products");
+  XLSX.utils.book_append_sheet(
+    wb,
+    XLSX.utils.json_to_sheet(
+      inventoryMovements.map((m) => ({
+        ID: m.id,
+        Product: (m.product as Row | null)?.name ?? m.product_id,
+        Type: m.movement_type,
+        Change: m.quantity_delta,
+        "Stock After": m.stock_after,
+        Note: m.note,
+        By: (m.by as Row | null)?.full_name ?? "",
+        "Created At": m.created_at,
+      })),
+    ),
+    "Inventory Movements",
+  );
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(productTypes.map((p) => ({ ID: p.id, Name: p.name, "Created At": p.created_at }))), "Product Types");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(settings.map((s) => ({ "Monthly Target (cartons)": s.monthly_target_cartons }))), "Settings");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(staffRows), "Staff");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(auditRows), "Edit History");
 

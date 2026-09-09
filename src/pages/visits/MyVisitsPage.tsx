@@ -1,4 +1,4 @@
-import { errorMessage } from "../../lib/errors";
+import { friendlyError } from "../../lib/errors";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -30,7 +30,7 @@ export default function MyVisitsPage() {
         const urls = await visitPhotoUrls(data.map((v) => v.photo_path));
         if (alive) setPhotos(Object.fromEntries(data.map((v) => [v.id, urls[v.photo_path]]).filter(([, u]) => u)));
       })
-      .catch((err) => setError(errorMessage(err)))
+      .catch((err) => setError(friendlyError(err)))
       .finally(() => alive && setLoading(false));
     return () => {
       alive = false;

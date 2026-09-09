@@ -41,22 +41,3 @@ export async function fetchOrderItems(orderId: string): Promise<OrderLineItem[]>
   if (error) throw error;
   return (data ?? []) as OrderLineItem[];
 }
-
-/** Insert every line for a brand-new order — called right after the order itself is
- * created, once its id exists. */
-export async function insertOrderItems(orderId: string, rows: { product_name: string; quantity: number }[]): Promise<void> {
-  if (!supabase || rows.length === 0) return;
-  const { error } = await supabase
-    .from("order_items")
-    .insert(rows.map((r) => ({ order_id: orderId, product_name: r.product_name, quantity: r.quantity })));
-  if (error) throw error;
-}
-
-/** A manager's correction replaces every line wholesale — simpler and safer than
- * diffing which lines changed, added, or were removed. */
-export async function replaceOrderItems(orderId: string, rows: { product_name: string; quantity: number }[]): Promise<void> {
-  if (!supabase) return;
-  const { error: deleteError } = await supabase.from("order_items").delete().eq("order_id", orderId);
-  if (deleteError) throw deleteError;
-  await insertOrderItems(orderId, rows);
-}

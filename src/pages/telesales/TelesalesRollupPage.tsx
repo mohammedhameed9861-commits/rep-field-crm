@@ -1,4 +1,4 @@
-import { errorMessage } from "../../lib/errors";
+import { friendlyError } from "../../lib/errors";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -52,7 +52,7 @@ export default function TelesalesRollupPage() {
         }),
       );
     } catch (err) {
-      setError(errorMessage(err));
+      setError(friendlyError(err));
     } finally {
       setLoading(false);
     }
@@ -62,7 +62,7 @@ export default function TelesalesRollupPage() {
     if (profile?.role !== "manager") return;
     fetchStaff()
       .then((staff) => setAgents(staff.filter((p) => p.role === "telesales")))
-      .catch((err) => setError(errorMessage(err)));
+      .catch((err) => setError(friendlyError(err)));
   }, [profile]);
 
   useEffect(() => {
