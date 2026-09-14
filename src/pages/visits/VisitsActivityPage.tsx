@@ -247,6 +247,14 @@ export default function VisitsActivityPage() {
                     src={photos[v.id]}
                     alt={v.account?.name ?? ""}
                     className="h-14 w-14 shrink-0 rounded-lg object-cover"
+                    onError={(e) => {
+                      // A deleted/expired photo shows a plain empty box instead of
+                      // the browser's broken-image icon.
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src =
+                        "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+                      e.currentTarget.className = "h-14 w-14 shrink-0 rounded-lg bg-gray-100";
+                    }}
                   />
                 ) : (
                   <div className="h-14 w-14 shrink-0 rounded-lg bg-gray-100" />
