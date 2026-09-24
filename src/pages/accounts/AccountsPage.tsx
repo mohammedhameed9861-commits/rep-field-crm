@@ -8,6 +8,7 @@ import { formatDate, formatDateTime, timeAgo } from "../../lib/format";
 import { useAuth } from "../../lib/auth";
 import type { Account, ActivityItem, OrderRow, ShopClass } from "../../lib/types";
 import AccountForm from "./AccountForm";
+import AccountsBoard from "./AccountsBoard";
 import EditOrderModal from "./EditOrderModal";
 import EditHistoryButton from "../../components/EditHistoryButton";
 
@@ -29,6 +30,7 @@ export default function AccountsPage() {
   const [search, setSearch] = useState("");
   const [showNew, setShowNew] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [tab, setTab] = useState<"list" | "board">("list");
 
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
@@ -68,6 +70,13 @@ export default function AccountsPage() {
     } catch (err) {
       setError(friendlyError(err));
     }
+  }
+
+  /** Local-state update after a Board drag/move — the server call already
+   * happened in AccountsBoard; this just keeps the shared accounts list in
+   * sync so the change shows immediately everywhere without a full reload. */
+  function handleAccountMoved(accountId: string, columnId: string | null) {
+    setAccounts((prev) => prev.map((a) => (a.id === accountId ? { ...a, board_column_id: columnId } : a)));
   }
 
   useEffect(() => {
@@ -120,6 +129,37 @@ export default function AccountsPage() {
 
       {error && <p className="px-4 md:px-7 pb-3 text-sm text-red-600">{error}</p>}
 
+      {!id && (
+        <div className="flex shrink-0 gap-1 px-4 pb-3 md:px-7">
+          <button
+            onClick={() => setTab("list")}
+            className={`rounded-full px-4 py-1.5 text-sm font-semibold ${
+              tab === "list" ? "bg-teal-500 text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+            }`}
+          >
+            {t("board.tabList")}
+          </button>
+          <button
+            onClick={() => setTab("board")}
+            className={`rounded-full px-4 py-1.5 text-sm font-semibold ${
+              tab === "board" ? "bg-teal-500 text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+            }`}
+          >
+            {t("board.tabBoard")}
+          </button>
+        </div>
+      )}
+
+      {tab === "board" && !id ? (
+        <div className="flex min-h-0 flex-1 px-4 pb-6 md:px-7">
+          <AccountsBoard
+            accounts={accounts}
+            isManager={profile?.role === "manager"}
+            onAccountMoved={handleAccountMoved}
+            onOpenAccount={(accId) => navigate(`/accounts/${accId}`)}
+          />
+        </div>
+      ) : (
       <div className="flex min-h-0 flex-1 gap-4 px-4 md:px-7 pb-6">
         {/* List */}
         <div
@@ -421,6 +461,7 @@ export default function AccountsPage() {
           )}
         </div>
       </div>
+      )}
 
       {showNew && (
         <AccountForm

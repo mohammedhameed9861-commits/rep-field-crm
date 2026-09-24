@@ -125,6 +125,23 @@
     "orderPlaced": "تم تسجيل الطلب",
     "backToList": "كل الحسابات"
   },
+  "board": {
+    "tabList": "القائمة",
+    "tabBoard": "اللوحة",
+    "unfiled": "غير مصنّف",
+    "unfiledHint": "لم يُصنّف ضمن عمود بعد",
+    "addColumn": "إضافة عمود",
+    "columnNamePlaceholder": "اسم العمود",
+    "noColumnsYet": "لا توجد أعمدة بعد.",
+    "noColumnsYetManager": "لا توجد أعمدة بعد — أضف عموداً لبدء تصنيف المحلات.",
+    "renameColumn": "إعادة تسمية العمود",
+    "deleteColumn": "حذف العمود",
+    "deleteColumnConfirm": "حذف \"{{name}}\"؟ لن تُحذف المحلات الموجودة فيه — ستعود فقط إلى غير مصنّف.",
+    "moveTo": "نقل إلى…",
+    "shopCountOne": "{{count}} محل",
+    "shopCountOther": "{{count}} محلات",
+    "dragHint": "اسحب محلاً من القائمة إلى عمود، أو استخدم قائمة \"نقل إلى…\" على أي محل."
+  },
   "accountForm": {
     "addTitle": "إضافة حساب",
     "editTitle": "تعديل الحساب",

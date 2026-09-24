@@ -125,6 +125,23 @@
     "orderPlaced": "Order placed",
     "backToList": "All accounts"
   },
+  "board": {
+    "tabList": "List",
+    "tabBoard": "Board",
+    "unfiled": "Unfiled",
+    "unfiledHint": "Not filed into a column yet",
+    "addColumn": "Add column",
+    "columnNamePlaceholder": "Column name",
+    "noColumnsYet": "No columns yet.",
+    "noColumnsYetManager": "No columns yet — add one to start organizing shops.",
+    "renameColumn": "Rename column",
+    "deleteColumn": "Delete column",
+    "deleteColumnConfirm": "Delete \"{{name}}\"? Shops in it won't be deleted — they'll just go back to Unfiled.",
+    "moveTo": "Move to…",
+    "shopCountOne": "{{count}} shop",
+    "shopCountOther": "{{count}} shops",
+    "dragHint": "Drag a shop from the list into a column, or use the \"Move to…\" menu on any shop."
+  },
   "accountForm": {
     "addTitle": "Add Account",
     "editTitle": "Edit Account",
