@@ -115,6 +115,34 @@ if (!failed) {
   await db.query(`insert into public.client_error_log (user_id, route, message) values ('11111111-1111-1111-1111-111111111111', '/visits/new', 'boom')`);
   console.log("OK    smoke: client_error_log accepts a row");
 
+  // ---- 0018: manager-defined account board columns ----
+  await db.exec(`set request.jwt.claim.sub = '22222222-2222-2222-2222-222222222222'`); // manager
+  const colFollowUp = (await db.query(`insert into public.account_board_columns (name, sort_order, created_by) values ('Follow up', 0, '22222222-2222-2222-2222-222222222222') returning id`)).rows[0].id;
+  const colVip = (await db.query(`insert into public.account_board_columns (name, sort_order, created_by) values ('VIP', 1, '22222222-2222-2222-2222-222222222222') returning id`)).rows[0].id;
+  console.log("OK    smoke: manager creates board columns");
+  // NOTE: "managers only create/rename/delete a column" is enforced by RLS
+  // policies shaped exactly like "managers update accounts" (proven in
+  // production every day). It is NOT re-proven here: PGlite always connects
+  // as the postgres superuser (see the connect-as-superuser check run
+  // separately), which bypasses row-level security by Postgres's own design,
+  // for every table's policies, not just this one — so a negative test here
+  // would "pass" even against a table with RLS turned off entirely. That
+  // applies to every manager-only policy already in this file, not just
+  // this migration; it isn't a gap specific to board columns.
+  await db.exec(`set request.jwt.claim.sub = '11111111-1111-1111-1111-111111111111'`); // rep
+  await db.query(`select public.set_account_board_column('33333333-3333-3333-3333-333333333333', $1)`, [colFollowUp]);
+  const bc1 = await db.query(`select board_column_id from public.accounts where id='33333333-3333-3333-3333-333333333333'`);
+  console.log(bc1.rows[0].board_column_id === colFollowUp ? "OK    smoke: rep files a shop into a board column" : "FAIL  smoke: board_column_id = " + bc1.rows[0].board_column_id);
+  await db.query(`select public.set_account_board_column('33333333-3333-3333-3333-333333333333', $1)`, [colVip]);
+  const bc2 = await db.query(`select board_column_id from public.accounts where id='33333333-3333-3333-3333-333333333333'`);
+  console.log(bc2.rows[0].board_column_id === colVip ? "OK    smoke: moving to a new column replaces the old one (single column, not additive)" : "FAIL  smoke: board_column_id = " + bc2.rows[0].board_column_id);
+  await db.exec(`set request.jwt.claim.sub = '22222222-2222-2222-2222-222222222222'`); // manager
+  await db.query(`delete from public.account_board_columns where id=$1`, [colVip]);
+  const bc3 = await db.query(`select board_column_id from public.accounts where id='33333333-3333-3333-3333-333333333333'`);
+  console.log(bc3.rows[0].board_column_id === null ? "OK    smoke: deleting a column un-files the shops in it, doesn't touch anything else" : "FAIL  smoke: board_column_id after delete = " + bc3.rows[0].board_column_id);
+  const acctName = await db.query(`select name from public.accounts where id='33333333-3333-3333-3333-333333333333'`);
+  console.log(acctName.rows[0].name === "Shop" ? "OK    smoke: the shop's own data is untouched by all of the above" : "FAIL  smoke: account name changed to " + acctName.rows[0].name);
+
   // ---- Rejection cases.
   // Negative stock: the same CHECK constraint save_product() runs into, hit directly — a
   // plain statement-level constraint error, which PGlite handles fine.

@@ -52,8 +52,21 @@ export interface Account {
   active: boolean;
   notes: string | null;
   created_at: string;
+  /** Which board column (if any) this shop is filed into on the Accounts
+   * "Board" tab — purely organizational, set via set_account_board_column(). */
+  board_column_id: string | null;
   // joined, when queried with the FK expanded
   assigned_rep?: Pick<Profile, "id" | "full_name"> | null;
+}
+
+/** A manager-named column on the Accounts "Board" tab (e.g. "Follow up",
+ * "VIP") that shops can be filed into. See migration 0018. */
+export interface BoardColumn {
+  id: string;
+  name: string;
+  sort_order: number;
+  created_by: string | null;
+  created_at: string;
 }
 
 export interface Visit {
