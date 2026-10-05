@@ -1,7 +1,7 @@
 import imageCompression from "browser-image-compression";
 import { supabase, VISIT_PHOTOS_BUCKET } from "./supabase";
 import { summarizeLines, type OrderLineDraft } from "./orderLines";
-import type { NoSaleReason, OrderStatus, Visit, VisitOutcome } from "./types";
+import type { NoSaleReason, OrderStatus, ShopClass, Visit, VisitOutcome } from "./types";
 
 export { searchAccounts } from "./accounts";
 
@@ -20,6 +20,10 @@ export interface NewVisitInput {
   /** Only used when outcome is "sold" — creates the linked order (and its line items) in
    * the same step. */
   order?: { lines: OrderLineDraft[]; status: OrderStatus };
+  /** Updates the shop's class (A/B/C), atomically with the visit — null/omitted leaves
+   * it exactly as it was. A rep sets this in person, since it's often only clear once
+   * someone is standing in the shop; a manager can still change it from Accounts too. */
+  shop_class?: ShopClass | null;
 }
 
 /** Compress the photo, upload it, then log the visit — and, if sold, its order and every
@@ -60,6 +64,7 @@ export async function createVisit(input: NewVisitInput): Promise<string> {
     p_note: input.note,
     p_next_followup_at: input.next_followup_at,
     p_lines: lines,
+    p_shop_class: input.shop_class ?? null,
   });
   if (error) throw error;
   return data as string;

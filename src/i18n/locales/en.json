@@ -207,6 +207,8 @@
     "searchPlaceholder": "Search any shop by name…",
     "noShopsMatch": "No shops match.",
     "takePhoto": "Take a photo of the shop",
+    "shopClassLabel": "Shop class",
+    "shopClassHint": "Set or correct it while you're here — leave as is if nothing's changed.",
     "sold": "Sold",
     "noSale": "No Sale",
     "bouquetsPlaceholder": "Bouquets",

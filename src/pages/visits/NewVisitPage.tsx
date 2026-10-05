@@ -7,10 +7,12 @@ import { useAuth } from "../../lib/auth";
 import { createVisit, searchAccounts } from "../../lib/visits";
 import { emptyLine, summarizeLines, type OrderLineDraft } from "../../lib/orderLines";
 import { fetchProductTypes } from "../../lib/productTypes";
-import type { Account, NoSaleReason, ProductType, VisitOutcome } from "../../lib/types";
+import type { Account, NoSaleReason, ProductType, ShopClass, VisitOutcome } from "../../lib/types";
 import CameraCapture from "../../components/CameraCapture";
 import FollowUpPicker from "../../components/FollowUpPicker";
 import OrderLinesEditor from "../../components/OrderLinesEditor";
+
+const SHOP_CLASSES: ShopClass[] = ["A", "B", "C"];
 
 const NO_SALE_REASONS: NoSaleReason[] = [
   "no_need_today",
@@ -40,6 +42,7 @@ export default function NewVisitPage() {
   // One id per form: a retry after a failed/dropped save reuses it, so the database
   // can tell "same visit again" from "a new visit" (see createVisit).
   const [clientId] = useState(() => crypto.randomUUID());
+  const [shopClass, setShopClass] = useState<ShopClass | "">("");
   const [outcome, setOutcome] = useState<VisitOutcome>("sold");
   const [noSaleReason, setNoSaleReason] = useState<NoSaleReason | "">("");
   const [note, setNote] = useState("");
@@ -90,6 +93,7 @@ export default function NewVisitPage() {
         note: note || null,
         next_followup_at: nextFollowupAt,
         order: outcome === "sold" ? { lines, status: "pending" } : undefined,
+        shop_class: shopClass || null,
       });
       navigate("/visits");
     } catch (err) {
@@ -119,7 +123,10 @@ export default function NewVisitPage() {
             {results.map((a) => (
               <button
                 key={a.id}
-                onClick={() => setAccount(a)}
+                onClick={() => {
+                  setAccount(a);
+                  setShopClass(a.shop_class ?? "");
+                }}
                 className="rounded-lg p-3 text-start text-sm hover:bg-gray-50"
               >
                 <span className="font-semibold text-gray-900">{a.name}</span>
@@ -138,11 +145,31 @@ export default function NewVisitPage() {
             </div>
             <button
               type="button"
-              onClick={() => setAccount(null)}
+              onClick={() => {
+                setAccount(null);
+                setShopClass("");
+              }}
               className="rounded-full p-1.5 text-teal-600 hover:bg-teal-100"
             >
               <X size={16} />
             </button>
+          </div>
+
+          <div>
+            <p className="mb-1.5 text-xs font-semibold text-gray-500">{t("visits.shopClassLabel")}</p>
+            <select
+              value={shopClass}
+              onChange={(e) => setShopClass(e.target.value as ShopClass | "")}
+              className={field}
+            >
+              <option value="">{t("accountForm.shopClassPlaceholder")}</option>
+              {SHOP_CLASSES.map((c) => (
+                <option key={c} value={c}>
+                  {t(`shopClass.${c}`)}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-[11px] text-gray-400">{t("visits.shopClassHint")}</p>
           </div>
 
           <CameraCapture captured={photo} onCapture={setPhoto} />

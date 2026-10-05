@@ -207,6 +207,8 @@
     "searchPlaceholder": "ابحث عن أي محل بالاسم…",
     "noShopsMatch": "لا توجد محلات مطابقة.",
     "takePhoto": "التقط صورة للمحل",
+    "shopClassLabel": "فئة المحل",
+    "shopClassHint": "اضبطها أو صحّحها وأنت هنا — اتركها كما هي إذا لم يتغيّر شيء.",
     "sold": "تم البيع",
     "noSale": "لم يتم البيع",
     "bouquetsPlaceholder": "عدد الباقات",

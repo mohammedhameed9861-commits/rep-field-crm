@@ -143,6 +143,32 @@ if (!failed) {
   const acctName = await db.query(`select name from public.accounts where id='33333333-3333-3333-3333-333333333333'`);
   console.log(acctName.rows[0].name === "Shop" ? "OK    smoke: the shop's own data is untouched by all of the above" : "FAIL  smoke: account name changed to " + acctName.rows[0].name);
 
+  // ---- 0019: a rep sets the shop's class while logging a visit ----
+  await db.exec(`set request.jwt.claim.sub = '11111111-1111-1111-1111-111111111111'`); // rep
+  const scBefore = await db.query(`select shop_class::text as c from public.accounts where id='33333333-3333-3333-3333-333333333333'`);
+  console.log(scBefore.rows[0].c === "A" ? "OK    smoke: shop starts as class A (seed)" : "FAIL  smoke: shop starts as " + scBefore.rows[0].c);
+  await db.query(`select public.set_account_shop_class('33333333-3333-3333-3333-333333333333', 'B')`);
+  const scAfter = await db.query(`select shop_class::text as c from public.accounts where id='33333333-3333-3333-3333-333333333333'`);
+  console.log(scAfter.rows[0].c === "B" ? "OK    smoke: rep sets a shop's class directly" : "FAIL  smoke: class = " + scAfter.rows[0].c);
+  // log_visit's new p_shop_class param, exercised end to end: null (the
+  // default, same as every log_visit call above that never passed it) must
+  // leave the class untouched; passing a value changes it, atomically with
+  // the visit itself.
+  const cidNoClass = '99999999-9999-9999-9999-999999999999';
+  await db.query(`select public.log_visit($1, '33333333-3333-3333-3333-333333333333', 'n.jpg', 'no_sale', 'shop_closed', null, null, '[]'::jsonb)`, [cidNoClass]);
+  const scUnchanged = await db.query(`select shop_class::text as c from public.accounts where id='33333333-3333-3333-3333-333333333333'`);
+  console.log(scUnchanged.rows[0].c === "B" ? "OK    smoke: log_visit with no class given leaves it unchanged" : "FAIL  smoke: class = " + scUnchanged.rows[0].c);
+  const cidWithClass = '10101010-1010-1010-1010-101010101010';
+  await db.query(`select public.log_visit($1, '33333333-3333-3333-3333-333333333333', 'n2.jpg', 'no_sale', 'shop_closed', null, null, '[]'::jsonb, 'C')`, [cidWithClass]);
+  const scViaVisit = await db.query(`select shop_class::text as c from public.accounts where id='33333333-3333-3333-3333-333333333333'`);
+  console.log(scViaVisit.rows[0].c === "C" ? "OK    smoke: log_visit updates the shop's class atomically with the visit" : "FAIL  smoke: class = " + scViaVisit.rows[0].c);
+  // NOTE: "only a rep (not a manager) can call set_account_shop_class" is a
+  // real check in the function (see migration 0019) but isn't re-proven here
+  // as a rejection test — it raises, and PGlite crashes on the statement
+  // *after* any plpgsql RAISE (see the final test in this file), so only one
+  // raise-based test can safely exist, and that slot is already taken by the
+  // "sold visit with no lines" check below, which must stay last.
+
   // ---- Rejection cases.
   // Negative stock: the same CHECK constraint save_product() runs into, hit directly — a
   // plain statement-level constraint error, which PGlite handles fine.
