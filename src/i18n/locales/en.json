@@ -9,7 +9,9 @@
     "loading": "Loading…",
     "signOut": "Sign out",
     "seeAll": "See all",
-    "openMenu": "Open menu"
+    "openMenu": "Open menu",
+    "delete": "Delete",
+    "currency": "IQD"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -22,7 +24,8 @@
     "newVisit": "New Visit",
     "myVisits": "My Visits",
     "newCall": "New Call",
-    "myCalls": "My Calls"
+    "myCalls": "My Calls",
+    "priceList": "Price List"
   },
   "login": {
     "title": "Sign in",
@@ -245,57 +248,24 @@
     "countOne": "{{count}} product",
     "countOther": "{{count}} products",
     "addProduct": "Add Product",
-    "manageTypes": "Manage Types",
     "colProduct": "Product",
-    "colStock": "Stock on hand",
-    "colThreshold": "Low / Critical at",
-    "colStatus": "Status",
     "colActions": "Actions",
     "noProductsYet": "No products yet.",
-    "inactive": "Inactive",
-    "archive": "Archive",
-    "reactivate": "Reactivate",
-    "archiveConfirm": "Archive {{name}}?",
-    "reactivateConfirm": "Reactivate {{name}}?",
-    "status": {
-      "ok": "OK",
-      "low": "Low",
-      "critical": "Critical"
-    },
-    "movement": {
-      "received": "Received (new stock)",
-      "sold": "Sold",
-      "damaged": "Damaged",
-      "returned": "Returned",
-      "adjusted": "Adjustment / correction"
-    }
-  },
-  "productTypes": {
-    "title": "Product Types",
-    "subtitle": "The picklist \"Add Product\" chooses from — add or remove a type here.",
-    "namePlaceholder": "Type name (e.g. Red Roses)",
-    "add": "Add",
-    "noneYet": "No product types yet — add one below.",
-    "deleteConfirm": "Remove \"{{name}}\" from the picklist?"
+    "colPrice": "Price",
+    "deleteConfirm": "Remove \"{{name}}\"?"
   },
   "productForm": {
     "addTitle": "Add Product",
     "editTitle": "Edit Product",
     "namePlaceholder": "Product name (e.g. Red Roses)",
-    "typePlaceholder": "Select a product type",
-    "noTypesYet": "No product types yet — add one from \"Manage Types\" first.",
-    "stockLabel": "Stock on hand",
-    "thresholdLabel": "Low-stock at",
-    "criticalLabel": "Critical at",
-    "stockReasonLabel": "Reason for the stock change",
-    "stockNotePlaceholder": "Note (e.g. shipment 12 Sep, 3 boxes wilted)"
+    "priceLabel": "Price per bouquet (IQD)"
   },
   "orderLines": {
     "productPlaceholder": "Select a product",
     "productsSelectedOne": "{{count}} product selected",
     "productsSelectedOther": "{{count}} products selected",
     "done": "Done",
-    "noTypesYet": "No product types yet — ask a manager to add some from Inventory → Manage Types first."
+    "noTypesYet": "No products yet — ask a manager to add some from Inventory first."
   },
   "editHistory": {
     "view": "History",
@@ -382,7 +352,6 @@
       "requiredPerDay": "Required/day",
       "currentPerDay": "Current/day",
       "last7Days": "Sales — Last 7 Days",
-      "inventoryAlerts": "Inventory Alerts",
       "salesTeam": "Sales Team",
       "noSalesTeamYet": "No staff yet.",
       "needsAttention": "Needs Attention",
@@ -425,5 +394,10 @@
     "auth": "Sign-in problem. Please sign in again.",
     "badCredentials": "Email or password is incorrect.",
     "offlineBanner": "You're offline — anything you save now will fail until the connection is back."
+  },
+  "priceList": {
+    "title": "Price List",
+    "subtitle": "Every product and its current price per bouquet.",
+    "noneYet": "No products yet."
   }
 }

@@ -16,6 +16,10 @@ export function formatDateTime(iso: string): string {
   });
 }
 
+export function formatPrice(n: number): string {
+  return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+}
+
 export function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
   const mins = Math.round(diffMs / 60000);

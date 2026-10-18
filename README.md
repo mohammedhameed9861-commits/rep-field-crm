@@ -92,17 +92,17 @@ flagged Overdue/Today once it's due
 (`src/components/UpcomingFollowUps.tsx`) — this *is* the rep's next
 task; there's no separate task table or notification system.
 
-**Inventory** — a manager-only screen listing every product with its
-stock on hand and low-stock threshold, plus edit. Deliberately simple,
-per the original ask: editing a product's stock is a plain manual
-number, not something orders adjust automatically. **Add Product** picks
-a **type** from a manager-curated picklist (Product → Quantity) instead
-of typing a name freehand, so "Red Roses" doesn't also show up as "red
-roses" — managers curate that list from **Manage Types** next to Add
-Product (`src/pages/inventory/ManageProductTypesModal.tsx`); everyone
-can read the list, only a manager can add or remove an entry. Editing an
-*existing* product still edits its name as free text, unchanged, so
-this doesn't touch any product already on the shelf.
+**Inventory** — a manager-only screen that's just a price list: **Add
+Product** asks for a name and a price per bouquet, nothing else — no
+stock counts, no thresholds. That same list (`product_types`) is what
+reps/telesales pick from in the Order line items picker (see above), so
+there's only ever one catalog to keep current, not two. Everyone can
+read it — reps and telesales get their own read-only **Price List**
+page (`src/pages/priceList/PriceListPage.tsx`) — but only a manager can
+add, edit, or delete an entry. A real delete (not an archive) is safe
+here: past orders store their product names as plain text, not a
+reference to this list, so removing a discontinued product can't orphan
+anything already sold.
 
 **Dashboard** — a manager's view is built around today vs. month-to-date:
 today's date at the top (so it's always clear which day you're looking
@@ -111,8 +111,7 @@ app), a top row (sales today, MTD sales, the monthly cartons target,
 active accounts, orders today — MTD Sales carries a small ↑/↓ trend
 badge, see below), an editable monthly target with a progress bar
 (remaining cartons, required/day, current/day, computed from real
-calendar days), a 7-day sales chart, inventory alerts (Low/Critical
-counts), month-to-date cartons per rep + a combined Telesales row, a
+calendar days), a 7-day sales chart, month-to-date cartons per rep + a combined Telesales row, a
 "Needs Attention" panel (inactive high-value accounts, declining
 accounts, reactivation opportunities — see thresholds below; each count
 is clickable — one flagged account jumps straight to its page, more
@@ -250,13 +249,13 @@ arrow, and the closed drawer sitting over the top bar in Arabic).
 ## Known gaps (intentional, for now)
 
 - **Orders aren't linked to specific products.** `orders.items` is free
-  text (e.g. "Red Roses x6"), not a reference into `products` — so
-  there's no way to tell which products are actually selling.
-  "Aging Stock" (slow-moving product) was deliberately dropped from the
-  Inventory Alerts for this reason; only Low/Critical stock-level
-  thresholds are tracked. Fixing this for real means reworking the
-  order-entry form to pick real products (with quantities) instead of
-  typing free text — a bigger change than this round's scope.
+  text (e.g. "Red Roses x6"), not a reference into `product_types` — so
+  there's no way to tell which products are actually selling, only the
+  order's total bouquet count.
+- Stock tracking (the old `products`/`inventory_movements` tables) was
+  deliberately dropped from the app in favor of a simple price list —
+  that data is still in the database, just no longer read or written by
+  anything.
 - Everything else from the original ask is built and bilingual.
 
 **No money amounts anywhere.** The business tracks bouquets (quantity)

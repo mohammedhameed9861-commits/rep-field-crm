@@ -9,7 +9,9 @@
     "loading": "جارٍ التحميل…",
     "signOut": "تسجيل الخروج",
     "seeAll": "عرض الكل",
-    "openMenu": "فتح القائمة"
+    "openMenu": "فتح القائمة",
+    "delete": "حذف",
+    "currency": "د.ع"
   },
   "nav": {
     "dashboard": "لوحة التحكم",
@@ -22,7 +24,8 @@
     "newVisit": "زيارة جديدة",
     "myVisits": "زياراتي",
     "newCall": "مكالمة جديدة",
-    "myCalls": "مكالماتي"
+    "myCalls": "مكالماتي",
+    "priceList": "قائمة الأسعار"
   },
   "login": {
     "title": "تسجيل الدخول",
@@ -245,57 +248,24 @@
     "countOne": "{{count}} منتج",
     "countOther": "{{count}} منتجات",
     "addProduct": "إضافة منتج",
-    "manageTypes": "إدارة الأنواع",
     "colProduct": "المنتج",
-    "colStock": "الكمية المتوفرة",
-    "colThreshold": "منخفض / حرج عند",
-    "colStatus": "الحالة",
     "colActions": "الإجراءات",
     "noProductsYet": "لا توجد منتجات بعد.",
-    "inactive": "غير نشط",
-    "archive": "أرشفة",
-    "reactivate": "إعادة تفعيل",
-    "archiveConfirm": "أرشفة {{name}}؟",
-    "reactivateConfirm": "إعادة تفعيل {{name}}؟",
-    "status": {
-      "ok": "جيد",
-      "low": "منخفض",
-      "critical": "حرج"
-    },
-    "movement": {
-      "received": "استلام (بضاعة جديدة)",
-      "sold": "بيع",
-      "damaged": "تالف",
-      "returned": "مرتجع",
-      "adjusted": "تعديل / تصحيح"
-    }
-  },
-  "productTypes": {
-    "title": "أنواع المنتجات",
-    "subtitle": "القائمة التي تُستخدم عند \"إضافة منتج\" — أضف أو احذف نوعاً من هنا.",
-    "namePlaceholder": "اسم النوع (مثال: ورد أحمر)",
-    "add": "إضافة",
-    "noneYet": "لا توجد أنواع منتجات بعد — أضف نوعاً أدناه.",
-    "deleteConfirm": "إزالة \"{{name}}\" من القائمة؟"
+    "colPrice": "السعر",
+    "deleteConfirm": "حذف \"{{name}}\"؟"
   },
   "productForm": {
     "addTitle": "إضافة منتج",
     "editTitle": "تعديل المنتج",
     "namePlaceholder": "اسم المنتج (مثال: ورد أحمر)",
-    "typePlaceholder": "اختر نوع المنتج",
-    "noTypesYet": "لا توجد أنواع منتجات بعد — أضف نوعاً أولاً من \"إدارة الأنواع\".",
-    "stockLabel": "الكمية المتوفرة",
-    "thresholdLabel": "حد المخزون المنخفض",
-    "criticalLabel": "حد المخزون الحرج",
-    "stockReasonLabel": "سبب تغيير المخزون",
-    "stockNotePlaceholder": "ملاحظة (مثال: شحنة 12 سبتمبر، 3 صناديق ذابلة)"
+    "priceLabel": "السعر لكل باقة (دينار عراقي)"
   },
   "orderLines": {
     "productPlaceholder": "اختر منتجاً",
     "productsSelectedOne": "اختيار {{count}} منتج",
     "productsSelectedOther": "اختيار {{count}} منتجات",
     "done": "تم",
-    "noTypesYet": "لا توجد أنواع منتجات بعد — اطلب من المدير إضافتها من المخزون ← إدارة الأنواع أولاً."
+    "noTypesYet": "لا توجد منتجات بعد — اطلب من المدير إضافة بعضها من المخزون أولاً."
   },
   "editHistory": {
     "view": "السجل",
@@ -382,7 +352,6 @@
       "requiredPerDay": "المطلوب/يوم",
       "currentPerDay": "الحالي/يوم",
       "last7Days": "المبيعات — آخر ٧ أيام",
-      "inventoryAlerts": "تنبيهات المخزون",
       "salesTeam": "فريق المبيعات",
       "noSalesTeamYet": "لا يوجد موظفون بعد.",
       "needsAttention": "يحتاج انتباه",
@@ -425,5 +394,10 @@
     "auth": "مشكلة في تسجيل الدخول. سجّل الدخول مرة أخرى.",
     "badCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
     "offlineBanner": "أنت غير متصل — أي حفظ الآن سيفشل حتى يعود الاتصال."
+  },
+  "priceList": {
+    "title": "قائمة الأسعار",
+    "subtitle": "كل المنتجات وسعرها الحالي لكل باقة.",
+    "noneYet": "لا توجد منتجات بعد."
   }
 }

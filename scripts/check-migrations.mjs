@@ -181,6 +181,18 @@ if (!failed) {
   const prodRestored = await db.query(`select active from public.products where id=$1`, [pid]);
   console.log(prodRestored.rows[0].active === true ? "OK    smoke: restoring a product flips active back" : "FAIL  smoke: active = " + prodRestored.rows[0].active);
 
+  // ---- 0021: product_types gain a price, become the one product catalog ----
+  const ptId = (await db.query(`insert into public.product_types (name) values ('Debug Rose') returning id`)).rows[0].id;
+  const ptDefault = await db.query(`select price::text as p from public.product_types where id=$1`, [ptId]);
+  console.log(ptDefault.rows[0].p === "0.00" ? "OK    smoke: a new product type defaults to price 0" : "FAIL  smoke: price = " + ptDefault.rows[0].p);
+  await db.query(`update public.product_types set price=1500 where id=$1`, [ptId]);
+  const ptPriced = await db.query(`select price::text as p from public.product_types where id=$1`, [ptId]);
+  console.log(ptPriced.rows[0].p === "1500.00" ? "OK    smoke: a manager sets a product's price" : "FAIL  smoke: price = " + ptPriced.rows[0].p);
+  const ptAudit = await db.query(`select count(*)::int as n from public.audit_log where table_name='product_types' and record_id=$1`, [ptId]);
+  console.log(ptAudit.rows[0].n === 1 ? "OK    smoke: the price change is captured in audit_log" : "FAIL  smoke: audit rows = " + ptAudit.rows[0].n);
+  try { await db.query(`update public.product_types set price=-1 where id=$1`, [ptId]); console.log("FAIL  smoke: negative price ALLOWED"); failed = true; }
+  catch (e) { console.log("OK    smoke: negative price is rejected (" + (e.code || "check") + ")"); }
+
   // ---- Rejection cases.
   // Negative stock: the same CHECK constraint save_product() runs into, hit directly — a
   // plain statement-level constraint error, which PGlite handles fine.

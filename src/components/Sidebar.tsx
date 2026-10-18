@@ -11,6 +11,7 @@ import {
   Boxes,
   Download,
   Images,
+  Tag,
 } from "lucide-react";
 import { useAuth } from "../lib/auth";
 import { setLanguage } from "../i18n";
@@ -30,12 +31,14 @@ const managerNav = [
 const repNav = [
   { to: "/visits/new", labelKey: "nav.newVisit", icon: Camera, end: true },
   { to: "/visits", labelKey: "nav.myVisits", icon: History },
+  { to: "/price-list", labelKey: "nav.priceList", icon: Tag },
 ];
 
 // Telesales works the phones — same idea as reps, just calls instead of visits.
 const telesalesNav = [
   { to: "/calls/new", labelKey: "nav.newCall", icon: PhoneCall, end: true },
   { to: "/calls", labelKey: "nav.myCalls", icon: History },
+  { to: "/price-list", labelKey: "nav.priceList", icon: Tag },
 ];
 
 export default function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
