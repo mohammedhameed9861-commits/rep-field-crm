@@ -252,6 +252,11 @@
     "colStatus": "Status",
     "colActions": "Actions",
     "noProductsYet": "No products yet.",
+    "inactive": "Inactive",
+    "archive": "Archive",
+    "reactivate": "Reactivate",
+    "archiveConfirm": "Archive {{name}}?",
+    "reactivateConfirm": "Reactivate {{name}}?",
     "status": {
       "ok": "OK",
       "low": "Low",

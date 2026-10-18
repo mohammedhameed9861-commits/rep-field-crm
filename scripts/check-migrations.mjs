@@ -169,6 +169,18 @@ if (!failed) {
   // raise-based test can safely exist, and that slot is already taken by the
   // "sold visit with no lines" check below, which must stay last.
 
+  // ---- 0020: products get an archive/restore flag instead of deletion ----
+  const prodActive = await db.query(`select active from public.products where id=$1`, [pid]);
+  console.log(prodActive.rows[0].active === true ? "OK    smoke: a new product defaults to active" : "FAIL  smoke: active = " + prodActive.rows[0].active);
+  await db.query(`update public.products set active=false where id=$1`, [pid]);
+  const prodInactive = await db.query(`select active, stock_qty::text as s from public.products where id=$1`, [pid]);
+  console.log(prodInactive.rows[0].active === false && prodInactive.rows[0].s === "7.0" ? "OK    smoke: archiving a product only flips active, stock is untouched" : "FAIL  smoke: " + JSON.stringify(prodInactive.rows[0]));
+  const mvAfterArchive = await db.query(`select count(*)::int as n from public.inventory_movements where product_id=$1`, [pid]);
+  console.log(mvAfterArchive.rows[0].n === 3 ? "OK    smoke: archiving a product doesn't touch its inventory ledger" : "FAIL  smoke: movement count = " + mvAfterArchive.rows[0].n);
+  await db.query(`update public.products set active=true where id=$1`, [pid]);
+  const prodRestored = await db.query(`select active from public.products where id=$1`, [pid]);
+  console.log(prodRestored.rows[0].active === true ? "OK    smoke: restoring a product flips active back" : "FAIL  smoke: active = " + prodRestored.rows[0].active);
+
   // ---- Rejection cases.
   // Negative stock: the same CHECK constraint save_product() runs into, hit directly — a
   // plain statement-level constraint error, which PGlite handles fine.

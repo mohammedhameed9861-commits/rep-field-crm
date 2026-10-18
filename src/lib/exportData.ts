@@ -263,6 +263,7 @@ export async function exportAllDataToExcel(filenamePrefix = "flowercom-crm-expor
     "Stock on Hand": p.stock_qty,
     "Low-Stock Threshold": p.low_stock_threshold,
     "Critical Threshold": p.critical_threshold,
+    Active: p.active,
     "Created At": p.created_at,
   }));
 

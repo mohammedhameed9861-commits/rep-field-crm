@@ -137,7 +137,8 @@ export async function fetchInventoryAlertCounts(): Promise<InventoryAlertCounts>
   if (!supabase) return { low: 0, critical: 0 };
   const { data, error } = await supabase
     .from("products")
-    .select("stock_qty, low_stock_threshold, critical_threshold");
+    .select("stock_qty, low_stock_threshold, critical_threshold")
+    .eq("active", true);
   if (error) throw error;
   const products = (data ?? []) as Product[];
   let low = 0;

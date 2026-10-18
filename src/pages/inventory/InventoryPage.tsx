@@ -1,9 +1,9 @@
 import { friendlyError } from "../../lib/errors";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ListChecks, Pencil, Plus } from "lucide-react";
+import { Archive, ArchiveRestore, ListChecks, Pencil, Plus } from "lucide-react";
 import { useAuth } from "../../lib/auth";
-import { fetchProducts } from "../../lib/inventory";
+import { fetchProducts, setProductActive } from "../../lib/inventory";
 import type { Product } from "../../lib/types";
 import ProductForm from "./ProductForm";
 import ManageProductTypesModal from "./ManageProductTypesModal";
@@ -33,6 +33,17 @@ export default function InventoryPage() {
   useEffect(() => {
     void reload();
   }, []);
+
+  async function toggleActive(product: Product) {
+    const key = product.active ? "inventory.archiveConfirm" : "inventory.reactivateConfirm";
+    if (!confirm(t(key, { name: product.name }))) return;
+    try {
+      await setProductActive(product.id, !product.active);
+      await reload();
+    } catch (err) {
+      setError(friendlyError(err));
+    }
+  }
 
   if (profile?.role !== "manager") {
     return (
@@ -91,9 +102,18 @@ export default function InventoryPage() {
               return (
                 <div
                   key={p.id}
-                  className="min-w-[640px] grid grid-cols-[1fr_110px_140px_100px_140px] items-center gap-2 border-t border-gray-100 px-4 py-3"
+                  className={`min-w-[640px] grid grid-cols-[1fr_110px_140px_100px_140px] items-center gap-2 border-t border-gray-100 px-4 py-3 ${
+                    !p.active ? "opacity-50" : ""
+                  }`}
                 >
-                  <span className="text-sm font-semibold text-gray-900">{p.name}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-gray-900">{p.name}</span>
+                    {!p.active && (
+                      <span className="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-[10.5px] font-bold text-gray-500">
+                        {t("inventory.inactive")}
+                      </span>
+                    )}
+                  </div>
                   <span className="text-sm text-gray-700" dir="ltr">
                     {p.stock_qty}
                   </span>
@@ -112,12 +132,28 @@ export default function InventoryPage() {
                     {t(`inventory.status.${status}`)}
                   </span>
                   <div className="flex flex-col items-end gap-1">
-                    <button
-                      onClick={() => setEditing(p)}
-                      className="flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50"
-                    >
-                      <Pencil size={13} /> {t("common.edit")}
-                    </button>
+                    <div className="flex gap-1.5">
+                      <button
+                        onClick={() => setEditing(p)}
+                        className="flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50"
+                      >
+                        <Pencil size={13} /> {t("common.edit")}
+                      </button>
+                      <button
+                        onClick={() => void toggleActive(p)}
+                        className="flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50"
+                      >
+                        {p.active ? (
+                          <>
+                            <Archive size={13} /> {t("inventory.archive")}
+                          </>
+                        ) : (
+                          <>
+                            <ArchiveRestore size={13} /> {t("inventory.reactivate")}
+                          </>
+                        )}
+                      </button>
+                    </div>
                     <EditHistoryButton
                       tableName="products"
                       recordId={p.id}
@@ -126,6 +162,7 @@ export default function InventoryPage() {
                         { key: "stock_qty", label: t("inventory.colStock") },
                         { key: "low_stock_threshold", label: t("productForm.thresholdLabel") },
                         { key: "critical_threshold", label: t("productForm.criticalLabel") },
+                        { key: "active", label: t("reps.colStatus") },
                       ]}
                     />
                   </div>
