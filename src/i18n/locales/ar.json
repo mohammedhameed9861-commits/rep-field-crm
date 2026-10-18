@@ -287,7 +287,9 @@
   },
   "orderLines": {
     "productPlaceholder": "اختر منتجاً",
-    "addProduct": "إضافة منتج آخر",
+    "productsSelectedOne": "اختيار {{count}} منتج",
+    "productsSelectedOther": "اختيار {{count}} منتجات",
+    "done": "تم",
     "noTypesYet": "لا توجد أنواع منتجات بعد — اطلب من المدير إضافتها من المخزون ← إدارة الأنواع أولاً."
   },
   "editHistory": {
