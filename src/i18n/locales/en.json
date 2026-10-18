@@ -287,7 +287,9 @@
   },
   "orderLines": {
     "productPlaceholder": "Select a product",
-    "addProduct": "Add another product",
+    "productsSelectedOne": "{{count}} product selected",
+    "productsSelectedOther": "{{count}} products selected",
+    "done": "Done",
     "noTypesYet": "No product types yet — ask a manager to add some from Inventory → Manage Types first."
   },
   "editHistory": {
