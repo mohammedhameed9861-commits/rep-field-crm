@@ -252,6 +252,11 @@
     "colStatus": "الحالة",
     "colActions": "الإجراءات",
     "noProductsYet": "لا توجد منتجات بعد.",
+    "inactive": "غير نشط",
+    "archive": "أرشفة",
+    "reactivate": "إعادة تفعيل",
+    "archiveConfirm": "أرشفة {{name}}؟",
+    "reactivateConfirm": "إعادة تفعيل {{name}}؟",
     "status": {
       "ok": "جيد",
       "low": "منخفض",

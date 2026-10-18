@@ -46,3 +46,11 @@ export async function updateProduct(id: string, input: ProductInput): Promise<vo
   });
   if (error) throw error;
 }
+
+/** Archive/restore, not delete — stock, movement history, and past order lines that
+ * name this product all stay intact either way. */
+export async function setProductActive(id: string, active: boolean): Promise<void> {
+  if (!supabase) throw new Error("Supabase is not configured");
+  const { error } = await supabase.from("products").update({ active }).eq("id", id);
+  if (error) throw error;
+}

@@ -140,6 +140,7 @@ export interface Product {
   stock_qty: number;
   low_stock_threshold: number;
   critical_threshold: number;
+  active: boolean;
   created_at: string;
 }
 
