@@ -2,9 +2,8 @@ import { friendlyError } from "../../lib/errors";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { AlertTriangle, ArrowDown, ArrowUp, Pencil, Truck, Users } from "lucide-react";
+import { ArrowDown, ArrowUp, Pencil, Truck, Users } from "lucide-react";
 import {
-  fetchInventoryAlertCounts,
   fetchLast7DaysSeries,
   fetchMonthTrend,
   fetchNeedsAttention,
@@ -12,7 +11,6 @@ import {
   fetchTodayActivityByStaff,
   fetchTopStats,
   type DaySeriesPoint,
-  type InventoryAlertCounts,
   type MonthTrend,
   type NeedsAttentionAccounts,
   type SalesTeamRow,
@@ -28,7 +26,6 @@ export default function ManagerDashboard() {
   const [stats, setStats] = useState<TopStats | null>(null);
   const [trend, setTrend] = useState<MonthTrend | null>(null);
   const [series, setSeries] = useState<DaySeriesPoint[]>([]);
-  const [alerts, setAlerts] = useState<InventoryAlertCounts>({ low: 0, critical: 0 });
   const [salesTeam, setSalesTeam] = useState<SalesTeamRow[]>([]);
   const [todayActivity, setTodayActivity] = useState<TodayActivityRow[]>([]);
   const [needsAttention, setNeedsAttention] = useState<NeedsAttentionAccounts | null>(null);
@@ -42,11 +39,10 @@ export default function ManagerDashboard() {
 
   async function reload() {
     try {
-      const [s, mt, sr, a, st, ta, na] = await Promise.all([
+      const [s, mt, sr, st, ta, na] = await Promise.all([
         fetchTopStats(),
         fetchMonthTrend(),
         fetchLast7DaysSeries(7),
-        fetchInventoryAlertCounts(),
         fetchSalesTeamMTD(),
         fetchTodayActivityByStaff(),
         fetchNeedsAttention(),
@@ -54,7 +50,6 @@ export default function ManagerDashboard() {
       setStats(s);
       setTrend(mt);
       setSeries(sr);
-      setAlerts(a);
       setSalesTeam(st);
       setTodayActivity(ta);
       setNeedsAttention(na);
@@ -199,39 +194,14 @@ export default function ManagerDashboard() {
           )}
         </div>
 
-        {/* Chart + inventory alerts */}
-        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_260px]">
-          <div className="rounded-2xl border border-gray-200 bg-white p-5">
-            <h2 className="mb-3 text-sm font-bold text-sea-800">{t("dashboard.manager.last7Days")}</h2>
-            {loading ? (
-              <p className="text-sm text-gray-400">{t("common.loading")}</p>
-            ) : (
-              <SevenDayChart series={series} />
-            )}
-          </div>
-          <div className="rounded-2xl border border-gray-200 bg-white p-5">
-            <h2 className="mb-3 flex items-center gap-1.5 text-sm font-bold text-sea-800">
-              <AlertTriangle size={15} className="text-warn-600" /> {t("dashboard.manager.inventoryAlerts")}
-            </h2>
-            {loading ? (
-              <p className="text-sm text-gray-400">{t("common.loading")}</p>
-            ) : (
-              <div className="flex flex-col gap-2 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700">{t("inventory.status.low")}</span>
-                  <span className="rounded-full bg-warn-100 px-2 py-0.5 font-bold text-warn-600" dir="ltr">
-                    {alerts.low}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700">{t("inventory.status.critical")}</span>
-                  <span className="rounded-full bg-red-100 px-2 py-0.5 font-bold text-red-600" dir="ltr">
-                    {alerts.critical}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
+        {/* Chart */}
+        <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-5">
+          <h2 className="mb-3 text-sm font-bold text-sea-800">{t("dashboard.manager.last7Days")}</h2>
+          {loading ? (
+            <p className="text-sm text-gray-400">{t("common.loading")}</p>
+          ) : (
+            <SevenDayChart series={series} />
+          )}
         </div>
 
         {/* Sales team */}

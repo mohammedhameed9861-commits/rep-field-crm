@@ -163,11 +163,13 @@ export interface AppSettings {
   monthly_target_cartons: number;
 }
 
-/** A manager-curated picklist for naming a new product — keeps "Red Roses" from
- * also showing up as "red roses" or "Red Rose" depending on who typed it. */
+/** The one and only product catalog: a manager-set name and price per bouquet.
+ * Doubles as the picklist reps/telesales choose from when logging an order — keeps
+ * "Red Roses" from also showing up as "red roses" or "Red Rose" depending on who typed it. */
 export interface ProductType {
   id: string;
   name: string;
+  price: number;
   created_at: string;
 }
 

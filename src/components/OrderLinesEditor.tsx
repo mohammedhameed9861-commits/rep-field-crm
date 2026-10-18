@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ChevronDown, X } from "lucide-react";
 import type { ProductType } from "../lib/types";
 import type { OrderLineDraft } from "../lib/orderLines";
+import { formatPrice } from "../lib/format";
 
 // Deliberately no w-full here: in a flex row, a w-full sibling that also refuses to shrink
 // (as the quantity box did) takes the whole row and crushes the product dropdown down to
@@ -27,6 +28,7 @@ export default function OrderLinesEditor({
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const selectedNames = new Set(lines.map((l) => l.product_name).filter(Boolean));
+  const priceByName = new Map(productTypes.map((pt) => [pt.name, pt.price]));
 
   function toggleProduct(name: string) {
     if (selectedNames.has(name)) {
@@ -88,7 +90,10 @@ export default function OrderLinesEditor({
                     onChange={() => toggleProduct(pt.name)}
                     className="h-4 w-4 shrink-0 accent-teal-500"
                   />
-                  <span className="text-gray-800">{pt.name}</span>
+                  <span className="min-w-0 flex-1 truncate text-gray-800">{pt.name}</span>
+                  <span className="shrink-0 text-xs text-gray-400" dir="ltr">
+                    {formatPrice(pt.price)} {t("common.currency")}
+                  </span>
                 </label>
               );
             })}
@@ -109,9 +114,14 @@ export default function OrderLinesEditor({
         .map(({ line, i }) => (
           <div key={i} className="flex items-center gap-2">
             <span
-              className={`${field} min-w-0 flex-1 truncate bg-gray-50 text-gray-800`}
+              className={`${field} flex min-w-0 flex-1 items-center justify-between gap-2 bg-gray-50 text-gray-800`}
             >
-              {line.product_name}
+              <span className="min-w-0 truncate">{line.product_name}</span>
+              {priceByName.has(line.product_name) && (
+                <span className="shrink-0 text-xs text-gray-400" dir="ltr">
+                  {formatPrice(priceByName.get(line.product_name)!)} {t("common.currency")}
+                </span>
+              )}
             </span>
             <input
               required

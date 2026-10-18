@@ -11,6 +11,7 @@ import VisitsActivityPage from "./pages/visits/VisitsActivityPage";
 import NewCallPage from "./pages/calls/NewCallPage";
 import MyCallsPage from "./pages/calls/MyCallsPage";
 import InventoryPage from "./pages/inventory/InventoryPage";
+import PriceListPage from "./pages/priceList/PriceListPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import TelesalesRollupPage from "./pages/telesales/TelesalesRollupPage";
 import PullDataPage from "./pages/export/PullDataPage";
@@ -39,6 +40,7 @@ export default function App() {
             <Route path="calls" element={<MyCallsPage />} />
             <Route path="telesales" element={<TelesalesRollupPage />} />
             <Route path="inventory" element={<InventoryPage />} />
+            <Route path="price-list" element={<PriceListPage />} />
             <Route path="pull-data" element={<PullDataPage />} />
           </Route>
         </Routes>

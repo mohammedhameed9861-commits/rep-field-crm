@@ -1,6 +1,6 @@
 import { supabase } from "./supabase";
 import { fetchSettings } from "./settings";
-import type { ActivityItem, Call, OrderRow, Product, Profile, Visit } from "./types";
+import type { ActivityItem, Call, OrderRow, Profile, Visit } from "./types";
 
 function startOfDayISO(d: Date): string {
   const copy = new Date(d);
@@ -125,29 +125,6 @@ export async function fetchLast7DaysSeries(days = 7): Promise<DaySeriesPoint[]> 
     if (buckets.has(key)) buckets.set(key, (buckets.get(key) ?? 0) + Number(o.quantity));
   }
   return Array.from(buckets.entries()).map(([date, cartons]) => ({ date, cartons }));
-}
-
-export interface InventoryAlertCounts {
-  low: number;
-  critical: number;
-}
-
-/** Low counts products at/under their low-stock threshold but above critical; critical counts the more urgent subset. */
-export async function fetchInventoryAlertCounts(): Promise<InventoryAlertCounts> {
-  if (!supabase) return { low: 0, critical: 0 };
-  const { data, error } = await supabase
-    .from("products")
-    .select("stock_qty, low_stock_threshold, critical_threshold")
-    .eq("active", true);
-  if (error) throw error;
-  const products = (data ?? []) as Product[];
-  let low = 0;
-  let critical = 0;
-  for (const p of products) {
-    if (p.stock_qty <= p.critical_threshold) critical++;
-    else if (p.stock_qty <= p.low_stock_threshold) low++;
-  }
-  return { low, critical };
 }
 
 export interface SalesTeamRow {
