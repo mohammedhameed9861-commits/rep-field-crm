@@ -307,7 +307,7 @@ export async function exportAllDataToExcel(filenamePrefix = "flowercom-crm-expor
     "Inventory Movements",
   );
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(productTypes.map((p) => ({ ID: p.id, Name: p.name, "Created At": p.created_at }))), "Product Types");
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(settings.map((s) => ({ "Monthly Target (cartons)": s.monthly_target_cartons }))), "Settings");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(settings.map((s) => ({ "Monthly Target (bouquets)": s.monthly_target_cartons }))), "Settings");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(staffRows), "Staff");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(auditRows), "Edit History");
 
