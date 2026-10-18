@@ -45,9 +45,9 @@
     "manager": "Manager"
   },
   "shopClass": {
-    "A": "A · 4–6 cartons/week",
-    "B": "B · 2.5–3.5 cartons/week",
-    "C": "C · 1–2 cartons/week"
+    "A": "A · 4–6 bouquets/week",
+    "B": "B · 2.5–3.5 bouquets/week",
+    "C": "C · 1–2 bouquets/week"
   },
   "noSaleReason": {
     "no_need_today": "No need today",
@@ -371,7 +371,7 @@
       "target": "Target",
       "statAccounts": "Active Accounts",
       "ordersToday": "Orders Today",
-      "cartons": "cartons",
+      "bouquets": "bouquets",
       "monthlyTarget": "Monthly Target",
       "remaining": "Remaining",
       "requiredPerDay": "Required/day",

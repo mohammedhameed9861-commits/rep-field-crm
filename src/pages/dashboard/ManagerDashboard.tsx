@@ -175,7 +175,7 @@ export default function ManagerDashboard() {
             <>
               <div className="mt-2 flex items-baseline justify-between">
                 <span className="text-sm font-semibold text-gray-700" dir="ltr">
-                  {mtd} / {target} {t("dashboard.manager.cartons")}
+                  {mtd} / {target} {t("dashboard.manager.bouquets")}
                 </span>
                 <span className="text-sm font-bold text-teal-700" dir="ltr">
                   {pct.toFixed(1)}%
@@ -251,7 +251,7 @@ export default function ManagerDashboard() {
                     {row.key === "telesales" ? t("nav.telesales") : row.name}
                   </span>
                   <span className="font-semibold text-gray-500" dir="ltr">
-                    {row.cartons} {t("dashboard.manager.cartons")}
+                    {row.cartons} {t("dashboard.manager.bouquets")}
                   </span>
                 </div>
               ))}
@@ -311,7 +311,7 @@ export default function ManagerDashboard() {
                     </span>
                     <span className="font-semibold text-gray-500" dir="ltr">
                       {row.count} {t(`dashboard.manager.unit.${row.unit}`)} / {row.cartons}{" "}
-                      {t("dashboard.manager.cartons")}
+                      {t("dashboard.manager.bouquets")}
                     </span>
                   </div>
                 ))}
