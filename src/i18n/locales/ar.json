@@ -363,6 +363,16 @@
       "unit": {
         "visits": "زيارة",
         "calls": "مكالمة"
+      },
+      "growth": {
+        "title": "مؤشرات النمو",
+        "window": "آخر 30 يومًا",
+        "repeatPurchaseRate": "معدل الشراء المتكرر",
+        "repeatPurchaseHint": "{{repeat}} من {{buying}} محل اشترى، اشترى مرة أخرى",
+        "conversionRate": "معدل التحويل",
+        "conversionHint": "{{sold}} من {{total}} زيارة انتهت بعملية بيع",
+        "activePenetration": "نسبة انتشار العملاء النشطين",
+        "activePenetrationHint": "{{ordering}} من {{total}} محل نشط قدّم طلبًا"
       }
     },
     "telesales": {

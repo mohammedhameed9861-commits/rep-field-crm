@@ -16,8 +16,11 @@ export function formatDateTime(iso: string): string {
   });
 }
 
-export function formatPrice(n: number): string {
-  return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+/** Tolerates a missing value on purpose: the SQL that adds a new column (like
+ * product_types.price) is a manual step run separately from the code deploy, so a
+ * stale row without it must show as 0, never crash the whole screen. */
+export function formatPrice(n: number | null | undefined): string {
+  return (n ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
 }
 
 export function timeAgo(iso: string): string {
