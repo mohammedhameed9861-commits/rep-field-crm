@@ -13,6 +13,7 @@ import {
   fetchTopLists,
   fetchTopStats,
   NOT_ORDERING_DAYS,
+  TOP_SHOPS_COUNT,
   type DaySeriesPoint,
   type GrowthMetrics,
   type MonthTrend,
@@ -24,6 +25,12 @@ import {
 } from "../../lib/dashboard";
 import { updateMonthlyTarget } from "../../lib/settings";
 import SevenDayChart from "./SevenDayChart";
+
+/** "YYYY-MM" for the current month in the user's own timezone (toISOString would give UTC). */
+function currentMonth(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
 
 export default function ManagerDashboard() {
   const { t, i18n } = useTranslation();
@@ -38,6 +45,7 @@ export default function ManagerDashboard() {
   const [expandedAttention, setExpandedAttention] = useState<keyof NeedsAttentionAccounts | null>(null);
   const [topLists, setTopLists] = useState<TopLists | null>(null);
   const [topListsFailed, setTopListsFailed] = useState(false);
+  const [topMonth, setTopMonth] = useState(currentMonth); // "YYYY-MM"
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -72,12 +80,19 @@ export default function ManagerDashboard() {
 
   useEffect(() => {
     void reload();
-    // Separate from reload(): these need migration 0022, and a dashboard that's live before
-    // that SQL has been run should still show everything else.
-    fetchTopLists()
-      .then(setTopLists)
-      .catch(() => setTopListsFailed(true));
   }, []);
+
+  useEffect(() => {
+    const [y, m] = topMonth.split("-").map(Number);
+    let alive = true;
+    setTopListsFailed(false);
+    fetchTopLists(new Date(y, m - 1, 1))
+      .then((r) => alive && setTopLists(r))
+      .catch(() => alive && setTopListsFailed(true));
+    return () => {
+      alive = false;
+    };
+  }, [topMonth]);
 
   async function saveTarget() {
     const value = Number(targetInput);
@@ -282,8 +297,20 @@ export default function ManagerDashboard() {
           )}
         </div>
 
-        {/* Top items / top shops / shops that stopped ordering */}
-        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+        {/* Top items / top shops / shops that stopped ordering. Needs migrations 0022 + 0023;
+            fetched on its own so a dashboard that's live before the SQL is still usable. */}
+        <div className="mt-4 flex items-center gap-2 text-xs text-gray-500">
+          <span>{t("dashboard.manager.topMonth")}</span>
+          <input
+            type="month"
+            value={topMonth}
+            max={currentMonth()}
+            onChange={(e) => e.target.value && setTopMonth(e.target.value)}
+            className="rounded-lg border border-gray-200 px-2 py-1 text-xs text-gray-700"
+            dir="ltr"
+          />
+        </div>
+        <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="rounded-2xl border border-gray-200 bg-white p-5">
             <h2 className="mb-3 text-sm font-bold text-sea-800">{t("dashboard.manager.topItems")}</h2>
             <TopList
@@ -296,7 +323,10 @@ export default function ManagerDashboard() {
             />
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white p-5">
-            <h2 className="mb-3 text-sm font-bold text-sea-800">{t("dashboard.manager.topShops")}</h2>
+            <h2 className="mb-3 text-sm font-bold text-sea-800">
+              {t("dashboard.manager.topShops", { count: TOP_SHOPS_COUNT })}
+            </h2>
+            <div className="max-h-72 overflow-y-auto">
             <TopList
               state={topLists ? "ready" : topListsFailed ? "failed" : "loading"}
               rows={(topLists?.shops ?? []).map((r) => ({
@@ -306,6 +336,7 @@ export default function ManagerDashboard() {
                 onClick: () => navigate(`/accounts/${r.id}`),
               }))}
             />
+            </div>
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white p-5">
             <h2 className="mb-3 text-sm font-bold text-sea-800">
