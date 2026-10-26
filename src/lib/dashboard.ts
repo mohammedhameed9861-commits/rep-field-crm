@@ -380,6 +380,45 @@ export async function fetchNeedsAttention(): Promise<NeedsAttentionAccounts> {
   return { inactiveHighValue, declining, reactivation };
 }
 
+export interface TopLists {
+  items: { name: string; qty: number }[];
+  shops: { id: string; name: string; qty: number }[];
+  notOrdering: { id: string; name: string; daysSince: number }[];
+}
+
+export const NOT_ORDERING_DAYS = 10;
+
+/** Best-selling items and shops this month, plus shops with no order in 10+ days — rolled
+ * up in the database (migration 0022). */
+export async function fetchTopLists(): Promise<TopLists> {
+  if (!supabase) return { items: [], shops: [], notOrdering: [] };
+  const since = startOfMonthISO(new Date());
+  const [items, shops, stale] = await Promise.all([
+    supabase.rpc("top_items", { since, max_rows: 5 }),
+    supabase.rpc("top_shops", { since, max_rows: 5 }),
+    supabase.rpc("shops_not_ordering", { min_days: NOT_ORDERING_DAYS }),
+  ]);
+  if (items.error) throw items.error;
+  if (shops.error) throw shops.error;
+  if (stale.error) throw stale.error;
+  return {
+    items: ((items.data ?? []) as { product_name: string; total_qty: number | string }[]).map((r) => ({
+      name: r.product_name,
+      qty: Number(r.total_qty),
+    })),
+    shops: ((shops.data ?? []) as { id: string; name: string; total_qty: number | string }[]).map((r) => ({
+      id: r.id,
+      name: r.name,
+      qty: Number(r.total_qty),
+    })),
+    notOrdering: ((stale.data ?? []) as { id: string; name: string; days_since: number }[]).map((r) => ({
+      id: r.id,
+      name: r.name,
+      daysSince: r.days_since,
+    })),
+  };
+}
+
 /** Visits, calls and orders across every account, merged into one feed — the sitewide version of an account's own activity timeline. */
 export async function fetchRecentActivity(limit = 20): Promise<ActivityItem[]> {
   if (!supabase) return [];

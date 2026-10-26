@@ -358,6 +358,13 @@
       "inactiveHighValue": "حساب عالي القيمة غير نشط",
       "declining": "حساب في تراجع",
       "reactivationOpportunities": "فرصة لإعادة التفعيل",
+      "topItems": "أكثر 5 أصناف سحباً هذا الشهر",
+      "topShops": "أقوى 5 محلات سحباً هذا الشهر",
+      "notOrdering": "محلات بدون طلب منذ {{days}} أيام أو أكثر",
+      "daysAgo_one": "قبل {{count}} يوم",
+      "daysAgo_other": "قبل {{count}} يوم",
+      "topListsUnavailable": "غير متوفر بعد.",
+      "nothingToShow": "لا يوجد شيء للعرض.",
       "todaysActivity": "نشاط اليوم",
       "noActivityToday": "لا يوجد شيء مسجل اليوم.",
       "unit": {
