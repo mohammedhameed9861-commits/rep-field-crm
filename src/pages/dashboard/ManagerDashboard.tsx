@@ -4,17 +4,22 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ArrowDown, ArrowUp, Pencil, Truck, Users } from "lucide-react";
 import {
+  fetchGrowthMetrics,
   fetchLast7DaysSeries,
   fetchMonthTrend,
   fetchNeedsAttention,
   fetchSalesTeamMTD,
   fetchTodayActivityByStaff,
+  fetchTopLists,
   fetchTopStats,
+  NOT_ORDERING_DAYS,
   type DaySeriesPoint,
+  type GrowthMetrics,
   type MonthTrend,
   type NeedsAttentionAccounts,
   type SalesTeamRow,
   type TodayActivityRow,
+  type TopLists,
   type TopStats,
 } from "../../lib/dashboard";
 import { updateMonthlyTarget } from "../../lib/settings";
@@ -26,10 +31,13 @@ export default function ManagerDashboard() {
   const [stats, setStats] = useState<TopStats | null>(null);
   const [trend, setTrend] = useState<MonthTrend | null>(null);
   const [series, setSeries] = useState<DaySeriesPoint[]>([]);
+  const [growth, setGrowth] = useState<GrowthMetrics | null>(null);
   const [salesTeam, setSalesTeam] = useState<SalesTeamRow[]>([]);
   const [todayActivity, setTodayActivity] = useState<TodayActivityRow[]>([]);
   const [needsAttention, setNeedsAttention] = useState<NeedsAttentionAccounts | null>(null);
   const [expandedAttention, setExpandedAttention] = useState<keyof NeedsAttentionAccounts | null>(null);
+  const [topLists, setTopLists] = useState<TopLists | null>(null);
+  const [topListsFailed, setTopListsFailed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,10 +47,11 @@ export default function ManagerDashboard() {
 
   async function reload() {
     try {
-      const [s, mt, sr, st, ta, na] = await Promise.all([
+      const [s, mt, sr, g, st, ta, na] = await Promise.all([
         fetchTopStats(),
         fetchMonthTrend(),
         fetchLast7DaysSeries(7),
+        fetchGrowthMetrics(30),
         fetchSalesTeamMTD(),
         fetchTodayActivityByStaff(),
         fetchNeedsAttention(),
@@ -50,6 +59,7 @@ export default function ManagerDashboard() {
       setStats(s);
       setTrend(mt);
       setSeries(sr);
+      setGrowth(g);
       setSalesTeam(st);
       setTodayActivity(ta);
       setNeedsAttention(na);
@@ -62,6 +72,11 @@ export default function ManagerDashboard() {
 
   useEffect(() => {
     void reload();
+    // Separate from reload(): these need migration 0022, and a dashboard that's live before
+    // that SQL has been run should still show everything else.
+    fetchTopLists()
+      .then(setTopLists)
+      .catch(() => setTopListsFailed(true));
   }, []);
 
   async function saveTarget() {
@@ -194,6 +209,44 @@ export default function ManagerDashboard() {
           )}
         </div>
 
+        {/* Growth metrics */}
+        <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-5">
+          <div className="mb-3 flex items-baseline justify-between">
+            <h2 className="text-sm font-bold text-sea-800">{t("dashboard.manager.growth.title")}</h2>
+            <span className="text-[11px] text-gray-400">{t("dashboard.manager.growth.window")}</span>
+          </div>
+          {loading || !growth ? (
+            <p className="text-sm text-gray-400">{t("common.loading")}</p>
+          ) : (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <GrowthStat
+                label={t("dashboard.manager.growth.repeatPurchaseRate")}
+                pct={growth.repeatPurchaseRate}
+                hint={t("dashboard.manager.growth.repeatPurchaseHint", {
+                  repeat: growth.repeatCustomers,
+                  buying: growth.buyingCustomers,
+                })}
+              />
+              <GrowthStat
+                label={t("dashboard.manager.growth.conversionRate")}
+                pct={growth.conversionRate}
+                hint={t("dashboard.manager.growth.conversionHint", {
+                  sold: growth.soldVisits,
+                  total: growth.totalVisits,
+                })}
+              />
+              <GrowthStat
+                label={t("dashboard.manager.growth.activePenetration")}
+                pct={growth.activePenetrationRate}
+                hint={t("dashboard.manager.growth.activePenetrationHint", {
+                  ordering: growth.orderingActiveShops,
+                  total: growth.totalActiveShops,
+                })}
+              />
+            </div>
+          )}
+        </div>
+
         {/* Chart */}
         <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-5">
           <h2 className="mb-3 text-sm font-bold text-sea-800">{t("dashboard.manager.last7Days")}</h2>
@@ -227,6 +280,54 @@ export default function ManagerDashboard() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Top items / top shops / shops that stopped ordering */}
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <h2 className="mb-3 text-sm font-bold text-sea-800">{t("dashboard.manager.topItems")}</h2>
+            <TopList
+              state={topLists ? "ready" : topListsFailed ? "failed" : "loading"}
+              rows={(topLists?.items ?? []).map((r) => ({
+                key: r.name,
+                label: r.name,
+                value: `${r.qty} ${t("dashboard.manager.bouquets")}`,
+              }))}
+            />
+          </div>
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <h2 className="mb-3 text-sm font-bold text-sea-800">{t("dashboard.manager.topShops")}</h2>
+            <TopList
+              state={topLists ? "ready" : topListsFailed ? "failed" : "loading"}
+              rows={(topLists?.shops ?? []).map((r) => ({
+                key: r.id,
+                label: r.name,
+                value: `${r.qty} ${t("dashboard.manager.bouquets")}`,
+                onClick: () => navigate(`/accounts/${r.id}`),
+              }))}
+            />
+          </div>
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <h2 className="mb-3 text-sm font-bold text-sea-800">
+              {t("dashboard.manager.notOrdering", { days: NOT_ORDERING_DAYS })}
+              {topLists && topLists.notOrdering.length > 0 && (
+                <span className="ms-1.5 text-gray-400" dir="ltr">
+                  ({topLists.notOrdering.length})
+                </span>
+              )}
+            </h2>
+            <div className="max-h-56 overflow-y-auto">
+              <TopList
+                state={topLists ? "ready" : topListsFailed ? "failed" : "loading"}
+                rows={(topLists?.notOrdering ?? []).map((r) => ({
+                  key: r.id,
+                  label: r.name,
+                  value: t("dashboard.manager.daysAgo", { count: r.daysSince }),
+                  onClick: () => navigate(`/accounts/${r.id}`),
+                }))}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Needs attention + today's activity */}
@@ -330,6 +431,20 @@ function MiniStat({
   );
 }
 
+/** One growth metric: a big percentage plus a plain-language hint of the underlying
+ * counts (e.g. "6 of 14 shops") — a bare % is easy to misread, the raw numbers aren't. */
+function GrowthStat({ label, pct, hint }: { label: string; pct: number; hint: string }) {
+  return (
+    <div className="rounded-xl bg-gray-50 p-3.5">
+      <div className="text-[10.5px] font-semibold text-gray-400">{label}</div>
+      <div className="mt-1 text-lg font-bold text-sea-800" dir="ltr">
+        {pct.toFixed(0)}%
+      </div>
+      <div className="mt-0.5 text-[11px] text-gray-500">{hint}</div>
+    </div>
+  );
+}
+
 /** One "Needs Attention" line — clicking it jumps straight to the flagged account (when
  * there's only one) or, with several, expands an inline list to pick from. */
 function NeedsAttentionRow({
@@ -382,6 +497,44 @@ function NeedsAttentionRow({
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+/** A short ranked list for the dashboard's top-lists row — the three states (loading, SQL not
+ * run yet, real rows) share one component so each card stays a few lines. */
+function TopList({
+  state,
+  rows,
+}: {
+  state: "loading" | "failed" | "ready";
+  rows: { key: string; label: string; value: string; onClick?: () => void }[];
+}) {
+  const { t } = useTranslation();
+  if (state === "loading") return <p className="text-sm text-gray-400">{t("common.loading")}</p>;
+  if (state === "failed") return <p className="text-sm text-gray-400">{t("dashboard.manager.topListsUnavailable")}</p>;
+  if (rows.length === 0) return <p className="text-sm text-gray-400">{t("dashboard.manager.nothingToShow")}</p>;
+  return (
+    <div className="flex flex-col gap-2 text-xs">
+      {rows.map((r, i) => (
+        <div key={r.key} className="flex items-center justify-between gap-2">
+          <span className="flex min-w-0 items-center gap-1.5">
+            <span className="w-4 shrink-0 text-gray-400" dir="ltr">
+              {i + 1}
+            </span>
+            {r.onClick ? (
+              <button type="button" onClick={r.onClick} className="truncate text-start text-teal-700 hover:underline">
+                {r.label}
+              </button>
+            ) : (
+              <span className="truncate text-gray-900">{r.label}</span>
+            )}
+          </span>
+          <span className="shrink-0 font-semibold text-gray-500" dir="ltr">
+            {r.value}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }

@@ -358,11 +358,28 @@
       "inactiveHighValue": "حساب عالي القيمة غير نشط",
       "declining": "حساب في تراجع",
       "reactivationOpportunities": "فرصة لإعادة التفعيل",
+      "topItems": "أكثر 5 أصناف سحباً هذا الشهر",
+      "topShops": "أقوى 5 محلات سحباً هذا الشهر",
+      "notOrdering": "محلات بدون طلب منذ {{days}} أيام أو أكثر",
+      "daysAgo_one": "قبل {{count}} يوم",
+      "daysAgo_other": "قبل {{count}} يوم",
+      "topListsUnavailable": "غير متوفر بعد.",
+      "nothingToShow": "لا يوجد شيء للعرض.",
       "todaysActivity": "نشاط اليوم",
       "noActivityToday": "لا يوجد شيء مسجل اليوم.",
       "unit": {
         "visits": "زيارة",
         "calls": "مكالمة"
+      },
+      "growth": {
+        "title": "مؤشرات النمو",
+        "window": "آخر 30 يومًا",
+        "repeatPurchaseRate": "معدل الشراء المتكرر",
+        "repeatPurchaseHint": "{{repeat}} من {{buying}} محل اشترى، اشترى مرة أخرى",
+        "conversionRate": "معدل التحويل",
+        "conversionHint": "{{sold}} من {{total}} زيارة انتهت بعملية بيع",
+        "activePenetration": "نسبة انتشار العملاء النشطين",
+        "activePenetrationHint": "{{ordering}} من {{total}} محل نشط قدّم طلبًا"
       }
     },
     "telesales": {

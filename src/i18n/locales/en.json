@@ -358,11 +358,28 @@
       "inactiveHighValue": "inactive high-value accounts",
       "declining": "declining accounts",
       "reactivationOpportunities": "reactivation opportunities",
+      "topItems": "Top 5 items this month",
+      "topShops": "Top 5 shops this month",
+      "notOrdering": "No order in {{days}}+ days",
+      "daysAgo_one": "{{count}} day ago",
+      "daysAgo_other": "{{count}} days ago",
+      "topListsUnavailable": "Not available yet.",
+      "nothingToShow": "Nothing to show.",
       "todaysActivity": "Today's Activity",
       "noActivityToday": "Nothing logged yet today.",
       "unit": {
         "visits": "visits",
         "calls": "calls"
+      },
+      "growth": {
+        "title": "Growth Metrics",
+        "window": "Last 30 days",
+        "repeatPurchaseRate": "Repeat Purchase Rate",
+        "repeatPurchaseHint": "{{repeat}} of {{buying}} shops that ordered, ordered again",
+        "conversionRate": "Conversion Rate",
+        "conversionHint": "{{sold}} of {{total}} visits ended in a sale",
+        "activePenetration": "Active Customer Penetration",
+        "activePenetrationHint": "{{ordering}} of {{total}} active shops ordered"
       }
     },
     "telesales": {

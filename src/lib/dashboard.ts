@@ -127,6 +127,84 @@ export async function fetchLast7DaysSeries(days = 7): Promise<DaySeriesPoint[]> 
   return Array.from(buckets.entries()).map(([date, cartons]) => ({ date, cartons }));
 }
 
+export interface GrowthMetrics {
+  /** % of shops that ordered in the window and ordered 2+ times. */
+  repeatPurchaseRate: number;
+  repeatCustomers: number;
+  buyingCustomers: number;
+  /** % of a rep's visits (window) that ended in a sale. */
+  conversionRate: number;
+  soldVisits: number;
+  totalVisits: number;
+  /** % of currently-active shops that ordered at least once in the window. */
+  activePenetrationRate: number;
+  orderingActiveShops: number;
+  totalActiveShops: number;
+}
+
+/** Three growth health numbers, all over the same trailing window (default 30 days):
+ * Repeat Purchase Rate (of shops that bought, how many bought again), Conversion Rate
+ * (of a rep's visits, how many ended in a sale), and Active Customer Penetration (of
+ * every active shop, how many actually ordered). */
+export async function fetchGrowthMetrics(days = 30): Promise<GrowthMetrics> {
+  const empty: GrowthMetrics = {
+    repeatPurchaseRate: 0,
+    repeatCustomers: 0,
+    buyingCustomers: 0,
+    conversionRate: 0,
+    soldVisits: 0,
+    totalVisits: 0,
+    activePenetrationRate: 0,
+    orderingActiveShops: 0,
+    totalActiveShops: 0,
+  };
+  if (!supabase) return empty;
+
+  const since = new Date();
+  since.setDate(since.getDate() - (days - 1));
+  since.setHours(0, 0, 0, 0);
+  const sinceISO = since.toISOString();
+
+  const [ordersRes, visitsRes, accountsRes] = await Promise.all([
+    supabase.from("orders").select("account_id").gte("created_at", sinceISO),
+    supabase.from("visits").select("outcome").gte("created_at", sinceISO),
+    supabase.from("accounts").select("id, active"),
+  ]);
+  if (ordersRes.error) throw ordersRes.error;
+  if (visitsRes.error) throw visitsRes.error;
+  if (accountsRes.error) throw accountsRes.error;
+
+  const orders = (ordersRes.data ?? []) as { account_id: string }[];
+  const visits = (visitsRes.data ?? []) as { outcome: string }[];
+  const accounts = (accountsRes.data ?? []) as { id: string; active: boolean }[];
+
+  const ordersByAccount = new Map<string, number>();
+  for (const o of orders) {
+    ordersByAccount.set(o.account_id, (ordersByAccount.get(o.account_id) ?? 0) + 1);
+  }
+  const buyingCustomers = ordersByAccount.size;
+  const repeatCustomers = Array.from(ordersByAccount.values()).filter((n) => n >= 2).length;
+
+  const totalVisits = visits.length;
+  const soldVisits = visits.filter((v) => v.outcome === "sold").length;
+
+  const activeAccountIds = new Set(accounts.filter((a) => a.active).map((a) => a.id));
+  const totalActiveShops = activeAccountIds.size;
+  const orderingActiveShops = Array.from(ordersByAccount.keys()).filter((id) => activeAccountIds.has(id)).length;
+
+  return {
+    repeatPurchaseRate: buyingCustomers > 0 ? (repeatCustomers / buyingCustomers) * 100 : 0,
+    repeatCustomers,
+    buyingCustomers,
+    conversionRate: totalVisits > 0 ? (soldVisits / totalVisits) * 100 : 0,
+    soldVisits,
+    totalVisits,
+    activePenetrationRate: totalActiveShops > 0 ? (orderingActiveShops / totalActiveShops) * 100 : 0,
+    orderingActiveShops,
+    totalActiveShops,
+  };
+}
+
 export interface SalesTeamRow {
   key: string;
   name: string;
@@ -300,6 +378,45 @@ export async function fetchNeedsAttention(): Promise<NeedsAttentionAccounts> {
   }
 
   return { inactiveHighValue, declining, reactivation };
+}
+
+export interface TopLists {
+  items: { name: string; qty: number }[];
+  shops: { id: string; name: string; qty: number }[];
+  notOrdering: { id: string; name: string; daysSince: number }[];
+}
+
+export const NOT_ORDERING_DAYS = 10;
+
+/** Best-selling items and shops this month, plus shops with no order in 10+ days — rolled
+ * up in the database (migration 0022). */
+export async function fetchTopLists(): Promise<TopLists> {
+  if (!supabase) return { items: [], shops: [], notOrdering: [] };
+  const since = startOfMonthISO(new Date());
+  const [items, shops, stale] = await Promise.all([
+    supabase.rpc("top_items", { since, max_rows: 5 }),
+    supabase.rpc("top_shops", { since, max_rows: 5 }),
+    supabase.rpc("shops_not_ordering", { min_days: NOT_ORDERING_DAYS }),
+  ]);
+  if (items.error) throw items.error;
+  if (shops.error) throw shops.error;
+  if (stale.error) throw stale.error;
+  return {
+    items: ((items.data ?? []) as { product_name: string; total_qty: number | string }[]).map((r) => ({
+      name: r.product_name,
+      qty: Number(r.total_qty),
+    })),
+    shops: ((shops.data ?? []) as { id: string; name: string; total_qty: number | string }[]).map((r) => ({
+      id: r.id,
+      name: r.name,
+      qty: Number(r.total_qty),
+    })),
+    notOrdering: ((stale.data ?? []) as { id: string; name: string; days_since: number }[]).map((r) => ({
+      id: r.id,
+      name: r.name,
+      daysSince: r.days_since,
+    })),
+  };
 }
 
 /** Visits, calls and orders across every account, merged into one feed — the sitewide version of an account's own activity timeline. */
