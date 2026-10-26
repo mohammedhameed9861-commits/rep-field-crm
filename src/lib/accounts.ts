@@ -84,6 +84,13 @@ export async function updateOrder(id: string, input: OrderEditInput): Promise<vo
   if (error) throw error;
 }
 
+/** Manager-only permanent removal of an order (migration 0025) — logged to audit_log first. */
+export async function deleteOrder(id: string): Promise<void> {
+  if (!supabase) throw new Error("Supabase is not configured");
+  const { error } = await supabase.rpc("manager_delete_order", { p_order_id: id });
+  if (error) throw error;
+}
+
 export interface ManualOrderInput {
   staffId: string;
   /** "YYYY-MM-DD" — the day the sale really happened. */

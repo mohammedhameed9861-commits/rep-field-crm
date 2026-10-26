@@ -268,6 +268,8 @@
     "noTypesYet": "No products yet — ask a manager to add some from Inventory first."
   },
   "editHistory": {
+    "deleteOrder": "Delete this sale",
+    "confirmDeleteOrder": "Delete this sale permanently? It will no longer count anywhere. This can't be undone.",
     "addOrder": "Add sale",
     "creditTo": "Credit the sale to…",
     "pickStaff": "Pick who made the sale.",
