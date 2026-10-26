@@ -2,7 +2,7 @@ import { friendlyError } from "../../lib/errors";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
-import { updateOrder } from "../../lib/accounts";
+import { deleteOrder, updateOrder } from "../../lib/accounts";
 import { fetchOrderItems, type OrderLineDraft } from "../../lib/orderLines";
 import { fetchProductTypes } from "../../lib/productTypes";
 import type { OrderRow, OrderStatus, ProductType } from "../../lib/types";
@@ -61,6 +61,19 @@ export default function EditOrderModal({
     }
   }
 
+  async function onDelete() {
+    if (!window.confirm(t("editHistory.confirmDeleteOrder"))) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await deleteOrder(order.id);
+      onSaved();
+    } catch (err) {
+      setError(friendlyError(err));
+      setBusy(false);
+    }
+  }
+
   const field =
     "w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100";
 
@@ -93,6 +106,14 @@ export default function EditOrderModal({
               className="w-full rounded-full bg-teal-500 px-6 py-2.5 font-semibold text-white transition hover:bg-teal-600 disabled:opacity-50"
             >
               {busy ? t("common.saving") : t("common.saveChanges")}
+            </button>
+            <button
+              type="button"
+              onClick={onDelete}
+              disabled={busy}
+              className="w-full rounded-full border border-red-200 px-6 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+            >
+              {t("editHistory.deleteOrder")}
             </button>
           </form>
         )}
