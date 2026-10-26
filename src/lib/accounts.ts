@@ -84,6 +84,44 @@ export async function updateOrder(id: string, input: OrderEditInput): Promise<vo
   if (error) throw error;
 }
 
+export interface ManualOrderInput {
+  staffId: string;
+  /** "YYYY-MM-DD" — the day the sale really happened. */
+  date: string;
+  lines: OrderLineDraft[];
+  status: OrderStatus;
+}
+
+/** Active reps and telesales agents a manager can credit a missed sale to. */
+export async function fetchSaleCredits(): Promise<{ id: string; full_name: string; role: string }[]> {
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, full_name, role")
+    .eq("active", true)
+    .in("role", ["rep", "telesales"])
+    .order("full_name", { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+}
+
+/** Manager-only: log a sale on someone's behalf (migration 0024). */
+export async function addManualOrder(accountId: string, input: ManualOrderInput): Promise<void> {
+  if (!supabase) throw new Error("Supabase is not configured");
+  const { rows } = summarizeLines(input.lines);
+  if (rows.length === 0) throw new Error("An order needs at least one product line");
+  // Noon local time on the chosen day, so timezone shifts can't move it to a neighbouring date.
+  const [y, m, d] = input.date.split("-").map(Number);
+  const { error } = await supabase.rpc("manager_add_order", {
+    p_account_id: accountId,
+    p_staff_id: input.staffId,
+    p_created_at: new Date(y, m - 1, d, 12, 0, 0).toISOString(),
+    p_lines: rows,
+    p_status: input.status,
+  });
+  if (error) throw error;
+}
+
 /** Orders, visits and calls for one account, merged into one chronological feed. */
 export async function fetchAccountActivity(accountId: string): Promise<{
   orders: OrderRow[];

@@ -9,6 +9,7 @@ import { useAuth } from "../../lib/auth";
 import type { Account, ActivityItem, OrderRow, ShopClass } from "../../lib/types";
 import AccountForm from "./AccountForm";
 import AccountsBoard from "./AccountsBoard";
+import AddOrderModal from "./AddOrderModal";
 import EditOrderModal from "./EditOrderModal";
 import EditHistoryButton from "../../components/EditHistoryButton";
 
@@ -36,6 +37,7 @@ export default function AccountsPage() {
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [detailLoading, setDetailLoading] = useState(false);
   const [editingOrder, setEditingOrder] = useState<OrderRow | null>(null);
+  const [addingOrder, setAddingOrder] = useState(false);
 
   async function reloadActivity(accountId: string) {
     setDetailLoading(true);
@@ -346,7 +348,17 @@ export default function AccountsPage() {
               ) : (
                 <>
                   <div className="pt-5">
-                    <h3 className="mb-2 text-sm font-bold text-sea-800">{t("accounts.orderHistory")}</h3>
+                    <div className="mb-2 flex items-center justify-between">
+                      <h3 className="text-sm font-bold text-sea-800">{t("accounts.orderHistory")}</h3>
+                      {profile?.role === "manager" && (
+                        <button
+                          onClick={() => setAddingOrder(true)}
+                          className="flex items-center gap-1 text-xs font-semibold text-teal-700 hover:underline"
+                        >
+                          <Plus size={12} /> {t("editHistory.addOrder")}
+                        </button>
+                      )}
+                    </div>
                     {orders.length === 0 ? (
                       <p className="text-sm text-gray-400">{t("accounts.noOrdersYet")}</p>
                     ) : (
@@ -480,6 +492,17 @@ export default function AccountsPage() {
           onSaved={() => {
             setEditing(false);
             void reload();
+          }}
+        />
+      )}
+
+      {addingOrder && id && (
+        <AddOrderModal
+          accountId={id}
+          onClose={() => setAddingOrder(false)}
+          onSaved={() => {
+            setAddingOrder(false);
+            void reloadActivity(id);
           }}
         />
       )}

@@ -268,6 +268,10 @@
     "noTypesYet": "No products yet — ask a manager to add some from Inventory first."
   },
   "editHistory": {
+    "addOrder": "Add sale",
+    "creditTo": "Credit the sale to…",
+    "pickStaff": "Pick who made the sale.",
+    "addOrderHint": "Logged as a sold visit (or order call) by that person, marked \"Entered by manager\".",
     "view": "History",
     "title": "Edit History",
     "none": "No edits yet.",
