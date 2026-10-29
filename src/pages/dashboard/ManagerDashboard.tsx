@@ -6,6 +6,7 @@ import { ArrowDown, ArrowUp, Pencil, Truck, Users } from "lucide-react";
 import {
   fetchGrowthMetrics,
   fetchLast7DaysSeries,
+  fetchMonthOverview,
   fetchMonthTrend,
   fetchNeedsAttention,
   fetchSalesTeamMTD,
@@ -16,6 +17,7 @@ import {
   TOP_SHOPS_COUNT,
   type DaySeriesPoint,
   type GrowthMetrics,
+  type MonthOverview,
   type MonthTrend,
   type NeedsAttentionAccounts,
   type SalesTeamRow,
@@ -45,6 +47,8 @@ export default function ManagerDashboard() {
   const [expandedAttention, setExpandedAttention] = useState<keyof NeedsAttentionAccounts | null>(null);
   const [topLists, setTopLists] = useState<TopLists | null>(null);
   const [topListsFailed, setTopListsFailed] = useState(false);
+  const [overview, setOverview] = useState<MonthOverview | null>(null);
+  const [overviewFailed, setOverviewFailed] = useState(false);
   const [topMonth, setTopMonth] = useState(currentMonth); // "YYYY-MM"
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -89,6 +93,19 @@ export default function ManagerDashboard() {
     fetchTopLists(new Date(y, m - 1, 1))
       .then((r) => alive && setTopLists(r))
       .catch(() => alive && setTopListsFailed(true));
+    return () => {
+      alive = false;
+    };
+  }, [topMonth]);
+
+  // Separate from the top lists above: a missing migration (0026) must not hide them or vice versa.
+  useEffect(() => {
+    const [y, m] = topMonth.split("-").map(Number);
+    let alive = true;
+    setOverviewFailed(false);
+    fetchMonthOverview(new Date(y, m - 1, 1))
+      .then((r) => alive && setOverview(r))
+      .catch(() => alive && setOverviewFailed(true));
     return () => {
       alive = false;
     };
@@ -310,7 +327,46 @@ export default function ManagerDashboard() {
             dir="ltr"
           />
         </div>
-        <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
+          <MiniStat
+            label={t("dashboard.manager.avgPerOrder")}
+            value={overview ? overview.avgPerOrder.toFixed(1) : overviewFailed ? "—" : "…"}
+          />
+          <MiniStat
+            label={t("dashboard.manager.firstTimeBuyers")}
+            value={overview ? overview.firstTime.length : overviewFailed ? "—" : "…"}
+          />
+        </div>
+        <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <h2 className="mb-3 text-sm font-bold text-sea-800">{t("dashboard.manager.salesByArea")}</h2>
+            <div className="max-h-56 overflow-y-auto">
+              <TopList
+                state={overview ? "ready" : overviewFailed ? "failed" : "loading"}
+                rows={(overview?.byArea ?? []).map((r) => ({
+                  key: r.area || "—",
+                  label: r.area || t("dashboard.manager.noArea"),
+                  value: `${r.qty} ${t("dashboard.manager.bouquets")}`,
+                }))}
+              />
+            </div>
+          </div>
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <h2 className="mb-3 text-sm font-bold text-sea-800">{t("dashboard.manager.firstTimeBuyers")}</h2>
+            <div className="max-h-56 overflow-y-auto">
+              <TopList
+                state={overview ? "ready" : overviewFailed ? "failed" : "loading"}
+                rows={(overview?.firstTime ?? []).map((r) => ({
+                  key: r.id,
+                  label: r.name,
+                  value: "",
+                  onClick: () => navigate(`/accounts/${r.id}`),
+                }))}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="rounded-2xl border border-gray-200 bg-white p-5">
             <h2 className="mb-3 text-sm font-bold text-sea-800">{t("dashboard.manager.topItems")}</h2>
             <TopList

@@ -345,6 +345,10 @@
   },
   "dashboard": {
     "manager": {
+      "avgPerOrder": "Avg bouquets / order",
+      "firstTimeBuyers": "First-time buyers",
+      "salesByArea": "Sales by area",
+      "noArea": "No area set",
       "title": "Dashboard",
       "salesToday": "Sales Today",
       "mtdSales": "MTD Sales",
