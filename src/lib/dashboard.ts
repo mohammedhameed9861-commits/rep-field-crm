@@ -389,6 +389,7 @@ export interface TopLists {
 export const NOT_ORDERING_DAYS = 10;
 
 export const TOP_SHOPS_COUNT = 50;
+export const TOP_ITEMS_COUNT = 20;
 
 /** Best-selling items and shops for the month containing `month`, plus shops with no order
  * in 10+ days (always as of today) — rolled up in the database (migrations 0022/0023). */
@@ -397,7 +398,7 @@ export async function fetchTopLists(month: Date): Promise<TopLists> {
   const since = new Date(month.getFullYear(), month.getMonth(), 1).toISOString();
   const until = new Date(month.getFullYear(), month.getMonth() + 1, 1).toISOString();
   const [items, shops, stale] = await Promise.all([
-    supabase.rpc("top_items", { since, until, max_rows: 5 }),
+    supabase.rpc("top_items", { since, until, max_rows: TOP_ITEMS_COUNT }),
     supabase.rpc("top_shops", { since, until, max_rows: TOP_SHOPS_COUNT }),
     supabase.rpc("shops_not_ordering", { min_days: NOT_ORDERING_DAYS }),
   ]);

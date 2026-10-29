@@ -14,6 +14,7 @@ import {
   fetchTopLists,
   fetchTopStats,
   NOT_ORDERING_DAYS,
+  TOP_ITEMS_COUNT,
   TOP_SHOPS_COUNT,
   type DaySeriesPoint,
   type GrowthMetrics,
@@ -368,15 +369,19 @@ export default function ManagerDashboard() {
         </div>
         <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="rounded-2xl border border-gray-200 bg-white p-5">
-            <h2 className="mb-3 text-sm font-bold text-sea-800">{t("dashboard.manager.topItems")}</h2>
-            <TopList
-              state={topLists ? "ready" : topListsFailed ? "failed" : "loading"}
-              rows={(topLists?.items ?? []).map((r) => ({
-                key: r.name,
-                label: r.name,
-                value: `${r.qty} ${t("dashboard.manager.bouquets")}`,
-              }))}
-            />
+            <h2 className="mb-3 text-sm font-bold text-sea-800">
+              {t("dashboard.manager.topItems", { count: TOP_ITEMS_COUNT })}
+            </h2>
+            <div className="max-h-72 overflow-y-auto">
+              <TopList
+                state={topLists ? "ready" : topListsFailed ? "failed" : "loading"}
+                rows={(topLists?.items ?? []).map((r) => ({
+                  key: r.name,
+                  label: r.name,
+                  value: `${r.qty} ${t("dashboard.manager.bouquets")}`,
+                }))}
+              />
+            </div>
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white p-5">
             <h2 className="mb-3 text-sm font-bold text-sea-800">
