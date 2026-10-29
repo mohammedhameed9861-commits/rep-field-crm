@@ -345,8 +345,9 @@
   },
   "dashboard": {
     "manager": {
+      "oneTimeBuyers": "اشتروا مرة واحدة فقط",
+      "oneTimeHint": "محلات عندها طلب واحد فقط، وكم مضى عليه.",
       "avgPerOrder": "متوسط الباقات لكل طلب",
-      "firstTimeBuyers": "عملاء اشتروا لأول مرة",
       "salesByArea": "المبيعات حسب المنطقة",
       "noArea": "بدون منطقة",
       "title": "لوحة التحكم",

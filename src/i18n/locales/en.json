@@ -345,8 +345,9 @@
   },
   "dashboard": {
     "manager": {
+      "oneTimeBuyers": "Bought only once",
+      "oneTimeHint": "Shops with a single order ever, and how long ago it was.",
       "avgPerOrder": "Avg bouquets / order",
-      "firstTimeBuyers": "First-time buyers",
       "salesByArea": "Sales by area",
       "noArea": "No area set",
       "title": "Dashboard",

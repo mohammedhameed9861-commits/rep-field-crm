@@ -8,6 +8,7 @@ import {
   fetchLast7DaysSeries,
   fetchMonthOverview,
   fetchMonthTrend,
+  fetchOneTimeBuyers,
   fetchNeedsAttention,
   fetchSalesTeamMTD,
   fetchTodayActivityByStaff,
@@ -20,6 +21,7 @@ import {
   type MonthOverview,
   type MonthTrend,
   type NeedsAttentionAccounts,
+  type OneTimeBuyer,
   type SalesTeamRow,
   type TodayActivityRow,
   type TopLists,
@@ -49,6 +51,8 @@ export default function ManagerDashboard() {
   const [topListsFailed, setTopListsFailed] = useState(false);
   const [overview, setOverview] = useState<MonthOverview | null>(null);
   const [overviewFailed, setOverviewFailed] = useState(false);
+  const [oneTime, setOneTime] = useState<OneTimeBuyer[] | null>(null);
+  const [oneTimeFailed, setOneTimeFailed] = useState(false);
   const [topMonth, setTopMonth] = useState(currentMonth); // "YYYY-MM"
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -97,6 +101,13 @@ export default function ManagerDashboard() {
       alive = false;
     };
   }, [topMonth]);
+
+  // Not month-based, so it loads once; separate so a missing migration (0027) hides only this card.
+  useEffect(() => {
+    fetchOneTimeBuyers()
+      .then(setOneTime)
+      .catch(() => setOneTimeFailed(true));
+  }, []);
 
   // Separate from the top lists above: a missing migration (0026) must not hide them or vice versa.
   useEffect(() => {
@@ -333,8 +344,8 @@ export default function ManagerDashboard() {
             value={overview ? overview.avgPerOrder.toFixed(1) : overviewFailed ? "—" : "…"}
           />
           <MiniStat
-            label={t("dashboard.manager.firstTimeBuyers")}
-            value={overview ? overview.firstTime.length : overviewFailed ? "—" : "…"}
+            label={t("dashboard.manager.oneTimeBuyers")}
+            value={oneTime ? oneTime.length : oneTimeFailed ? "—" : "…"}
           />
         </div>
         <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -352,14 +363,15 @@ export default function ManagerDashboard() {
             </div>
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white p-5">
-            <h2 className="mb-3 text-sm font-bold text-sea-800">{t("dashboard.manager.firstTimeBuyers")}</h2>
+            <h2 className="mb-1 text-sm font-bold text-sea-800">{t("dashboard.manager.oneTimeBuyers")}</h2>
+            <p className="mb-3 text-xs text-gray-400">{t("dashboard.manager.oneTimeHint")}</p>
             <div className="max-h-56 overflow-y-auto">
               <TopList
-                state={overview ? "ready" : overviewFailed ? "failed" : "loading"}
-                rows={(overview?.firstTime ?? []).map((r) => ({
+                state={oneTime ? "ready" : oneTimeFailed ? "failed" : "loading"}
+                rows={(oneTime ?? []).map((r) => ({
                   key: r.id,
                   label: r.name,
-                  value: "",
+                  value: t("dashboard.manager.daysAgo", { count: r.daysSince }),
                   onClick: () => navigate(`/accounts/${r.id}`),
                 }))}
               />
