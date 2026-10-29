@@ -422,6 +422,42 @@ export async function fetchTopLists(month: Date): Promise<TopLists> {
   };
 }
 
+export interface MonthOverview {
+  orders: number;
+  cartons: number;
+  /** Average bouquets per order; 0 when there were no orders. */
+  avgPerOrder: number;
+  firstTime: { id: string; name: string }[];
+  /** area is "" for shops with no area set. */
+  byArea: { area: string; qty: number }[];
+}
+
+/** Order count, average bouquets per order, first-time buyers and sales by area for the month
+ * containing `month` — rolled up in the database (migration 0026). */
+export async function fetchMonthOverview(month: Date): Promise<MonthOverview> {
+  const empty = { orders: 0, cartons: 0, avgPerOrder: 0, firstTime: [], byArea: [] };
+  if (!supabase) return empty;
+  const since = new Date(month.getFullYear(), month.getMonth(), 1).toISOString();
+  const until = new Date(month.getFullYear(), month.getMonth() + 1, 1).toISOString();
+  const { data, error } = await supabase.rpc("month_overview", { since, until });
+  if (error) throw error;
+  const d = (data ?? {}) as {
+    orders?: number;
+    cartons?: number | string;
+    first_time?: { id: string; name: string }[];
+    by_area?: { area: string; qty: number | string }[];
+  };
+  const orders = Number(d.orders ?? 0);
+  const cartons = Number(d.cartons ?? 0);
+  return {
+    orders,
+    cartons,
+    avgPerOrder: orders > 0 ? cartons / orders : 0,
+    firstTime: d.first_time ?? [],
+    byArea: (d.by_area ?? []).map((r) => ({ area: r.area, qty: Number(r.qty) })),
+  };
+}
+
 /** Visits, calls and orders across every account, merged into one feed — the sitewide version of an account's own activity timeline. */
 export async function fetchRecentActivity(limit = 20): Promise<ActivityItem[]> {
   if (!supabase) return [];

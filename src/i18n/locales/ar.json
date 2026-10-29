@@ -345,6 +345,10 @@
   },
   "dashboard": {
     "manager": {
+      "avgPerOrder": "متوسط الباقات لكل طلب",
+      "firstTimeBuyers": "عملاء اشتروا لأول مرة",
+      "salesByArea": "المبيعات حسب المنطقة",
+      "noArea": "بدون منطقة",
       "title": "لوحة التحكم",
       "salesToday": "مبيعات اليوم",
       "mtdSales": "مبيعات الشهر",
