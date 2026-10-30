@@ -368,7 +368,7 @@
       "inactiveHighValue": "حساب عالي القيمة غير نشط",
       "declining": "حساب في تراجع",
       "reactivationOpportunities": "فرصة لإعادة التفعيل",
-      "topItems": "أكثر 5 أصناف سحباً",
+      "topItems": "أكثر {{count}} صنف سحباً",
       "topShops": "أقوى {{count}} محل سحباً",
       "topMonth": "الشهر:",
       "notOrdering": "محلات بدون طلب منذ {{days}} أيام أو أكثر",

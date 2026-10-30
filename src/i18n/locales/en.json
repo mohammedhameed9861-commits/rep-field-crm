@@ -368,7 +368,7 @@
       "inactiveHighValue": "inactive high-value accounts",
       "declining": "declining accounts",
       "reactivationOpportunities": "reactivation opportunities",
-      "topItems": "Top 5 items",
+      "topItems": "Top {{count}} items",
       "topShops": "Top {{count}} shops",
       "topMonth": "Month:",
       "notOrdering": "No order in {{days}}+ days",
