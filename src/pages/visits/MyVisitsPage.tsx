@@ -74,6 +74,11 @@ export default function MyVisitsPage() {
                   <img
                     src={photos[v.id]}
                     alt={v.account?.name ?? ""}
+                    // Only the photos scrolled into view download — the list holds up to 200
+                    // (500 for a manager) and each is ~300KB, so loading them all was most of
+                    // the app's storage bandwidth.
+                    loading="lazy"
+                    decoding="async"
                     className="h-14 w-14 shrink-0 rounded-lg object-cover"
                     onError={(e) => {
                       // A deleted/expired photo shows a plain empty box instead of
