@@ -313,6 +313,7 @@
     "inventoryMovements": "Inventory movements"
   },
   "visitsActivity": {
+    "loadMore": "Load older visits",
     "title": "Visits Activity",
     "managerOnly": "Only managers can view team-wide visit activity.",
     "countOne": "{{count}} visit",
@@ -345,6 +346,9 @@
   },
   "dashboard": {
     "manager": {
+      "allTime": "All time",
+      "salesByRep": "Sales by rep",
+      "ordersUnit": "orders",
       "avgPerOrder": "Avg bouquets / order",
       "firstTimeBuyers": "First-time buyers",
       "salesByArea": "Sales by area",

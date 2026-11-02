@@ -313,6 +313,7 @@
     "inventoryMovements": "حركات المخزون"
   },
   "visitsActivity": {
+    "loadMore": "عرض زيارات أقدم",
     "title": "نشاط الزيارات",
     "managerOnly": "المدير فقط يمكنه عرض نشاط الزيارات على مستوى الفريق.",
     "countOne": "{{count}} زيارة",
@@ -345,6 +346,9 @@
   },
   "dashboard": {
     "manager": {
+      "allTime": "كل الفترات",
+      "salesByRep": "المبيعات حسب المندوب",
+      "ordersUnit": "طلب",
       "avgPerOrder": "متوسط الباقات لكل طلب",
       "firstTimeBuyers": "عملاء اشتروا لأول مرة",
       "salesByArea": "المبيعات حسب المنطقة",
