@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Pencil } from "lucide-react";
 import { useAuth } from "../../lib/auth";
-import { fetchAllVisits, visitPhotoUrls } from "../../lib/visits";
+import { fetchAllVisits, VISITS_PAGE, visitPhotoUrls } from "../../lib/visits";
 import { fetchStaff, setStaffTarget } from "../../lib/reps";
 import { fetchRepPerformance, type RepPerformanceRow } from "../../lib/dashboard";
 import type { Profile, Visit, VisitOutcome } from "../../lib/types";
@@ -36,16 +36,43 @@ export default function VisitsActivityPage() {
 
   const [editingVisit, setEditingVisit] = useState<Visit | null>(null);
 
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  function currentFilters() {
+    return {
+      repId: repId || undefined,
+      outcome: outcome || undefined,
+      dateFrom: dateFrom || undefined,
+      dateTo: dateTo || undefined,
+    };
+  }
+
+  /** Appends the next page — older visits beyond the first VISITS_PAGE, under the same filters. */
+  async function loadMore() {
+    setLoadingMore(true);
+    try {
+      const data = await fetchAllVisits(currentFilters(), visits.length);
+      setVisits((prev) => [...prev, ...data]);
+      setHasMore(data.length === VISITS_PAGE);
+      const urls = await visitPhotoUrls(data.map((v) => v.photo_path));
+      setPhotos((prev) => ({
+        ...prev,
+        ...Object.fromEntries(data.map((v) => [v.id, urls[v.photo_path]]).filter(([, u]) => u)),
+      }));
+    } catch (err) {
+      setError(friendlyError(err));
+    } finally {
+      setLoadingMore(false);
+    }
+  }
+
   async function reloadVisits() {
     setLoading(true);
     try {
-      const data = await fetchAllVisits({
-        repId: repId || undefined,
-        outcome: outcome || undefined,
-        dateFrom: dateFrom || undefined,
-        dateTo: dateTo || undefined,
-      });
+      const data = await fetchAllVisits(currentFilters());
       setVisits(data);
+      setHasMore(data.length === VISITS_PAGE);
       const urls = await visitPhotoUrls(data.map((v) => v.photo_path));
       setPhotos(Object.fromEntries(data.map((v) => [v.id, urls[v.photo_path]]).filter(([, u]) => u)));
     } catch (err) {
@@ -311,6 +338,15 @@ export default function VisitsActivityPage() {
                 </div>
               </div>
             ))}
+            {hasMore && (
+              <button
+                onClick={() => void loadMore()}
+                disabled={loadingMore}
+                className="mt-1 rounded-full border border-gray-200 px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+              >
+                {loadingMore ? t("common.loading") : t("visitsActivity.loadMore")}
+              </button>
+            )}
           </div>
         )}
       </div>

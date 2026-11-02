@@ -147,7 +147,11 @@ export interface VisitFilters {
 }
 
 /** Every visit across every rep — the manager's team-wide monitoring view, not one rep's own history. */
-export async function fetchAllVisits(filters: VisitFilters = {}): Promise<Visit[]> {
+export const VISITS_PAGE = 500;
+
+/** One page (VISITS_PAGE rows) of the team-wide list, newest first; pass the number already
+ * loaded as `offset` to get the next page. A full page means there may be more. */
+export async function fetchAllVisits(filters: VisitFilters = {}, offset = 0): Promise<Visit[]> {
   if (!supabase) return [];
   let q = supabase
     .from("visits")
@@ -155,7 +159,7 @@ export async function fetchAllVisits(filters: VisitFilters = {}): Promise<Visit[
       "*, account:accounts!visits_account_id_fkey(id, name, area), rep:profiles!visits_rep_id_fkey(id, full_name)",
     )
     .order("created_at", { ascending: false })
-    .limit(500);
+    .range(offset, offset + VISITS_PAGE - 1);
   if (filters.repId) q = q.eq("rep_id", filters.repId);
   if (filters.outcome) q = q.eq("outcome", filters.outcome);
   if (filters.dateFrom) q = q.gte("created_at", `${filters.dateFrom}T00:00:00`);

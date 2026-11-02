@@ -388,15 +388,34 @@ export interface TopLists {
 
 export const NOT_ORDERING_DAYS = 10;
 
+/** A half-open [since, until) window the dashboard's month section reads, as ISO timestamps. */
+export interface DateRange {
+  since: string;
+  until: string;
+}
+
+/** The calendar month containing `month`, in the user's own timezone. */
+export function monthRange(month: Date): DateRange {
+  return {
+    since: new Date(month.getFullYear(), month.getMonth(), 1).toISOString(),
+    until: new Date(month.getFullYear(), month.getMonth() + 1, 1).toISOString(),
+  };
+}
+
+/** Every order ever — "since" is far before any real data, "until" is tomorrow. */
+export function allTimeRange(): DateRange {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return { since: new Date(2000, 0, 1).toISOString(), until: tomorrow.toISOString() };
+}
+
 export const TOP_SHOPS_COUNT = 50;
 export const TOP_ITEMS_COUNT = 20;
 
 /** Best-selling items and shops for the month containing `month`, plus shops with no order
  * in 10+ days (always as of today) — rolled up in the database (migrations 0022/0023). */
-export async function fetchTopLists(month: Date): Promise<TopLists> {
+export async function fetchTopLists({ since, until }: DateRange): Promise<TopLists> {
   if (!supabase) return { items: [], shops: [], notOrdering: [] };
-  const since = new Date(month.getFullYear(), month.getMonth(), 1).toISOString();
-  const until = new Date(month.getFullYear(), month.getMonth() + 1, 1).toISOString();
   const [items, shops, stale] = await Promise.all([
     supabase.rpc("top_items", { since, until, max_rows: TOP_ITEMS_COUNT }),
     supabase.rpc("top_shops", { since, until, max_rows: TOP_SHOPS_COUNT }),
@@ -435,11 +454,9 @@ export interface MonthOverview {
 
 /** Order count, average bouquets per order, first-time buyers and sales by area for the month
  * containing `month` — rolled up in the database (migration 0026). */
-export async function fetchMonthOverview(month: Date): Promise<MonthOverview> {
+export async function fetchMonthOverview({ since, until }: DateRange): Promise<MonthOverview> {
   const empty = { orders: 0, cartons: 0, avgPerOrder: 0, firstTime: [], byArea: [] };
   if (!supabase) return empty;
-  const since = new Date(month.getFullYear(), month.getMonth(), 1).toISOString();
-  const until = new Date(month.getFullYear(), month.getMonth() + 1, 1).toISOString();
   const { data, error } = await supabase.rpc("month_overview", { since, until });
   if (error) throw error;
   const d = (data ?? {}) as {
@@ -457,6 +474,29 @@ export async function fetchMonthOverview(month: Date): Promise<MonthOverview> {
     firstTime: d.first_time ?? [],
     byArea: (d.by_area ?? []).map((r) => ({ area: r.area, qty: Number(r.qty) })),
   };
+}
+
+export interface StaffSales {
+  id: string;
+  name: string;
+  role: "rep" | "telesales";
+  orders: number;
+  cartons: number;
+}
+
+/** Cartons and order count per rep and telesales agent for a date range (migration 0028). */
+export async function fetchSalesByStaff({ since, until }: DateRange): Promise<StaffSales[]> {
+  if (!supabase) return [];
+  const { data, error } = await supabase.rpc("sales_by_staff", { since, until });
+  if (error) throw error;
+  type Row = { id: string; full_name: string; role: "rep" | "telesales"; orders: number | string; cartons: number | string };
+  return ((data ?? []) as Row[]).map((r) => ({
+    id: r.id,
+    name: r.full_name,
+    role: r.role,
+    orders: Number(r.orders),
+    cartons: Number(r.cartons),
+  }));
 }
 
 /** Visits, calls and orders across every account, merged into one feed — the sitewide version of an account's own activity timeline. */

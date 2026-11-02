@@ -9,11 +9,14 @@ import {
   fetchMonthOverview,
   fetchMonthTrend,
   fetchNeedsAttention,
+  fetchSalesByStaff,
   fetchSalesTeamMTD,
   fetchTodayActivityByStaff,
   fetchTopLists,
   fetchTopStats,
   NOT_ORDERING_DAYS,
+  allTimeRange,
+  monthRange,
   TOP_ITEMS_COUNT,
   TOP_SHOPS_COUNT,
   type DaySeriesPoint,
@@ -22,6 +25,7 @@ import {
   type MonthTrend,
   type NeedsAttentionAccounts,
   type SalesTeamRow,
+  type StaffSales,
   type TodayActivityRow,
   type TopLists,
   type TopStats,
@@ -51,6 +55,9 @@ export default function ManagerDashboard() {
   const [overview, setOverview] = useState<MonthOverview | null>(null);
   const [overviewFailed, setOverviewFailed] = useState(false);
   const [topMonth, setTopMonth] = useState(currentMonth); // "YYYY-MM"
+  const [allTime, setAllTime] = useState(false);
+  const [staffSales, setStaffSales] = useState<StaffSales[] | null>(null);
+  const [staffSalesFailed, setStaffSalesFailed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -89,28 +96,44 @@ export default function ManagerDashboard() {
 
   useEffect(() => {
     const [y, m] = topMonth.split("-").map(Number);
+    const range = allTime ? allTimeRange() : monthRange(new Date(y, m - 1, 1));
     let alive = true;
     setTopListsFailed(false);
-    fetchTopLists(new Date(y, m - 1, 1))
+    fetchTopLists(range)
       .then((r) => alive && setTopLists(r))
       .catch(() => alive && setTopListsFailed(true));
     return () => {
       alive = false;
     };
-  }, [topMonth]);
+  }, [topMonth, allTime]);
 
   // Separate from the top lists above: a missing migration (0026) must not hide them or vice versa.
   useEffect(() => {
     const [y, m] = topMonth.split("-").map(Number);
+    const range = allTime ? allTimeRange() : monthRange(new Date(y, m - 1, 1));
     let alive = true;
     setOverviewFailed(false);
-    fetchMonthOverview(new Date(y, m - 1, 1))
+    fetchMonthOverview(range)
       .then((r) => alive && setOverview(r))
       .catch(() => alive && setOverviewFailed(true));
     return () => {
       alive = false;
     };
-  }, [topMonth]);
+  }, [topMonth, allTime]);
+
+  // Separate again: needs migration 0028.
+  useEffect(() => {
+    const [y, m] = topMonth.split("-").map(Number);
+    const range = allTime ? allTimeRange() : monthRange(new Date(y, m - 1, 1));
+    let alive = true;
+    setStaffSalesFailed(false);
+    fetchSalesByStaff(range)
+      .then((r) => alive && setStaffSales(r))
+      .catch(() => alive && setStaffSalesFailed(true));
+    return () => {
+      alive = false;
+    };
+  }, [topMonth, allTime]);
 
   async function saveTarget() {
     const value = Number(targetInput);
@@ -324,9 +347,39 @@ export default function ManagerDashboard() {
             value={topMonth}
             max={currentMonth()}
             onChange={(e) => e.target.value && setTopMonth(e.target.value)}
-            className="rounded-lg border border-gray-200 px-2 py-1 text-xs text-gray-700"
+            disabled={allTime}
+            className="rounded-lg border border-gray-200 px-2 py-1 text-xs text-gray-700 disabled:opacity-40"
             dir="ltr"
           />
+          <button
+            type="button"
+            onClick={() => setAllTime(!allTime)}
+            className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+              allTime ? "border-teal-500 bg-teal-500 text-white" : "border-gray-200 text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            {t("dashboard.manager.allTime")}
+          </button>
+        </div>
+        <div className="mt-3 rounded-2xl border border-gray-200 bg-white p-5">
+          <h2 className="mb-3 text-sm font-bold text-sea-800">
+            {t("dashboard.manager.salesByRep")}
+            {staffSales && (
+              <span className="ms-1.5 text-gray-400" dir="ltr">
+                ({staffSales.reduce((sum, r) => sum + r.cartons, 0)} {t("dashboard.manager.bouquets")})
+              </span>
+            )}
+          </h2>
+          <div className="max-h-72 overflow-y-auto">
+            <TopList
+              state={staffSales ? "ready" : staffSalesFailed ? "failed" : "loading"}
+              rows={(staffSales ?? []).map((r) => ({
+                key: r.id,
+                label: r.role === "telesales" ? `${r.name} (${t("nav.telesales")})` : r.name,
+                value: `${r.cartons} ${t("dashboard.manager.bouquets")} · ${r.orders} ${t("dashboard.manager.ordersUnit")}`,
+              }))}
+            />
+          </div>
         </div>
         <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
           <MiniStat
