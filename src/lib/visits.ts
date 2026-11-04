@@ -55,6 +55,22 @@ export async function createVisit(input: NewVisitInput): Promise<string> {
     .upload(path, compressed, { contentType: compressed.type, upsert: true });
   if (uploadError) throw uploadError;
 
+  // A tiny copy for the lists, which show the photo as a ~56px square — loading the full
+  // 300KB file for that was most of the app's bandwidth. Best-effort: the visit is saved
+  // either way, and a visit without a thumbnail just falls back to the full photo.
+  try {
+    const thumb = await imageCompression(input.photo, {
+      maxSizeMB: 0.03,
+      maxWidthOrHeight: 240,
+      useWebWorker: true,
+    });
+    await supabase.storage
+      .from(VISIT_PHOTOS_BUCKET)
+      .upload(thumbPath(path), thumb, { contentType: thumb.type, upsert: true });
+  } catch {
+    /* thumbnail is optional */
+  }
+
   const { data, error } = await supabase.rpc("log_visit", {
     p_client_id: input.client_id,
     p_account_id: input.account_id,
@@ -85,21 +101,44 @@ export async function updateVisit(id: string, input: VisitEditInput): Promise<vo
   if (error) throw error;
 }
 
+/** Where a photo's thumbnail lives: same folder, "_thumb" before the extension. */
+function thumbPath(photoPath: string): string {
+  return photoPath.replace(/\.jpg$/, "_thumb.jpg");
+}
+
+export interface VisitPhotoLink {
+  /** What the list shows: the small copy when there is one, else the full photo. */
+  thumb: string;
+  /** The full-size photo, opened when someone taps the picture. */
+  full: string;
+}
+
 /** Signed URLs for a whole list of visit photos in a handful of requests — the bucket is
  * private, so plain public URLs won't work, and signing them one request per photo (as
- * this used to) meant a page of 200 visits fired 200 storage calls at once. */
-export async function visitPhotoUrls(paths: string[]): Promise<Record<string, string>> {
+ * this used to) meant a page of 200 visits fired 200 storage calls at once. Signing is cheap;
+ * only the URLs an <img> actually loads cost bandwidth. */
+export async function visitPhotoLinks(paths: string[]): Promise<Record<string, VisitPhotoLink>> {
   if (!supabase || paths.length === 0) return {};
-  const out: Record<string, string> = {};
-  const CHUNK = 100;
-  for (let i = 0; i < paths.length; i += CHUNK) {
-    const { data, error } = await supabase.storage
-      .from(VISIT_PHOTOS_BUCKET)
-      .createSignedUrls(paths.slice(i, i + CHUNK), 60 * 60);
-    if (error) continue; // a missing photo just shows the grey placeholder
-    for (const d of data ?? []) if (d.path && d.signedUrl) out[d.path] = d.signedUrl;
+  const sign = async (list: string[]): Promise<Record<string, string>> => {
+    const out: Record<string, string> = {};
+    const CHUNK = 100;
+    for (let i = 0; i < list.length; i += CHUNK) {
+      const { data, error } = await supabase!.storage
+        .from(VISIT_PHOTOS_BUCKET)
+        .createSignedUrls(list.slice(i, i + CHUNK), 60 * 60);
+      if (error) continue; // a missing photo just shows the grey placeholder
+      for (const d of data ?? []) if (d.path && d.signedUrl) out[d.path] = d.signedUrl;
+    }
+    return out;
+  };
+  const withThumbs = paths.filter((p) => thumbPath(p) !== p);
+  const [full, thumbs] = await Promise.all([sign(paths), sign(withThumbs.map(thumbPath))]);
+  const links: Record<string, VisitPhotoLink> = {};
+  for (const p of paths) {
+    const f = full[p];
+    if (f) links[p] = { thumb: thumbs[thumbPath(p)] ?? f, full: f };
   }
-  return out;
+  return links;
 }
 
 /** How many of a rep's own visits "My Visits" shows — PostgREST caps any single

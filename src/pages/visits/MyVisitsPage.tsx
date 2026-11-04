@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { useAuth } from "../../lib/auth";
-import { fetchMyVisits, fetchMyVisitFollowUps, MY_VISITS_LIMIT, visitPhotoUrls } from "../../lib/visits";
+import { fetchMyVisits, fetchMyVisitFollowUps, MY_VISITS_LIMIT, visitPhotoLinks, type VisitPhotoLink } from "../../lib/visits";
 import type { Visit } from "../../lib/types";
 import { formatDateTime } from "../../lib/format";
 import UpcomingFollowUps from "../../components/UpcomingFollowUps";
@@ -14,7 +14,7 @@ export default function MyVisitsPage() {
   const { t } = useTranslation();
   const [visits, setVisits] = useState<Visit[]>([]);
   const [followUps, setFollowUps] = useState<Visit[]>([]);
-  const [photos, setPhotos] = useState<Record<string, string>>({});
+  const [photos, setPhotos] = useState<Record<string, VisitPhotoLink>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,7 +27,7 @@ export default function MyVisitsPage() {
         if (!alive) return;
         setVisits(data);
         setFollowUps(upcoming);
-        const urls = await visitPhotoUrls(data.map((v) => v.photo_path));
+        const urls = await visitPhotoLinks(data.map((v) => v.photo_path));
         if (alive) setPhotos(Object.fromEntries(data.map((v) => [v.id, urls[v.photo_path]]).filter(([, u]) => u)));
       })
       .catch((err) => setError(friendlyError(err)))
@@ -71,8 +71,9 @@ export default function MyVisitsPage() {
                 className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3"
               >
                 {photos[v.id] ? (
+                  <a href={photos[v.id].full} target="_blank" rel="noreferrer" className="shrink-0">
                   <img
-                    src={photos[v.id]}
+                    src={photos[v.id].thumb}
                     alt={v.account?.name ?? ""}
                     // Only the photos scrolled into view download — the list holds up to 200
                     // (500 for a manager) and each is ~300KB, so loading them all was most of
@@ -81,6 +82,12 @@ export default function MyVisitsPage() {
                     decoding="async"
                     className="h-14 w-14 shrink-0 rounded-lg object-cover"
                     onError={(e) => {
+                      // No thumbnail (older visit)? Fall back to the full photo once.
+                      if (!e.currentTarget.dataset.triedFull && e.currentTarget.src !== photos[v.id].full) {
+                        e.currentTarget.dataset.triedFull = "1";
+                        e.currentTarget.src = photos[v.id].full;
+                        return;
+                      }
                       // A deleted/expired photo shows a plain empty box instead of
                       // the browser's broken-image icon.
                       e.currentTarget.onerror = null;
@@ -89,6 +96,7 @@ export default function MyVisitsPage() {
                       e.currentTarget.className = "h-14 w-14 shrink-0 rounded-lg bg-gray-100";
                     }}
                   />
+                  </a>
                 ) : (
                   <div className="h-14 w-14 shrink-0 rounded-lg bg-gray-100" />
                 )}

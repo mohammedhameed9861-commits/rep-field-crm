@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Pencil } from "lucide-react";
 import { useAuth } from "../../lib/auth";
-import { fetchAllVisits, VISITS_PAGE, visitPhotoUrls } from "../../lib/visits";
+import { fetchAllVisits, VISITS_PAGE, visitPhotoLinks, type VisitPhotoLink } from "../../lib/visits";
 import { fetchStaff, setStaffTarget } from "../../lib/reps";
 import { fetchRepPerformance, type RepPerformanceRow } from "../../lib/dashboard";
 import type { Profile, Visit, VisitOutcome } from "../../lib/types";
@@ -21,7 +21,7 @@ export default function VisitsActivityPage() {
   const [performance, setPerformance] = useState<RepPerformanceRow[]>([]);
   const [performanceLoading, setPerformanceLoading] = useState(true);
   const [visits, setVisits] = useState<Visit[]>([]);
-  const [photos, setPhotos] = useState<Record<string, string>>({});
+  const [photos, setPhotos] = useState<Record<string, VisitPhotoLink>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,7 +55,7 @@ export default function VisitsActivityPage() {
       const data = await fetchAllVisits(currentFilters(), visits.length);
       setVisits((prev) => [...prev, ...data]);
       setHasMore(data.length === VISITS_PAGE);
-      const urls = await visitPhotoUrls(data.map((v) => v.photo_path));
+      const urls = await visitPhotoLinks(data.map((v) => v.photo_path));
       setPhotos((prev) => ({
         ...prev,
         ...Object.fromEntries(data.map((v) => [v.id, urls[v.photo_path]]).filter(([, u]) => u)),
@@ -73,7 +73,7 @@ export default function VisitsActivityPage() {
       const data = await fetchAllVisits(currentFilters());
       setVisits(data);
       setHasMore(data.length === VISITS_PAGE);
-      const urls = await visitPhotoUrls(data.map((v) => v.photo_path));
+      const urls = await visitPhotoLinks(data.map((v) => v.photo_path));
       setPhotos(Object.fromEntries(data.map((v) => [v.id, urls[v.photo_path]]).filter(([, u]) => u)));
     } catch (err) {
       setError(friendlyError(err));
@@ -270,8 +270,9 @@ export default function VisitsActivityPage() {
                 className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3"
               >
                 {photos[v.id] ? (
+                  <a href={photos[v.id].full} target="_blank" rel="noreferrer" className="shrink-0">
                   <img
-                    src={photos[v.id]}
+                    src={photos[v.id].thumb}
                     alt={v.account?.name ?? ""}
                     // Only the photos scrolled into view download — the list holds up to 200
                     // (500 for a manager) and each is ~300KB, so loading them all was most of
@@ -280,6 +281,12 @@ export default function VisitsActivityPage() {
                     decoding="async"
                     className="h-14 w-14 shrink-0 rounded-lg object-cover"
                     onError={(e) => {
+                      // No thumbnail (older visit)? Fall back to the full photo once.
+                      if (!e.currentTarget.dataset.triedFull && e.currentTarget.src !== photos[v.id].full) {
+                        e.currentTarget.dataset.triedFull = "1";
+                        e.currentTarget.src = photos[v.id].full;
+                        return;
+                      }
                       // A deleted/expired photo shows a plain empty box instead of
                       // the browser's broken-image icon.
                       e.currentTarget.onerror = null;
@@ -288,6 +295,7 @@ export default function VisitsActivityPage() {
                       e.currentTarget.className = "h-14 w-14 shrink-0 rounded-lg bg-gray-100";
                     }}
                   />
+                  </a>
                 ) : (
                   <div className="h-14 w-14 shrink-0 rounded-lg bg-gray-100" />
                 )}
