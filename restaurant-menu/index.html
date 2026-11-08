@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>قائمة الطعام والطلب عبر واتساب</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <h1 id="siteName"></h1>
+    <nav id="tabs" class="tabs" aria-label="المطاعم"></nav>
+  </header>
+
+  <main>
+    <p id="tagline" class="tagline"></p>
+    <div id="menu"></div>
+  </main>
+
+  <button id="cartBar" class="cart-bar" hidden>
+    <span>عرض السلة (<b id="cartCount">0</b>)</span>
+    <span id="cartTotalBar"></span>
+  </button>
+
+  <div id="sheet" class="sheet" hidden>
+    <div class="sheet-body">
+      <button class="close" id="closeSheet" aria-label="إغلاق">×</button>
+      <h2>سلتك</h2>
+      <div id="cartItems"></div>
+      <p class="total">المجموع: <b id="cartTotal"></b></p>
+
+      <form id="orderForm" novalidate>
+        <label>الاسم<input name="name" required autocomplete="name"></label>
+        <label>رقم الهاتف<input name="phone" type="tel" required autocomplete="tel" inputmode="tel"></label>
+        <label>العنوان<textarea name="address" rows="2" required></textarea></label>
+        <label>ملاحظات (اختياري)<textarea name="notes" rows="2"></textarea></label>
+        <p id="err" class="err" hidden></p>
+        <button type="submit" class="wa-btn">إرسال الطلب عبر واتساب</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
